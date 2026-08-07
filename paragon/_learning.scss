@@ -1,3 +1,5 @@
+@use "./variables" as brand;
+
 // Learning MFE-specific font overrides for course-authored content
 // This file can be imported only by frontend-app-learning and other course-delivery MFEs.
 // Other MFEs (authn, account, discussions, etc.) won't need these selectors.
@@ -47,14 +49,14 @@ h1, h2, h3, h4, h5, h6,
 .page-header,
 .page-header h1,
 .sequence-header {
-    font-family: 'Jomolhari', 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    font-family: brand.$font-family-course-content !important;
 }
 
 // Increase font sizes for section and subsection titles (since Jomolhari can look small)
 .section-title {
-    font-size: 1.35rem;
+    font-size: brand.$learning-section-title-font-size;
 }
 
 .sequence-title {
-    font-size: 1.25rem;
+    font-size: brand.$learning-sequence-title-font-size;
 }

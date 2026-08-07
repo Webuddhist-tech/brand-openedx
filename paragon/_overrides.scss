@@ -1,3 +1,5 @@
+@use "./variables" as brand;
+
 // Use this file to define style overrides for @edx/paragon
 // This file is included after all Paragon styles, but should generally avoid using private mixins in Paragon.
 
@@ -6,9 +8,9 @@
 // English/Latin characters fall through to the explicit sans-serif fallbacks (no system-ui).
 // These overrides apply globally to ALL MFEs.
 :root {
-    --pgn-typography-font-family-sans-serif: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --pgn-typography-font-family-base: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --pgn-typography-headings-font-family: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --pgn-typography-input-btn-font-family: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-family-sans-serif: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --pgn-typography-font-family-sans-serif: #{brand.$font-family-sans-serif};
+    --pgn-typography-font-family-base: #{brand.$font-family-base};
+    --pgn-typography-headings-font-family: #{brand.$font-family-base};
+    --pgn-typography-input-btn-font-family: #{brand.$font-family-base};
+    --font-family-sans-serif: #{brand.$font-family-sans-serif};
 }

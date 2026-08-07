@@ -1,7 +1,115 @@
 // Use this file to set SASS variables for @edx/paragon
 // See _variables.scss in https://github.com/openedx/paragon/blob/master/scss/core/ for reference
 
+// WeBuddhist Academy brand palette
+$color-saffron: #E8873A;
+$color-espresso: #1C0A00;
+$color-deep-saffron: #6B3300;
+$color-dharma-teal: #0C4E68;
+
+$color-white: #FFFFFF;
+$color-parchment: #FDF6EC;
+$color-sand: #F0E4CC;
+$color-dusk: #E0D0B0;
+$color-bark: #C4A882;
+$color-deep-brown: #5A2D0C;
+$color-warm-gray: #4A4035;
+
+// Semantic colors. These names match the older Indigo/Paragon Sass convention.
+$primary: $color-deep-saffron;
+$primary-light: $color-parchment;
+$secondary: $color-dharma-teal;
+$accent: $color-saffron;
+$primary-contrast: $color-white;
+$secondary-contrast: $color-white;
+$accent-contrast: $color-espresso;
+$text-color: $color-espresso;
+$text-color-primary: $color-deep-brown;
+$text-color-light: $color-warm-gray;
+$body-bg: $color-white;
+$card-bg: $color-parchment;
+$section-bg: $color-sand;
+$border-color: $color-dusk;
+$link-color: $color-dharma-teal;
+
+// Interactive states
+$primary-hover: #8B4400;
+$primary-active: #4F2500;
+$secondary-hover: #0E6080;
+$secondary-active: #093C52;
+$accent-hover: #C9712A;
+$accent-active: #B05E1A;
+$ghost-hover-bg: rgba($color-dharma-teal, 0.08);
+$ghost-active-bg: rgba($color-dharma-teal, 0.16);
+$interaction-transition: 150ms ease-out;
+
+// Status colors
+$success-bg: #E8F5EC;
+$success-text: #1A5C2A;
+$error-bg: #FDEAEA;
+$error-text: #8B0000;
+$warning-bg: #FEF3E2;
+$warning-text: #5C3000;
+$info-bg: #E3F1F7;
+$info-text: $color-dharma-teal;
+
 // Noto Serif Tibetan activates only for Tibetan chars (unicode-range: U+0F00-0FFF).
 // English/Latin chars fall through to the explicit sans-serif fallbacks below.
-$font-family-sans-serif: 'Noto Serif Tibetan', "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-noto-serif-tibetan: 'Noto Serif Tibetan';
+$font-family-jomolhari: 'Jomolhari';
+$font-family-brand-display: "Cormorant Garamond", $font-family-jomolhari, Georgia, serif;
+$font-family-brand-ui: "DM Sans", $font-family-noto-serif-tibetan, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-family-sans-serif: $font-family-noto-serif-tibetan, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 $font-family-base: $font-family-sans-serif;
+$font-family-course-content: $font-family-jomolhari, $font-family-sans-serif;
+
+// Brand type scale
+$font-size-display: 72px;
+$font-size-h1: 48px;
+$font-size-h2: 36px;
+$font-size-h3: 24px;
+$font-size-h4: 18px;
+$font-size-body: 18px;
+$font-size-caption: 14px;
+$font-size-label: 12px;
+$font-weight-display: 300;
+$font-weight-h1: 300;
+$font-weight-h2: 400;
+$font-weight-h3: 600;
+$font-weight-h4: 600;
+$font-weight-body: 400;
+$font-weight-caption: 400;
+$font-weight-label: 600;
+$line-height-display: 1.08;
+$line-height-h1: 1.12;
+$line-height-h2: 1.18;
+$line-height-h3: 1.28;
+$line-height-h4: 1.35;
+$line-height-body: 1.7;
+$line-height-caption: 1.55;
+$line-height-label: 1.4;
+
+// 4px spacing scale
+$spacing-1: 4px;
+$spacing-2: 8px;
+$spacing-3: 12px;
+$spacing-4: 16px;
+$spacing-6: 24px;
+$spacing-8: 32px;
+$spacing-12: 48px;
+$spacing-16: 64px;
+
+// Shape and accessibility
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+$border-radius-full: 9999px;
+$focus-ring-color: $color-dharma-teal;
+$focus-ring-color-dark: $color-parchment;
+$focus-ring-width: 3px;
+$focus-ring-offset: 3px;
+$minimum-touch-target: 44px;
+
+$learning-section-title-font-size: 1.35rem;
+$learning-sequence-title-font-size: 1.25rem;
