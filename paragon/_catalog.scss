@@ -1,1 +1,421 @@
 // Catalog MFE-specific overrides.
+
+@use "./variables" as brand;
+
+// Schools and partners carousel (homepage banner slot).
+//
+// Layout note: the track is deliberately wider than its viewport — it holds
+// --pc-window logos while only --pc-per-view of them fit, leaving one
+// off-screen either side to slide in from. Those two counts and the slide
+// duration are set as inline custom properties by the React component, so
+// nothing here needs measuring in JS and it stays correct on resize.
+.partner-carousel {
+  padding: brand.$spacing-12 0;
+  background: brand.$body-bg;
+  font-family: brand.$font-family-brand-ui;
+
+  // The section eyebrow, matching .course-categories__title. The font-family
+  // above is what puts it in the UI font: this is a <p>, so without it the
+  // title inherits the body stack, whose Latin fallback is a system face
+  // rather than the brand's.
+  &__title {
+    text-align: center;
+    font-size: brand.$font-size-h4;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: brand.$text-color-muted;
+    margin-bottom: brand.$spacing-8;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-3;
+    width: 85%;
+    margin: 0 auto;
+    padding: 0 brand.$spacing-8;
+  }
+
+  &__arrow {
+    flex: 0 0 auto;
+    width: brand.$minimum-touch-target;
+    height: brand.$minimum-touch-target;
+    border-radius: brand.$border-radius-full;
+    border: 1px solid brand.$border-color;
+    background: brand.$color-white;
+    color: brand.$text-color-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background brand.$interaction-transition,
+      border-color brand.$interaction-transition,
+      color brand.$interaction-transition;
+
+    &:hover {
+      background: brand.$primary;
+      border-color: brand.$primary;
+      color: brand.$primary-contrast;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  &__viewport {
+    overflow: hidden;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__track {
+    display: flex;
+    align-items: center;
+    width: calc(100% * var(--pc-window) / var(--pc-per-view));
+    transition: transform var(--pc-duration) cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__item {
+    flex: 0 0 calc(100% / var(--pc-window));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: brand.$spacing-3 brand.$spacing-6;
+    border: 1px solid transparent;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$color-white;
+    overflow: hidden;
+    line-height: 0; // a plain logo tile, not a text link
+    transition: border-color brand.$interaction-transition;
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: -2px;
+      border-color: brand.$color-bark;
+    }
+  }
+
+  &__logo {
+    width: 100%;
+    height: 6.5rem;
+    object-fit: contain;
+    transition: transform 280ms cubic-bezier(0.34, 1.35, 0.64, 1);
+
+    .partner-carousel__item:hover &,
+    .partner-carousel__item:focus-visible & {
+      transform: scale(1.1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner-carousel__track,
+    .partner-carousel__logo {
+      transition-duration: 0s;
+    }
+  }
+}
+
+// Course categories: tabbed course grid on the homepage.
+.course-categories {
+  width: 85%;
+  margin: 0 auto;
+  padding: brand.$spacing-12 brand.$spacing-8;
+  font-family: brand.$font-family-brand-ui;
+
+  &__title {
+    text-align: center;
+    // This is an h2, and the brand points Paragon's
+    // --pgn-typography-headings-font-family at the display serif, which every
+    // h1–h6 picks up. That beats the UI font inherited from the section above,
+    // so it has to be restated here: the design sets this label in the UI
+    // font, not the display one. (The sibling .partner-carousel__title is a
+    // <p>, which is why it needs no such override.)
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-h4;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: brand.$text-color-muted;
+    margin-bottom: brand.$spacing-8;
+  }
+
+  &__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: brand.$spacing-2;
+    margin-bottom: brand.$spacing-8;
+  }
+
+  &__tab {
+    // Sized from the design rather than the spacing scale, which has nothing
+    // at 7px/18px. That lands the pill around 35px tall — comfortably over the
+    // 24px WCAG 2.5.8 minimum, but under the brand's 44px target, so the target
+    // is restored below for coarse pointers, where it actually bites.
+    padding: 7px 18px;
+    border: 1.5px solid brand.$border-color;
+    border-radius: brand.$border-radius-full;
+    background: transparent;
+    color: brand.$text-color-primary;
+    font-size: brand.$font-size-caption;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background brand.$interaction-transition,
+      border-color brand.$interaction-transition,
+      color brand.$interaction-transition;
+
+    &:hover {
+      border-color: brand.$color-bark;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+
+    &--active {
+      background: brand.$accent;
+      border-color: brand.$accent;
+      color: brand.$accent-contrast;
+
+      &:hover {
+        background: brand.$accent-hover;
+        border-color: brand.$accent-hover;
+      }
+    }
+
+    // Touch and stylus input, where a fingertip-sized target matters. Mouse
+    // and trackpad keep the design's pill.
+    @media (pointer: coarse) {
+      min-height: brand.$minimum-touch-target;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 1fr;
+    gap: brand.$spacing-6;
+
+    // Each course card is keyed by course ID (see CourseCategories.tsx), so
+    // switching tabs unmounts the old cards and mounts an entirely new set —
+    // this plays on that mount, no JS trigger needed. Staggered per column so
+    // the grid fills in left-to-right rather than popping in all at once;
+    // capped at 4 because a 5th+ card reusing the 1st card's delay reads as a
+    // stutter rather than a continuation of the wave.
+    > .course-card {
+      animation: course-card-enter 0.4s ease-out both;
+
+      @for $i from 1 through 4 {
+        &:nth-child(4n + #{$i}) {
+          animation-delay: 0.06s * ($i - 1);
+        }
+      }
+    }
+  }
+
+  @keyframes course-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__grid > .course-card {
+      animation: none;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    margin-top: brand.$spacing-8;
+  }
+
+  // Paragon's Button is not brand-themed (the brand package overrides only
+  // typography custom properties), so this is styled directly. A link rather
+  // than a button, so it keeps middle-click and open-in-new-tab.
+  &__view-all {
+    display: inline-flex;
+    align-items: center;
+    min-height: brand.$minimum-touch-target;
+    padding: brand.$spacing-2 brand.$spacing-6;
+    border-radius: brand.$border-radius-full;
+    background: brand.$primary;
+    color: brand.$primary-contrast;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-label;
+    text-decoration: none;
+    transition: background brand.$interaction-transition;
+
+    &:hover,
+    &:focus {
+      background: brand.$primary-hover;
+      color: brand.$primary-contrast;
+      text-decoration: none;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  @media (max-width: 1080px) {
+    &__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 760px) {
+    &__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 460px) {
+    &__grid { grid-template-columns: 1fr; }
+  }
+}
+
+// Course card. Shared by the homepage category grid and the catalog listing,
+// so it is styled here rather than inside either section.
+.course-card.pgn__card {
+  background: brand.$color-white;
+  border: 1px solid brand.$border-color;
+  border-radius: brand.$border-radius-lg;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(28, 10, 0, 0.06);
+  transition:
+    box-shadow brand.$interaction-transition,
+    transform brand.$interaction-transition,
+    border-color brand.$interaction-transition;
+
+  &:hover {
+    border-color: brand.$color-bark;
+    box-shadow: 0 10px 26px rgba(28, 10, 0, 0.11);
+    transform: translateY(-3px);
+  }
+
+  &:focus-visible {
+    outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+    outline-offset: 2px;
+  }
+
+  // Paragon's own card CSS loads separately from this file, so these need the
+  // extra class to win on specificity.
+  //
+  // Paragon caps the vertical wrapper at --pgn-size-card-image-vertical-max-height
+  // (140px), and the image below inherits that cap, so the image height only
+  // takes effect once the cap is lifted. Lifting it also lets the wrapper grow
+  // around the badge, which is what keeps the badge off the text beneath it.
+  // The badge is a child of this wrapper rather than of the card, so it is the
+  // wrapper — not the card's own `d-flex` — that has to stack image then badge
+  // in a column.
+  .pgn__card-wrapper-image-cap.vertical {
+    display: flex;
+    flex-direction: column;
+    max-height: none;
+  }
+
+  .pgn__card-image-cap {
+    height: 10rem;
+    max-height: none;
+    object-fit: cover;
+    background: brand.$section-bg;
+  }
+
+  // The wrapper is in this selector purely for specificity: Paragon styles the
+  // badge with `.pgn__card .pgn__card-wrapper-image-cap .pgn__card-logo-cap`,
+  // and Paragon's stylesheet is linked separately from this one, so matching
+  // its specificity would leave the winner down to load order.
+  .pgn__card-wrapper-image-cap .pgn__card-logo-cap {
+    // Paragon positions the badge absolutely against the image wrapper. Put it
+    // back in normal flow so the negative top margin lifts it to straddle the
+    // image and the text below is pushed down by it, rather than the badge
+    // floating over the text. It still needs to be a positioned element
+    // (relative, not static) with an explicit z-index so it reliably paints
+    // in front of the image rather than depending on DOM paint order.
+    // Display is left to Paragon, which keeps the badge hidden until its
+    // onLoad fires and then switches it to block.
+    position: relative;
+    z-index: 1;
+    // Nudged up as a relative offset rather than a bigger negative top margin,
+    // so the badge shifts on its own: a margin change would drag the provider
+    // name and title up with it.
+    top: -2px;
+    // The wrapper above is a flex column, which makes this badge a flex item.
+    // Without pinning flex-grow/shrink to 0, a flex item's declared size is
+    // only a hint the flex algorithm can stretch past — flex: 0 0 auto and
+    // align-self: flex-start are what actually make the fixed box below stick,
+    // matching the reference design's .cc-logo.
+    flex: 0 0 auto;
+    align-self: flex-start;
+    box-sizing: border-box;
+    // The inline-start margin is the badge's only horizontal constraint (it is
+    // align-self: flex-start in a column), so shrinking it moves the badge left
+    // without touching anything else in the card.
+    margin: -1.5rem 0 brand.$spacing-3 -10px;
+    width: 6rem;
+    height: 3.25rem;
+    padding: 7px 10px;
+    background: brand.$color-white;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    box-shadow: 0 2px 10px rgba(28, 10, 0, 0.1);
+    object-fit: contain;
+  }
+
+  // Written out rather than nested with `&__`, which would resolve against
+  // the compound `.course-card.pgn__card` selector above.
+  .course-card__meta {
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-1;
+    padding: 0 brand.$spacing-3 brand.$spacing-4;
+  }
+
+  .course-card__provider {
+    margin: 0;
+    font-size: brand.$font-size-caption;
+    font-weight: 700;
+    line-height: 1.35;
+    color: brand.$text-color;
+  }
+
+  .course-card__title {
+    margin: 0;
+    font-size: brand.$font-size-caption;
+    font-weight: 500;
+    line-height: 1.5;
+    color: brand.$text-color-primary;
+    text-wrap: pretty;
+    // Reserve space for 3 lines regardless of actual length, so card height
+    // is constant across categories instead of tracking the longest title in
+    // whichever tab is active. min-height (not height) lets a genuinely short
+    // title's box still shrink-wrap if line-height rounds it under 3 lines,
+    // while never growing past 3 — the clamp below cuts off anything longer.
+    min-height: calc(1.5em * 3);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .pgn__card-footer {
+    font-size: brand.$font-size-caption;
+    color: brand.$color-deep-saffron;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0s;
+  }
+}

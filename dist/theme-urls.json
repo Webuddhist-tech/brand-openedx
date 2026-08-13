@@ -1,0 +1,10 @@
+{
+  "themeUrls": {
+    "core": {
+      "paths": {
+        "default": "./core.css",
+        "minified": "./core.min.css"
+      }
+    }
+  }
+}

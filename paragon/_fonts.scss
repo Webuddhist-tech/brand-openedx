@@ -1,5 +1,26 @@
 @use "./variables" as brand;
 
+// DM Sans - the brand UI typeface. Variable font, so one file covers every
+// weight. Deliberately has no unicode-range: it should apply to all Latin
+// text, leaving Tibetan characters to fall through to the Tibetan faces
+// declared below, which are restricted to their own Unicode range.
+@font-face {
+    font-family: 'DM Sans';
+    src: url('./fonts/DM_Sans/DMSans-Variable.woff2') format('woff2-variations');
+    font-weight: 100 1000;
+    font-style: normal;
+    font-display: swap;
+}
+
+// Cormorant Garamond - the brand display typeface, used for headings.
+@font-face {
+    font-family: 'Cormorant Garamond';
+    src: url('./fonts/Cormorant_Garamond/CormorantGaramond-Variable.woff2') format('woff2-variations');
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 // Noto Serif Tibetan - for platform UI/static text (Tibetan Unicode range only)
 @font-face {
     font-family: brand.$font-family-noto-serif-tibetan;

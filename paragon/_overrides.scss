@@ -3,14 +3,21 @@
 // Use this file to define style overrides for @edx/paragon
 // This file is included after all Paragon styles, but should generally avoid using private mixins in Paragon.
 
-// Override Paragon CSS custom properties to use Noto Serif Tibetan for Tibetan chars.
-// Noto Serif Tibetan has unicode-range: U+0F00-0FFF, so it only activates for Tibetan characters.
-// English/Latin characters fall through to the explicit sans-serif fallbacks (no system-ui).
+// Override Paragon CSS custom properties to use the brand typefaces: DM Sans
+// for UI text and Cormorant Garamond for headings. Both stacks list Noto Serif
+// Tibetan after the brand face, and Noto Serif Tibetan has
+// unicode-range: U+0F00-0FFF, so Tibetan characters still render in it while
+// Latin characters use the brand face.
 // These overrides apply globally to ALL MFEs.
+//
+// NOTE: this package has no build step, and dist/core.css and dist/core.min.css
+// are committed artifacts that webpack loads as a separate theme entry point.
+// Any change here must be mirrored into both of those files, or the two will
+// disagree and whichever loads last wins.
 :root {
-    --pgn-typography-font-family-sans-serif: #{brand.$font-family-sans-serif};
-    --pgn-typography-font-family-base: #{brand.$font-family-base};
-    --pgn-typography-headings-font-family: #{brand.$font-family-base};
-    --pgn-typography-input-btn-font-family: #{brand.$font-family-base};
-    --font-family-sans-serif: #{brand.$font-family-sans-serif};
+    --pgn-typography-font-family-sans-serif: #{brand.$font-family-brand-ui};
+    --pgn-typography-font-family-base: #{brand.$font-family-brand-ui};
+    --pgn-typography-headings-font-family: #{brand.$font-family-brand-display};
+    --pgn-typography-input-btn-font-family: #{brand.$font-family-brand-ui};
+    --font-family-sans-serif: #{brand.$font-family-brand-ui};
 }
