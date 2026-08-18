@@ -2,22 +2,27 @@
 
 @use "./variables" as brand;
 
-// Schools and partners carousel (homepage banner slot).
-//
-// Layout note: the track is deliberately wider than its viewport — it holds
-// --pc-window logos while only --pc-per-view of them fit, leaving one
-// off-screen either side to slide in from. Those two counts and the slide
-// duration are set as inline custom properties by the React component, so
-// nothing here needs measuring in JS and it stays correct on resize.
+// --pc-per-view lives here, not set inline like the other vars, so the media
+// queries below can override it — an inline style always beats a media query.
 .partner-carousel {
   padding: brand.$spacing-12 0;
   background: brand.$body-bg;
   font-family: brand.$font-family-brand-ui;
+  --pc-per-view: 4;
 
-  // The section eyebrow, matching .course-categories__title. The font-family
-  // above is what puts it in the UI font: this is a <p>, so without it the
-  // title inherits the body stack, whose Latin fallback is a system face
-  // rather than the brand's.
+  @media (max-width: 960px) {
+    --pc-per-view: 3;
+  }
+
+  @media (max-width: 760px) {
+    --pc-per-view: 2;
+  }
+
+  @media (max-width: 460px) {
+    --pc-per-view: 1;
+  }
+
+  // Restates the UI font so this <p> doesn't fall back to the body stack.
   &__title {
     text-align: center;
     font-size: brand.$font-size-h4;
@@ -29,13 +34,34 @@
     scroll-margin-top: calc(50vh - 15rem); // for proper alignment of schools and partners redirect link.
   }
 
+  // Capped max-width, not a percentage, so the gutter shrinks with the
+  // viewport instead of wasting space small or growing forever large.
   &__row {
     display: flex;
     align-items: center;
     gap: brand.$spacing-3;
-    width: 85%;
+    max-width: 75rem;
     margin: 0 auto;
     padding: 0 brand.$spacing-8;
+
+    @media (max-width: 900px) {
+      padding: 0 brand.$spacing-6;
+    }
+
+    @media (max-width: 600px) {
+      gap: brand.$spacing-2;
+      padding: 0 brand.$spacing-4;
+    }
+
+    // Wider than .course-categories by the arrows' width, so the logos still
+    // line up with the grid below.
+    @media (min-width: 1600px) {
+      max-width: 97rem;
+    }
+
+    @media (min-width: 2000px) {
+      max-width: 104.5rem;
+    }
   }
 
   &__arrow {
@@ -122,19 +148,32 @@
 
 // Course categories: tabbed course grid on the homepage.
 .course-categories {
-  width: 85%;
+  // Same max-width/gutter approach as .partner-carousel__row.
+  max-width: 75rem;
   margin: 0 auto;
   padding: brand.$spacing-12 brand.$spacing-8;
   font-family: brand.$font-family-brand-ui;
 
+  @media (max-width: 900px) {
+    padding: brand.$spacing-12 brand.$spacing-6;
+  }
+
+  @media (max-width: 600px) {
+    padding: brand.$spacing-8 brand.$spacing-4;
+  }
+
+  @media (min-width: 1600px) {
+    max-width: 90rem;
+  }
+
+  @media (min-width: 2000px) {
+    max-width: 97.5rem;
+  }
+
   &__title {
     text-align: center;
-    // This is an h2, and the brand points Paragon's
-    // --pgn-typography-headings-font-family at the display serif, which every
-    // h1–h6 picks up. That beats the UI font inherited from the section above,
-    // so it has to be restated here: the design sets this label in the UI
-    // font, not the display one. (The sibling .partner-carousel__title is a
-    // <p>, which is why it needs no such override.)
+    // Overrides Paragon's serif heading font back to the UI font; the
+    // sibling .partner-carousel__title is a <p> so it needs no such override.
     font-family: brand.$font-family-brand-ui;
     font-size: brand.$font-size-h4;
     font-weight: brand.$font-weight-label;
@@ -153,10 +192,8 @@
   }
 
   &__tab {
-    // Sized from the design rather than the spacing scale, which has nothing
-    // at 7px/18px. That lands the pill around 35px tall — comfortably over the
-    // 24px WCAG 2.5.8 minimum, but under the brand's 44px target, so the target
-    // is restored below for coarse pointers, where it actually bites.
+    // Custom sizing (spacing scale has nothing at 7px/18px) lands this ~35px
+    // tall — over the 24px WCAG minimum, restored to 44px below for touch.
     padding: 7px 18px;
     border: 1.5px solid brand.$border-color;
     border-radius: brand.$border-radius-full;
@@ -190,8 +227,6 @@
       }
     }
 
-    // Touch and stylus input, where a fingertip-sized target matters. Mouse
-    // and trackpad keep the design's pill.
     @media (pointer: coarse) {
       min-height: brand.$minimum-touch-target;
     }
@@ -203,12 +238,8 @@
     grid-auto-rows: 1fr;
     gap: brand.$spacing-6;
 
-    // Each course card is keyed by course ID (see CourseCategories.tsx), so
-    // switching tabs unmounts the old cards and mounts an entirely new set —
-    // this plays on that mount, no JS trigger needed. Staggered per column so
-    // the grid fills in left-to-right rather than popping in all at once;
-    // capped at 4 because a 5th+ card reusing the 1st card's delay reads as a
-    // stutter rather than a continuation of the wave.
+    // Cards are keyed by course ID, so switching tabs remounts a new set and
+    // replays this. Staggered per column, capped at 4 to avoid an obvious repeat.
     > .course-card {
       animation: course-card-enter 0.4s ease-out both;
 
@@ -244,9 +275,7 @@
     margin-top: brand.$spacing-8;
   }
 
-  // Paragon's Button is not brand-themed (the brand package overrides only
-  // typography custom properties), so this is styled directly. A link rather
-  // than a button, so it keeps middle-click and open-in-new-tab.
+  // A link, not a Button, to keep middle-click/open-in-new-tab.
   &__view-all {
     display: inline-flex;
     align-items: center;
@@ -286,8 +315,7 @@
   }
 }
 
-// Course card. Shared by the homepage category grid and the catalog listing,
-// so it is styled here rather than inside either section.
+// Course card. Shared by the homepage grid and the catalog listing.
 .course-card.pgn__card {
   background: brand.$color-white;
   border: 1px solid brand.$border-color;
@@ -310,16 +338,8 @@
     outline-offset: 2px;
   }
 
-  // Paragon's own card CSS loads separately from this file, so these need the
-  // extra class to win on specificity.
-  //
-  // Paragon caps the vertical wrapper at --pgn-size-card-image-vertical-max-height
-  // (140px), and the image below inherits that cap, so the image height only
-  // takes effect once the cap is lifted. Lifting it also lets the wrapper grow
-  // around the badge, which is what keeps the badge off the text beneath it.
-  // The badge is a child of this wrapper rather than of the card, so it is the
-  // wrapper — not the card's own `d-flex` — that has to stack image then badge
-  // in a column.
+  // Extra class needed to beat Paragon's own card CSS on specificity; lifts
+  // Paragon's image-height cap so the wrapper can grow around the badge.
   .pgn__card-wrapper-image-cap.vertical {
     display: flex;
     flex-direction: column;
@@ -333,37 +353,20 @@
     background: brand.$section-bg;
   }
 
-  // The wrapper is in this selector purely for specificity: Paragon styles the
-  // badge with `.pgn__card .pgn__card-wrapper-image-cap .pgn__card-logo-cap`,
-  // and Paragon's stylesheet is linked separately from this one, so matching
-  // its specificity would leave the winner down to load order.
+  // Wrapper included purely to match Paragon's own selector specificity.
   .pgn__card-wrapper-image-cap .pgn__card-logo-cap {
-    // Paragon positions the badge absolutely against the image wrapper. Put it
-    // back in normal flow so the negative top margin lifts it to straddle the
-    // image and the text below is pushed down by it, rather than the badge
-    // floating over the text. It still needs to be a positioned element
-    // (relative, not static) with an explicit z-index so it reliably paints
-    // in front of the image rather than depending on DOM paint order.
-    // Display is left to Paragon, which keeps the badge hidden until its
-    // onLoad fires and then switches it to block.
+    // Un-absolutes Paragon's badge so it sits in flow and pushes the text
+    // down; kept relative + z-index so it still paints above the image.
     position: relative;
     z-index: 1;
-    // Nudged up as a relative offset rather than a bigger negative top margin,
-    // so the badge shifts on its own: a margin change would drag the provider
-    // name and title up with it.
+    // Relative offset, not a bigger margin, so only the badge shifts.
     top: -2px;
-    // The wrapper above is a flex column, which makes this badge a flex item.
-    // Without pinning flex-grow/shrink to 0, a flex item's declared size is
-    // only a hint the flex algorithm can stretch past — flex: 0 0 auto and
-    // align-self: flex-start are what actually make the fixed box below stick,
-    // matching the reference design's .cc-logo.
+    // Pins the badge's size in the flex column; without this it would stretch.
     flex: 0 0 auto;
     align-self: flex-start;
     box-sizing: border-box;
-    // The inline-start margin is the badge's only horizontal constraint (it is
-    // align-self: flex-start in a column), so shrinking it moves the badge left
-    // without touching anything else in the card.
-    margin: -1.5rem 0 brand.$spacing-3 -10px;
+    // Bottom margin matches .course-card__meta's gap for a consistent rhythm.
+    margin: -1.5rem 0 brand.$spacing-2 -10px;
     width: 6rem;
     height: 3.25rem;
     padding: 7px 10px;
@@ -374,13 +377,13 @@
     object-fit: contain;
   }
 
-  // Written out rather than nested with `&__`, which would resolve against
-  // the compound `.course-card.pgn__card` selector above.
+  // Written out rather than nested: &__ would resolve against the compound
+  // selector above.
   .course-card__meta {
     display: flex;
     flex-direction: column;
-    gap: brand.$spacing-1;
-    padding: 0 brand.$spacing-3 brand.$spacing-4;
+    gap: brand.$spacing-2;
+    padding: 0 brand.$spacing-3 brand.$spacing-4 brand.$spacing-4;
   }
 
   .course-card__provider {
@@ -393,17 +396,16 @@
 
   .course-card__title {
     margin: 0;
+    // Author-written content, so Jomolhari per the site's font policy.
+    font-family: brand.$font-family-jomolhari, brand.$font-family-brand-ui;
     font-size: brand.$font-size-caption;
     font-weight: 500;
-    line-height: 1.5;
+    // Tall enough to clear Jomolhari's stacked Tibetan glyphs without clipping.
+    line-height: 2;
     color: brand.$text-color-primary;
     text-wrap: pretty;
-    // Reserve space for 3 lines regardless of actual length, so card height
-    // is constant across categories instead of tracking the longest title in
-    // whichever tab is active. min-height (not height) lets a genuinely short
-    // title's box still shrink-wrap if line-height rounds it under 3 lines,
-    // while never growing past 3 — the clamp below cuts off anything longer.
-    min-height: calc(1.5em * 3);
+    // Reserves 3 lines so card height stays constant; must match line-height.
+    min-height: calc(2em * 3);
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -419,4 +421,457 @@
   @media (prefers-reduced-motion: reduce) {
     transition-duration: 0s;
   }
+}
+
+// Home page hero (homepage banner slot). Two columns: greeting/search vs. a
+// floating card pair. CSS drives the bob and rest positions; React only flags
+// which card is in front.
+.home-hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  max-width: 1200px;
+  min-height: 480px;
+  margin: 0 auto;
+  padding: 60px 40px 40px;
+  background: brand.$body-bg;
+  font-family: brand.$font-family-brand-ui;
+  color: brand.$color-espresso;
+
+  // Card width/gap drive sizing, offset, and the floor below, so the overlap
+  // stays fixed as the size changes.
+  --hero-card-width: 280px;
+  --hero-card-gap: 11px;
+
+  &__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: brand.$font-size-label;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: brand.$color-deep-saffron;
+  }
+
+  &__eyebrow-rule {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 2px;
+    background: brand.$color-saffron;
+  }
+
+  &__title {
+    // One fluid clamp covers signed-in/out sizes and both breakpoints, so the
+    // heading never jumps.
+    font-family: brand.$font-family-brand-display;
+    font-size: clamp(42px, 5.2vw, brand.$font-size-display);
+    font-weight: brand.$font-weight-display;
+    line-height: 1.06;
+    margin-bottom: 14px;
+  }
+
+  &__title-accent {
+    // Breaks the name onto its own line via CSS, not a <br> in the string, so
+    // translations can reorder the greeting freely.
+    display: block;
+    font-style: italic;
+    font-weight: brand.$font-weight-display;
+    color: brand.$color-deep-saffron;
+  }
+
+  // Paragon SearchField restyled as one pill; submit control kept (not the
+  // design's decorative icon) so it stays keyboard-operable.
+  &__search {
+    max-width: 420px;
+    margin: 28px 0 0;
+
+    .pgn__searchfield {
+      // Clips Paragon's internal nodes to the pill's radius, since not all of
+      // them inherit it.
+      overflow: hidden;
+      border: 2px solid brand.$color-deep-brown;
+      border-radius: brand.$border-radius-full;
+      background: brand.$color-white;
+      box-shadow: 0 4px 20px rgba(28, 10, 0, .07);
+      transition: border-color brand.$interaction-transition, box-shadow .2s ease;
+
+      &:hover {
+        border-color: brand.$color-espresso;
+      }
+
+      &:focus-within {
+        border-color: brand.$color-deep-saffron;
+        box-shadow: 0 0 0 3px rgba(107, 51, 0, .26), 0 6px 24px rgba(28, 10, 0, .09);
+      }
+
+      // Paragon's own focus ring (square double-border ::after) is disabled in
+      // favor of the rounded :focus-within ring above. :not() kept from
+      // Paragon's selector so this doesn't depend on stylesheet load order.
+      &.has-focus:not(.pgn__searchfield--external)::after {
+        content: none;
+      }
+
+      // Same fix, for Paragon's inner focus shadow.
+      &.has-focus:not(.pgn__searchfield--external) .pgn__searchfield_wrapper {
+        box-shadow: none;
+      }
+    }
+
+    .pgn__searchfield-form,
+    // Only used when submitButtonLocation is "external" (not the case here);
+    // kept for the same stray border.
+    .pgn__searchfield_wrapper {
+      // Small inset keeps the leading icon and focus outline clear of the
+      // pill's now-clipped corners.
+      padding: 0 4px;
+      border: 0;
+      border-radius: inherit;
+      background: transparent;
+    }
+
+    // Matches Paragon's own two-class selector so this wins on specificity
+    // instead of depending on stylesheet load order.
+    .pgn__searchfield .form-control {
+      font-family: brand.$font-family-brand-ui;
+      font-size: 16px;
+      color: brand.$color-espresso;
+      background: transparent;
+      border: 0;
+      height: auto;
+      padding: brand.$spacing-4 20px;
+
+      &::placeholder {
+        color: brand.$color-clay;
+      }
+    }
+
+    .pgn__searchfield .pgn__searchfield__button,
+    .pgn__searchfield .pgn__searchfield__iconbutton-submit {
+      // Ahead of the input, matching the design's leading icon.
+      order: -1;
+      color: brand.$color-clay;
+      background: transparent;
+      border: 0;
+
+      &:hover,
+      &:focus {
+        color: brand.$color-deep-saffron;
+        background: transparent;
+      }
+
+      // Swaps Paragon's square double-border focus ring for a rounded one
+      // that fits the pill.
+      &:focus-visible {
+        outline: 2px solid brand.$color-deep-saffron;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-full;
+
+        &::after {
+          content: none;
+        }
+      }
+    }
+  }
+
+  &__visual {
+    position: relative;
+    height: 360px;
+    // No max-width: cards set their own offset from the right edge, so this
+    // just fills the column. min-width is the pair's own width, so cards
+    // can't spill into the text on mid-size screens.
+    min-width: calc(var(--hero-card-width) * 2 + var(--hero-card-gap));
+  }
+
+  &__card {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: var(--hero-card-width);
+    // Not overflow:hidden — the ribbon needs to hang past the corner; the
+    // banner clips itself instead, on &__card-image below.
+    background: brand.$color-white;
+    border: 1px solid brand.$color-dusk;
+    border-radius: 14px;
+    box-shadow: 0 14px 44px rgba(28, 10, 0, .16);
+    text-decoration: none;
+    color: inherit;
+    // transform is left to the bob animation; the hover lift below uses
+    // translate/scale instead, which compose with it rather than fighting it.
+    transition:
+      top .9s cubic-bezier(.4, 0, .2, 1),
+      left .9s cubic-bezier(.4, 0, .2, 1),
+      right .9s cubic-bezier(.4, 0, .2, 1),
+      opacity .5s,
+      border-color brand.$interaction-transition,
+      box-shadow brand.$interaction-transition,
+      translate brand.$interaction-transition,
+      scale brand.$interaction-transition;
+
+    &:hover {
+      // Restates color/no-underline to beat Bootstrap's a:hover, which wins
+      // on specificity otherwise.
+      color: inherit;
+      text-decoration: none;
+      border-color: brand.$color-bark;
+      box-shadow: 0 18px 50px rgba(28, 10, 0, .22);
+      // Same lift as the grid cards, just further; translate/scale compose
+      // with the bob's transform instead of overwriting it.
+      translate: 0 -6px;
+      scale: 1.02;
+      // Pauses the bob so the lift reads as deliberate.
+      animation-play-state: paused;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$color-espresso;
+      outline-offset: 2px;
+    }
+
+    // Anchored to a shared right edge, not opposite edges, so the gap stays
+    // fixed instead of scaling with the container. Rotation lives in each
+    // position's own keyframes since it shares the transform with the bob.
+    &--front {
+      top: 60px;
+      left: auto;
+      right: calc(var(--hero-card-width) + var(--hero-card-gap));
+      z-index: 2;
+      animation: home-hero-float-front 6s ease-in-out infinite;
+    }
+
+    &--back {
+      top: 20px;
+      left: auto;
+      right: 0;
+      z-index: 1;
+      opacity: .85;
+      animation: home-hero-float-back 5s ease-in-out infinite;
+    }
+  }
+
+  &__card-image {
+    // Clips to its own rounded top corners now that the card can't; 13px
+    // matches the card's 14px radius measured inside its border.
+    border-radius: 13px 13px 0 0;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    // Tied to card width, not fixed, so the banner keeps its 1.75:1 ratio.
+    height: calc(var(--hero-card-width) / 1.75);
+    background: brand.$color-sand;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  // "New course" corner ribbon (named flag — &__card-badge below is already
+  // the provider's logo chip). Outer span is a clipping window; inner span is
+  // the band, rotated across it, sitting slightly outside the card so the
+  // ::before/::after tails read as a fold. Colors match the design kit's chip
+  // style; every length is 0.6x the reference pattern for this smaller card.
+  &__card-ribbon {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 90px;
+    height: 90px;
+    overflow: hidden;
+    // Above the banner, which clips itself and would otherwise cover this.
+    z-index: 2;
+
+    // The folded tails, tucked behind the band.
+    &::before,
+    &::after {
+      position: absolute;
+      z-index: -1;
+      content: "";
+      display: block;
+      // Deep saffron reads as the band's own shadowed color, selling the fold.
+      border: 3px solid brand.$color-deep-saffron;
+      border-top-color: transparent;
+      border-right-color: transparent;
+    }
+
+    &::before {
+      top: 0;
+      left: 0;
+    }
+
+    &::after {
+      bottom: 0;
+      right: 0;
+    }
+
+    span {
+      position: absolute;
+      display: block;
+      width: 135px;
+      left: -15px;
+      top: 18px;
+      transform: rotate(45deg);
+      // Scaled 0.6x from the reference; shorting it misaligns the corner tails.
+      padding: 9px 0;
+      background: brand.$color-saffron;
+      box-shadow: 0 3px 6px rgba(28, 10, 0, .1);
+      text-align: center;
+      text-transform: uppercase;
+      // No letter-spacing: this string is translated, and spacing breaks
+      // Tibetan stacks. Uppercase is a harmless no-op there.
+      font-family: brand.$font-family-brand-ui;
+      font: {
+        size: 11px;
+        weight: 700;
+      }
+      line-height: 1;
+      // Espresso, not white: white on saffron misses AA contrast.
+      color: brand.$color-espresso;
+    }
+  }
+
+  &__card-badge {
+    align-self: flex-start;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // Pulled up so the badge straddles the image's bottom edge.
+    margin: -28px 0 14px 16px;
+    width: 112px;
+    height: 60px;
+    padding: 8px 12px;
+    background: brand.$color-white;
+    border: 1px solid brand.$color-dusk;
+    border-radius: brand.$border-radius-lg;
+    box-shadow: 0 2px 10px rgba(28, 10, 0, .1);
+    // Initials fallback shown when a provider has no logo on file.
+    font-family: brand.$font-family-brand-display;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: brand.$color-deep-saffron;
+
+    img {
+      max-width: 100%;
+      max-height: 42px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+  }
+
+  &__card-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 16px 18px;
+  }
+
+  &__card-provider {
+    font-size: brand.$font-size-caption;
+    font-weight: 700;
+    line-height: 1.35;
+    color: brand.$color-espresso;
+  }
+
+  &__card-title {
+    // Author's own words, often Tibetan, so Jomolhari per font policy; Latin
+    // falls through to the UI face via Jomolhari's unicode-range.
+    font-family: brand.$font-family-jomolhari, brand.$font-family-brand-ui;
+    font-size: brand.$font-size-caption;
+    font-weight: 500;
+    line-height: 1.5;
+    color: brand.$color-deep-brown;
+    text-wrap: pretty;
+  }
+
+  // Cards shrink back to base size below the hero's full width, where there's
+  // no spare width for the enlarged pair.
+  @media (max-width: 1200px) {
+    --hero-card-width: 238px;
+
+    &__visual {
+      height: 320px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    gap: 28px;
+    padding: 44px brand.$spacing-6 brand.$spacing-8;
+
+    &__visual {
+      height: 364px;
+    }
+  }
+
+  @media (max-width: 760px) {
+    // Stacked absolute cards don't fit a narrow screen, so the back card
+    // steps aside and the front one goes full width.
+    &__visual {
+      height: auto;
+      display: flex;
+      justify-content: center;
+      // Only guards the stacked layout; kept here it'd force horizontal
+      // scroll on phones.
+      min-width: 0;
+    }
+
+    &__card {
+      // Relative, not static: stays a positioning context for the ribbon,
+      // which would otherwise resolve against &__visual.
+      position: relative;
+      width: 100%;
+      max-width: 300px;
+      opacity: 1;
+      animation: none;
+      transition: none;
+      box-shadow: 0 8px 26px rgba(28, 10, 0, .12);
+    }
+
+    &__card--back {
+      display: none;
+    }
+  }
+
+  @media (max-width: 600px) {
+    padding: 36px 20px 28px;
+  }
+
+  // Matches .course-categories' ultra-wide scale-up.
+  @media (min-width: 1600px) {
+    max-width: 1440px;
+  }
+
+  @media (min-width: 2000px) {
+    max-width: 1560px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__card {
+      animation: none;
+      transition-duration: 0s;
+    }
+  }
+}
+
+@keyframes home-hero-float-front {
+  0%,
+  100% { transform: translateY(0) rotate(5deg); }
+  50% { transform: translateY(-6px) rotate(5deg); }
+}
+
+@keyframes home-hero-float-back {
+  0%,
+  100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-8px) rotate(-4deg); }
 }
