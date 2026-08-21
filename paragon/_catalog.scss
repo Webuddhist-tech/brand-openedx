@@ -26,6 +26,7 @@
     text-transform: uppercase;
     color: brand.$text-color-muted;
     margin-bottom: brand.$spacing-8;
+    scroll-margin-top: calc(50vh - 15rem); // for proper alignment of schools and partners redirect link.
   }
 
   &__row {

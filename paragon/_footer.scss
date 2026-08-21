@@ -1,1 +1,421 @@
-// footer style
+// WeBuddhist MFE footer: layout and brand styling.
+@use "./variables" as brand;
+
+.site-footer {
+  --ft-shell: 1120px;
+  --ft-columns: minmax(240px, 1.5fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(190px, 1.2fr);
+  --ft-gap: clamp(#{brand.$spacing-8}, 3.2vw, #{brand.$spacing-12});
+
+  display: flex;
+  flex-direction: column;
+  padding: brand.$spacing-16 brand.$spacing-12 brand.$spacing-8;
+  background-color: brand.$color-espresso;
+  color: brand.$color-parchment;
+  font-family: brand.$font-family-brand-ui;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.ft-grid {
+  display: grid;
+  grid-template-columns: var(--ft-columns);
+  gap: var(--ft-gap);
+  align-items: start;
+  width: 100%;
+  max-width: var(--ft-shell);
+  margin: 0 auto;
+  padding-bottom: brand.$spacing-12;
+}
+
+.ft-brand {
+  min-width: 0;
+}
+
+.ft-brand .logo-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-3;
+  margin-bottom: brand.$spacing-4;
+  width: fit-content;
+  color: inherit;
+  text-decoration: none;
+  transition: opacity brand.$interaction-transition;
+}
+
+.ft-brand .logo-link:hover,
+.ft-brand .logo-link-hover {
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.85;
+}
+
+.ft-brand .logo-link:focus {
+  outline: none;
+}
+
+.ft-brand .logo-link:focus-visible {
+  border-radius: brand.$border-radius-sm;
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color-dark;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.ft-brand .logo-image {
+  display: block;
+  flex: 0 0 auto;
+  width: brand.$spacing-8;
+  height: brand.$spacing-8;
+  object-fit: contain;
+}
+
+.ft-brand-name {
+  font-family: brand.$font-family-brand-display;
+  font-size: brand.$font-size-h3;
+  font-weight: brand.$font-weight-label;
+  line-height: brand.$line-height-h3;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.ft-tagline {
+  // Structural width from the rebrand prototype.
+  max-width: 340px;
+  margin: 0;
+  color: rgba(brand.$color-parchment, 0.5);
+  font-size: brand.$font-size-caption;
+  line-height: brand.$line-height-body;
+  text-wrap: pretty;
+}
+
+.custom-tooltip {
+  position: absolute;
+  top: calc(brand.$spacing-12 * -1);
+  left: 50%;
+  z-index: 1001;
+  padding: brand.$spacing-1 brand.$spacing-2;
+  border: 1px solid rgba(brand.$color-parchment, 0.44);
+  border-radius: brand.$border-radius-sm;
+  background-color: brand.$color-espresso;
+  color: brand.$color-parchment;
+  font-size: brand.$font-size-label;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%);
+  transition:
+    opacity brand.$interaction-transition,
+    visibility brand.$interaction-transition;
+}
+
+.custom-tooltip-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.ft-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ft-col-title {
+  display: block;
+  width: 100%;
+  margin-bottom: brand.$spacing-4;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: brand.$color-saffron;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-label;
+  font-weight: brand.$font-weight-label;
+  line-height: brand.$line-height-label;
+  letter-spacing: 2.5px;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.ft-col-title:focus-visible {
+  border-radius: brand.$border-radius-sm;
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color-dark;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.ft-col-chev {
+  display: none;
+}
+
+.ft-col-body {
+  display: flex;
+  flex-direction: column;
+  gap: brand.$spacing-3;
+}
+
+.ft-col-body .footer-link {
+  width: fit-content;
+  color: rgba(brand.$color-parchment, 0.52);
+  font-size: brand.$font-size-caption;
+  line-height: brand.$line-height-caption;
+  text-decoration: none;
+  transition: color brand.$interaction-transition;
+}
+
+.ft-col-body .footer-link:hover {
+  color: brand.$color-saffron;
+  text-decoration: underline;
+  text-underline-offset: brand.$focus-ring-offset;
+}
+
+.ft-col-body .footer-link:focus-visible {
+  border-radius: brand.$border-radius-sm;
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color-dark;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.ft-col-app .footer-badges {
+  align-items: flex-start;
+  gap: brand.$spacing-2;
+  width: 100%;
+  max-width: 150px;
+}
+
+.ft-store {
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-2;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 150px;
+  min-width: 0;
+  padding: brand.$spacing-2;
+  border: 1px solid rgba(brand.$color-parchment, 0.44);
+  border-radius: brand.$border-radius-md;
+  color: brand.$color-parchment;
+  text-decoration: none;
+  transition:
+    border-color brand.$interaction-transition,
+    background-color brand.$interaction-transition;
+}
+
+.ft-store:hover {
+  border-color: brand.$color-saffron;
+  background-color: rgba(brand.$color-saffron, 0.07);
+  color: brand.$color-parchment;
+  text-decoration: none;
+}
+
+.ft-store:focus-visible {
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color-dark;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.ft-store-icon {
+  flex: 0 0 auto;
+  width: brand.$font-size-caption;
+  height: brand.$font-size-caption;
+  font-size: brand.$font-size-caption;
+}
+
+.ft-store-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.ft-store-prefix {
+  color: rgba(brand.$color-parchment, 0.6);
+  font-size: brand.$font-size-label;
+  letter-spacing: 0.4px;
+}
+
+.ft-store-name {
+  color: brand.$color-parchment;
+  font-size: brand.$font-size-label;
+  font-weight: brand.$font-weight-h4;
+  letter-spacing: -0.2px;
+}
+
+.ft-bottom {
+  display: grid;
+  grid-template-columns: var(--ft-columns);
+  gap: var(--ft-gap);
+  align-items: center;
+  width: 100%;
+  max-width: var(--ft-shell);
+  margin: 0 auto;
+  padding-top: brand.$spacing-6;
+  border-top: 1px solid rgba(brand.$color-parchment, 0.09);
+}
+
+.ft-copy {
+  grid-column: 1 / span 3;
+  color: rgba(brand.$color-parchment, 0.6);
+  font-size: brand.$font-size-caption;
+  line-height: brand.$line-height-caption;
+}
+
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  justify-self: start;
+  gap: brand.$spacing-3;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: brand.$minimum-touch-target;
+  height: brand.$minimum-touch-target;
+  border: 1px solid rgba(brand.$color-parchment, 0.44);
+  border-radius: brand.$border-radius-full;
+  color: rgba(brand.$color-parchment, 0.52);
+  font-size: brand.$font-size-caption;
+  text-decoration: none;
+  transition:
+    border-color brand.$interaction-transition,
+    background-color brand.$interaction-transition,
+    color brand.$interaction-transition;
+}
+
+.social-icon:hover {
+  border-color: brand.$color-saffron;
+  background-color: rgba(brand.$color-saffron, 0.07);
+  color: brand.$color-saffron;
+  text-decoration: none;
+}
+
+.social-icon:focus-visible {
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color-dark;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.language-selector-wrapper {
+  display: flex;
+  align-items: center;
+  max-width: var(--ft-shell);
+  margin: brand.$spacing-6 auto 0;
+}
+
+// Tablet: brand as a full-width banner, then three even link columns.
+@media (min-width: 601px) and (max-width: 960px) {
+  .site-footer {
+    --ft-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ft-grid {
+    gap: brand.$spacing-8;
+    padding-bottom: brand.$spacing-8;
+  }
+
+  .ft-brand {
+    grid-column: 1 / -1;
+    padding-bottom: brand.$spacing-8;
+    border-bottom: 1px solid rgba(brand.$color-parchment, 0.09);
+  }
+
+  .ft-tagline {
+    max-width: 560px;
+  }
+
+  .ft-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: brand.$spacing-4 brand.$spacing-6;
+  }
+
+  .ft-copy {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-footer {
+    padding: brand.$spacing-12 brand.$spacing-6 brand.$spacing-6;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-footer {
+    --ft-columns: 1fr;
+    padding: brand.$spacing-12 brand.$spacing-6 brand.$spacing-6;
+  }
+
+  .ft-grid {
+    gap: brand.$spacing-3;
+    padding-bottom: brand.$spacing-8;
+  }
+
+  .ft-bottom {
+    display: grid;
+    gap: brand.$spacing-4;
+  }
+
+  // Collapse each link column behind a tappable title.
+  .ft-col-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: brand.$spacing-3;
+    min-height: brand.$minimum-touch-target;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .ft-col-chev {
+    display: block;
+    flex: 0 0 auto;
+    transition: transform brand.$interaction-transition;
+  }
+
+  .ft-col.is-open .ft-col-chev {
+    transform: rotate(180deg);
+  }
+
+  .ft-col-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height brand.$interaction-transition;
+  }
+
+  .ft-col.is-open .ft-col-body {
+    margin-top: brand.$spacing-3;
+    // Cap only needs to clear the tallest column (two store buttons).
+    max-height: 340px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .site-footer {
+    --ft-shell: 1360px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .site-footer {
+    --ft-shell: 1480px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-brand .logo-link,
+  .custom-tooltip,
+  .ft-col-body .footer-link,
+  .ft-col-chev,
+  .ft-col-body,
+  .ft-store,
+  .social-icon {
+    transition: none;
+  }
+}
