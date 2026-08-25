@@ -16,6 +16,9 @@
 
   @media (max-width: 760px) {
     --pc-per-view: 2;
+    // A third of the desktop padding: 48px above the title leaves a large
+    // gap under the hero on a phone, where vertical space is scarce.
+    padding: brand.$spacing-4 0;
   }
 
   @media (max-width: 460px) {
@@ -413,9 +416,17 @@
     overflow: hidden;
   }
 
+  // Matches the design's .cc-date spec (compact padding, muted clay text).
   .pgn__card-footer {
-    font-size: brand.$font-size-caption;
-    color: brand.$color-deep-saffron;
+    padding: 2px 14px 14px;
+
+    // The "Starts: …" text is this nested div, not .pgn__card-footer itself
+    // — it carries its own explicit color/font-size, so styling the outer
+    // element alone has no effect.
+    .pgn__card-footer-text {
+      font-size: brand.$font-size-caption;
+      color: brand.$color-clay;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -572,6 +583,36 @@
         &::after {
           content: none;
         }
+      }
+    }
+
+    // The clear ("x") button that appears once there's a query. Paragon's
+    // default IconButton variant draws it as a filled navy circle, which
+    // matches neither the pill nor the plain leading icon above. Kept in step
+    // with the same rule on .catalog-page-head__search — if you change one,
+    // change both.
+    .pgn__searchfield .pgn__searchfield__iconbutton-reset {
+      color: brand.$color-clay;
+      background: transparent;
+      border: 0;
+
+      &:hover,
+      &:focus {
+        color: brand.$color-deep-saffron;
+        background: transparent;
+      }
+
+      // Paragon's own :focus rule (which fires on every click, not just
+      // keyboard use) draws its ring with box-shadow, not background, so
+      // clearing the background above isn't enough on its own.
+      &:focus {
+        box-shadow: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid brand.$color-deep-saffron;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-full;
       }
     }
   }
@@ -807,7 +848,7 @@
     grid-template-columns: 1fr;
     min-height: 0;
     gap: 28px;
-    padding: 44px brand.$spacing-6 brand.$spacing-8;
+    padding: 44px brand.$spacing-6 brand.$spacing-6;
 
     &__visual {
       height: 364px;
@@ -815,36 +856,125 @@
   }
 
   @media (max-width: 760px) {
-    // Stacked absolute cards don't fit a narrow screen, so the back card
-    // steps aside and the front one goes full width.
+    // Both cards stay on phones, still overlapping side by side — just
+    // smaller, with a deeper overlap, and the pair centred instead of
+    // anchored to the visual's right edge. The cards keep their absolute
+    // positioning, since the overlap depends on it.
+    --hero-card-width: 150px;
+    // Negative, unlike the desktop value: here the pair overlaps by this
+    // much rather than sitting apart. The whole pair is 2 x width + gap.
+    --hero-card-gap: -32px;
+
     &__visual {
-      height: auto;
-      display: flex;
-      justify-content: center;
-      // Only guards the stacked layout; kept here it'd force horizontal
-      // scroll on phones.
+      // Sized to the pair and centred, so the cards' `right` anchoring puts
+      // them mid-screen. Fits the 280px content box of a 320px phone.
+      width: calc(var(--hero-card-width) * 2 + var(--hero-card-gap));
       min-width: 0;
+      // Absolute children add no height, so this has to be stated. Sized to
+      // the front card's 24px offset plus the tallest a card can get (86px
+      // image + 34px badge + 98px of text at three clamped title lines
+      // = 218px), and no more — surplus here shows up as dead space between
+      // the cards and the carousel below.
+      height: 246px;
+      margin-inline: auto;
     }
 
     &__card {
-      // Relative, not static: stays a positioning context for the ribbon,
-      // which would otherwise resolve against &__visual.
-      position: relative;
-      width: 100%;
-      max-width: 300px;
-      opacity: 1;
+      // Bobbing in a cramped space reads as jitter, and hover is moot here.
       animation: none;
       transition: none;
-      box-shadow: 0 8px 26px rgba(28, 10, 0, .12);
+      box-shadow: 0 6px 18px rgba(28, 10, 0, .14);
+      border-radius: 12px;
+    }
+
+    // Shallower offsets than desktop: less room to spare vertically.
+    &__card--front {
+      top: 24px;
     }
 
     &__card--back {
-      display: none;
+      top: 0;
+    }
+
+    &__card-image {
+      border-radius: 11px 11px 0 0;
+    }
+
+    // Card chrome scaled to match: at 150px wide the desktop badge would
+    // cover most of the card, and the ribbon would overhang it.
+    &__card-badge {
+      margin: -18px 0 8px 10px;
+      width: 82px;
+      height: 44px;
+      padding: 5px 8px;
+      font-size: 15px;
+      letter-spacing: 1px;
+
+      img {
+        max-height: 28px;
+      }
+    }
+
+    // Every length here is ~0.7x its desktop value; they have to scale
+    // together or the rotated band stops meeting the corner tails.
+    &__card-ribbon {
+      top: -4px;
+      right: -4px;
+      width: 64px;
+      height: 64px;
+
+      &::before,
+      &::after {
+        border-width: 2px;
+      }
+
+      span {
+        width: 96px;
+        left: -11px;
+        top: 13px;
+        padding: 6px 0;
+        font-size: 9px;
+      }
+    }
+
+    &__card-text {
+      gap: 4px;
+      padding: 0 10px 12px;
+    }
+
+    &__card-provider {
+      font-size: 12px;
+    }
+
+    &__card-title {
+      font-size: 11px;
+      // Not tightened along with the font size: Jomolhari's stacked Tibetan
+      // glyphs are taller than the Latin ones and get clipped below about
+      // 2em. Same value the catalog card uses for the same reason.
+      line-height: 2;
+      // Bounded so a long title can't push the card past the fixed height
+      // set on &__visual above.
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      overflow: hidden;
+    }
+
+    // The full placeholder doesn't fit a phone at the desktop size.
+    // NOTE: below 16px, iOS Safari zooms the page in when the field is
+    // focused. Raise this back to 16px if that becomes a problem.
+    &__search .pgn__searchfield .form-control {
+      font-size: 14px;
+      // Minimal side padding: the leading icon already provides the visual
+      // inset, and the desktop 20px pushes the text noticeably off it while
+      // eating width the full placeholder needs.
+      padding: brand.$spacing-3 brand.$spacing-1;
     }
   }
 
   @media (max-width: 600px) {
-    padding: 36px 20px 28px;
+    padding: 36px 20px 20px;
   }
 
   // Matches .course-categories' ultra-wide scale-up.
@@ -860,6 +990,791 @@
     &__card {
       animation: none;
       transition-duration: 0s;
+    }
+  }
+}
+
+// Catalog listing page ("Discover new"). Restyles the existing CatalogPage —
+// only visual, no data-flow changes.
+//
+// Matches the home page's max-width/padding scheme instead of Paragon's
+// Container default, so the side whitespace reads the same on both pages.
+.catalog-page {
+  max-width: 75rem !important;
+  padding-left: brand.$spacing-8 !important;
+  padding-right: brand.$spacing-8 !important;
+
+  @media (max-width: 900px) {
+    padding-left: brand.$spacing-6 !important;
+    padding-right: brand.$spacing-6 !important;
+  }
+
+  @media (max-width: 600px) {
+    padding-left: brand.$spacing-4 !important;
+    padding-right: brand.$spacing-4 !important;
+  }
+
+  // Matches .home-hero / .course-categories' ultra-wide scale-up.
+  @media (min-width: 1600px) {
+    max-width: 90rem !important;
+  }
+
+  @media (min-width: 2000px) {
+    max-width: 97.5rem !important;
+  }
+}
+
+.catalog-page-head {
+  font-family: brand.$font-family-brand-ui;
+  color: brand.$color-espresso;
+
+  &__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    font-size: brand.$font-size-label;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: brand.$color-deep-saffron;
+  }
+
+  &__eyebrow-rule {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 2px;
+    background: brand.$color-saffron;
+  }
+
+  &__title {
+    font-family: brand.$font-family-brand-display;
+    font-size: clamp(34px, 4.2vw, 56px);
+    font-weight: brand.$font-weight-display;
+    line-height: 1.05;
+    margin-bottom: 22px;
+  }
+
+  &__title-accent {
+    font-style: italic;
+    font-weight: brand.$font-weight-display;
+    color: brand.$color-deep-saffron;
+  }
+
+  // Same pill treatment as .home-hero__search, scoped to this page.
+  &__search {
+    max-width: 480px;
+
+    .pgn__searchfield {
+      overflow: hidden;
+      border: 2px solid brand.$color-deep-brown;
+      border-radius: brand.$border-radius-full;
+      background: brand.$color-white;
+      box-shadow: 0 4px 20px rgba(28, 10, 0, .07);
+      transition: border-color brand.$interaction-transition, box-shadow .2s ease;
+
+      &:hover {
+        border-color: brand.$color-espresso;
+      }
+
+      &:focus-within {
+        border-color: brand.$color-deep-saffron;
+        box-shadow: 0 0 0 3px rgba(107, 51, 0, .26), 0 6px 24px rgba(28, 10, 0, .09);
+      }
+
+      // Drops Paragon's square focus ring in favor of the rounded one above.
+      &.has-focus:not(.pgn__searchfield--external)::after {
+        content: none;
+      }
+    }
+
+    .pgn__searchfield-form {
+      padding: 0 4px;
+      border: 0;
+      border-radius: inherit;
+      background: transparent;
+    }
+
+    .pgn__searchfield .form-control {
+      font-family: brand.$font-family-brand-ui;
+      font-size: 16px;
+      color: brand.$color-espresso;
+      background: transparent;
+      border: 0;
+      height: auto;
+      padding: brand.$spacing-4 20px;
+
+      &::placeholder {
+        color: brand.$color-clay;
+      }
+    }
+
+    // Ordered ahead of the input to match the design's leading search icon.
+    .pgn__searchfield .pgn__searchfield__iconbutton-submit {
+      order: -1;
+      color: brand.$color-clay;
+      background: transparent;
+      border: 0;
+
+      &:hover,
+      &:focus {
+        color: brand.$color-deep-saffron;
+        background: transparent;
+      }
+
+      &:focus-visible {
+        outline: 2px solid brand.$color-deep-saffron;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-full;
+      }
+    }
+
+    // The clear ("x") button that appears once there's a query — Paragon's
+    // default IconButton variant renders it as a filled navy circle, which
+    // doesn't match this page's plain-icon treatment (used above for the
+    // search icon itself).
+    .pgn__searchfield .pgn__searchfield__iconbutton-reset {
+      color: brand.$color-clay;
+      background: transparent;
+      border: 0;
+
+      &:hover,
+      &:focus {
+        color: brand.$color-deep-saffron;
+        background: transparent;
+      }
+
+      // Paragon's own :focus rule (fires on every click, not just keyboard
+      // use) sets a ring via box-shadow, not background — background alone
+      // above wasn't enough to clear it.
+      &:focus {
+        box-shadow: none;
+      }
+
+      &:focus-visible {
+        outline: 2px solid brand.$color-deep-saffron;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-full;
+      }
+    }
+  }
+}
+
+// Where the sticky filter panel parks below the top of the viewport: the site
+// header's height plus a gap. Named rather than inlined because two rules
+// below depend on it, but note it does not track the header automatically —
+// if the header's height changes, this needs changing with it.
+$filter-panel-sticky-top: 88px;
+
+// Filter sidebar panel. The collapsible groups are a custom component
+// (CollapsibleFilterGroup) — Paragon only renders a flat, non-collapsing list.
+.catalog-page .pgn__data-table-layout-sidebar {
+  position: sticky;
+  top: $filter-panel-sticky-top;
+  background: brand.$color-white !important;
+  border: 1px solid brand.$border-color;
+  border-radius: brand.$border-radius-lg !important;
+  box-shadow: none !important;
+  padding: 16px 16px 6px !important;
+  // Fixed width, wider than the mockup's 248px (real org/language lists run
+  // longer). !important: Paragon has a higher-specificity rule that would
+  // otherwise revert this to its own default 12rem.
+  width: 280px !important;
+  flex: 0 0 280px !important;
+  min-width: 0 !important;
+  // A sticky panel can't be scrolled by the page, so it has to scroll itself:
+  // with several groups expanded (real catalogs run to dozens of orgs) the
+  // panel outgrows the viewport, and without this the filters past the fold —
+  // and the "Clear all" button — are unreachable by any means.
+  max-height: calc(100vh - #{$filter-panel-sticky-top} - #{brand.$spacing-6});
+  overflow-y: auto;
+}
+
+.catalog-page .pgn__data-table-side-filters {
+  hr {
+    display: none;
+  }
+}
+
+// The title row holds both "Filters" and the "Clear all" button, supplied
+// together as one element via DataTable's `filtersTitle` prop (see
+// CatalogFiltersHeader). Flex, not absolute positioning, so a longer
+// translation of "Filters" pushes the button aside instead of colliding.
+// Both ancestors are named to clear Paragon's own three-class rule on this
+// element, which sets a 1rem bottom margin (it's an h3, so it also inherits a
+// heading margin). Without that, the row sits in ~28px of space top and bottom.
+.catalog-page .pgn__data-table-layout-sidebar .pgn__data-table-side-filters .pgn__data-table-side-filters-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: brand.$spacing-3;
+  font-family: brand.$font-family-brand-display;
+  font-size: 21px;
+  font-weight: 500;
+  color: brand.$color-espresso;
+  // Matches the panel's own 16px top padding, so the row sits in an even gap
+  // above and below.
+  margin: 0;
+  padding-bottom: brand.$spacing-4;
+}
+
+.catalog-filters-header__clear {
+  flex: 0 0 auto;
+  min-height: auto;
+  padding: 0;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-caption;
+  font-weight: 600;
+  color: brand.$color-deep-saffron;
+
+  // Paragon's Button sets its own color and (for link/tertiary variants) a
+  // background fill on these states at higher specificity than one class.
+  &:hover,
+  &:focus,
+  &:active {
+    color: brand.$primary-hover !important;
+    background: transparent !important;
+    text-decoration: underline;
+  }
+
+  // Paragon's Button draws a focus box as a ::before overlay on plain
+  // :focus, which fires on every click, not just keyboard use.
+  &:focus::before {
+    content: none;
+  }
+}
+
+.catalog-page .pgn__data-table-side-filters-item {
+  border-top: 1px solid brand.$color-sand;
+}
+
+// Paragon also renders its own "Clear filters" button after the last filter
+// group, with no prop to move or relabel it. The real, translatable button
+// lives in the title row above (CatalogFiltersHeader), so this duplicate is
+// hidden rather than restyled. !important because Paragon sets display: flex
+// on it from a three-class selector, which outranks this one.
+.catalog-page .pgn__data-table-side-filters-status {
+  display: none !important;
+}
+
+// Below the sidebar breakpoint Paragon replaces the filter panel with a
+// dropdown, whose toggle is an `outline-primary` button — Paragon's default
+// navy, which matches nothing else on this page. Its colours come from custom
+// properties, so they're redefined here rather than overridden declaration by
+// declaration.
+.catalog-page .pgn__data-table-filters {
+  .dropdown-toggle {
+    --pgn-btn-color: #{brand.$color-deep-brown};
+    --pgn-btn-bg: #{brand.$color-white};
+    --pgn-btn-border-color: #{brand.$border-color};
+    --pgn-btn-hover-color: #{brand.$color-deep-saffron};
+    --pgn-btn-hover-bg: #{rgba(brand.$color-deep-saffron, 0.08)};
+    --pgn-btn-hover-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-active-color: #{brand.$color-deep-saffron};
+    --pgn-btn-active-bg: #{rgba(brand.$color-deep-saffron, 0.12)};
+    --pgn-btn-active-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-focus-color: #{brand.$color-deep-brown};
+    --pgn-btn-focus-bg: #{brand.$color-white};
+    --pgn-btn-focus-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-focus-outline-color: #{brand.$focus-ring-color};
+
+    min-height: brand.$minimum-touch-target;
+    // Matches the desktop sidebar panel's own radius, not a full pill, so the
+    // two read as the same surface across the breakpoint.
+    border-radius: brand.$border-radius-lg;
+    border-width: 1.5px;
+    // Same typeface as the sidebar's "Filters" heading on wider screens so the
+    // two read as the same element, a little smaller since this one is a
+    // button rather than a heading.
+    font-family: brand.$font-family-brand-display;
+    font-size: 18px;
+    font-weight: 500;
+
+    // Same as the sidebar checkboxes, the pager and "Clear all": Paragon's
+    // Button draws its focus box as a ::before overlay on plain :focus, so it
+    // fires on every click rather than only on keyboard focus.
+    &:focus::before {
+      content: none;
+    }
+
+    // Keyboard focus keeps a ring, matching the pager's treatment.
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  // The panel of filter groups the dropdown opens; the groups inside it are
+  // the same CollapsibleFilterGroup used in the sidebar.
+  .dropdown-menu {
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    box-shadow: 0 12px 32px rgba(28, 10, 0, 0.13);
+    padding: brand.$spacing-2 brand.$spacing-4;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+}
+
+.catalog-filter-group {
+  &__toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 13px 0 11px;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-label;
+    letter-spacing: 1.6px;
+    font-weight: 700;
+    color: brand.$color-clay;
+    text-transform: uppercase;
+
+    &:hover {
+      color: brand.$color-espresso;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+      border-radius: brand.$border-radius-sm;
+    }
+  }
+
+  &__caret {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    transition: transform 150ms ease;
+  }
+
+  &[data-open="false"] &__caret {
+    transform: rotate(-90deg);
+  }
+
+  &__body {
+    padding-bottom: 12px;
+  }
+
+  // Paragon's own per-group label, fully hidden: the collapsible toggle
+  // button already shows this exact text, so leaving it visible to either
+  // the eye or the accessibility tree would duplicate it. display: none is
+  // safe here specifically because the checkbox group names itself via
+  // aria-labelledby, and name computation reads a referenced element's text
+  // whether or not it is hidden.
+  .pgn__checkbox-filter-label {
+    display: none;
+  }
+
+  // Paragon's own FormControlSet wrapper (one per filter group, holding all
+  // its checkbox rows) is a column flex with align-items: flex-start, which
+  // sizes each row to its own content instead of the group's full width —
+  // pinned to 100% here so a row can't be narrower than the panel itself.
+  .pgn__form-control-set {
+    width: 100%;
+  }
+
+  // Paragon sets this class to inline-flex (shrink to content); flex + width
+  // make the row span the full panel, so the badge's margin-left: auto below
+  // can actually reach the right edge. min-width: 0 throughout stops a long
+  // label from forcing the row (and the fixed-width sidebar) wider.
+  .pgn__form-checkbox {
+    display: flex !important;
+    width: 100% !important;
+    align-items: center;
+    gap: 10px;
+    // Right padding dropped (kept on the left) — the negative margin below
+    // only widens the hover highlight, it doesn't pull the badge back in, so
+    // 8px of right padding was the actual reason the badge sat left of the
+    // group's chevron above it.
+    padding: 6px 0 6px 8px;
+    margin: 0 -8px;
+    border-radius: 8px;
+    min-width: 0;
+    transition: background 150ms;
+
+    &:hover {
+      background: brand.$color-sand;
+    }
+
+    // FormCheckbox's own label wrapper (its second child div).
+    > div {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+  }
+
+  // Native checkbox fully replaced (appearance: none) and redrawn as the
+  // mockup's rounded box with its own checkmark on :checked.
+  .pgn__form-checkbox-input {
+    appearance: none;
+    margin: 0;
+    // Paragon's own min-width: 1.25rem on this class would otherwise floor
+    // this at 20px wide regardless of the width set here.
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    border-radius: 4px;
+    border: 1.5px solid brand.$color-bark;
+    background-color: brand.$color-white;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 11px 11px;
+    cursor: pointer;
+    transition: background-color 150ms ease, border-color 150ms ease;
+
+    &:checked {
+      background-color: brand.$color-saffron;
+      border-color: brand.$color-saffron;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231C0A00' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+
+    // Paragon draws its own focus box on plain :focus (fires on every click),
+    // not just :focus-visible — cleared in favor of the outline above.
+    &:focus::before {
+      content: none;
+    }
+  }
+
+  // Paragon renders this as a <p>, not a <label> — `.pgn__form-label` is the
+  // stable class hook either way.
+  .pgn__form-label {
+    font-size: brand.$font-size-caption;
+    color: brand.$text-color-primary;
+    width: 100%;
+    min-width: 0;
+  }
+
+  // Holds the choice's name and its count badge. Paragon's Stack doesn't
+  // grow this to full width by default, so the badge's margin-left: auto
+  // would have nowhere to push to.
+  .pgn__hstack {
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: flex-start;
+    overflow-wrap: anywhere;
+  }
+
+  .badge {
+    margin-left: auto;
+    background: brand.$color-sand;
+    color: brand.$color-clay;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+}
+
+// Applied-filter chips, rendered under the "Showing X-Y of Z" control bar.
+// padding-left matches that count text's own inset so the two line up.
+.catalog-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  margin-bottom: brand.$spacing-6;
+  padding-left: 12px;
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: brand.$color-sand;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-full;
+    padding: 5px 6px 5px 12px;
+    font-size: brand.$font-size-caption;
+    font-weight: 500;
+    color: brand.$color-espresso;
+
+    // 24px, not the mockup's 18px: 24 is the smallest target size that meets
+    // WCAG 2.2, and the rest of this page already holds to it. The glyph stays
+    // small so the chip's proportions barely change.
+    button {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 50%;
+      background: brand.$color-bark;
+      color: brand.$color-deep-brown;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      flex-shrink: 0;
+
+      svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      &:hover {
+        background: brand.$color-saffron;
+        color: brand.$color-espresso;
+      }
+    }
+  }
+}
+
+// Paragon's default card-like background/shadow on the results wrapper —
+// the mockup has no such box, only the individual course cards are boxed.
+.catalog-page .pgn__data-table-wrapper {
+  background: transparent !important;
+}
+
+// Paragon insets this row 12px on all four sides. Pulled up past zero, not
+// just to zero, so the "Showing …" text's own line-height (empty space above
+// the letterforms) doesn't read as a second gap on top of the removed inset.
+// The side inset stays, since the filter chips below are aligned to it.
+// Scoped to the sidebar layout's own breakpoint (matches the isMedium check
+// in CourseCatalogDataTableSlot: showFiltersInSidebar is true only above
+// breakpoints.large.maxWidth, ~1200px — not breakpoints.large.minWidth,
+// 992px, which is where the sidebar layout *starts* becoming available but
+// isMedium is still true, so React is still rendering the mobile dropdown).
+// Below the real threshold, this same negative margin was pulling that
+// dropdown button up into the search bar above it.
+@media (min-width: 1200px) {
+  .catalog-page .pgn__data-table-status-bar {
+    padding-top: 0;
+    margin-top: -3px;
+  }
+}
+
+// "Showing X-Y of Z courses" text comes from CatalogRowStatus, a custom
+// RowStatusComponent (Paragon's default wording has no CSS-only fix). Below
+// the sidebar breakpoint, with filters active, Paragon swaps this same slot
+// for FilterStatus's "Filtered by X" + "Clear all" button instead (wording
+// fixed via CatalogFilterStatus — styling here).
+.catalog-page .pgn__smart-status {
+  font-size: brand.$font-size-caption;
+  color: brand.$color-deep-brown;
+  font-family: brand.$font-family-brand-ui;
+
+  strong {
+    color: brand.$color-espresso;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 brand.$spacing-2;
+  }
+
+  .pgn__smart-status-button {
+    min-height: auto;
+    padding: 0;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-caption;
+    font-weight: 600;
+    color: brand.$color-deep-saffron;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: brand.$primary-hover !important;
+      background: transparent !important;
+      text-decoration: underline;
+    }
+
+    &:focus::before {
+      content: none;
+    }
+  }
+}
+
+// Card grid. This is a Bootstrap Row/Col grid, not CSS grid (column count
+// is set via CardView's `columnSizes` prop instead) — so the gutter is set
+// by redefining the variables Paragon's own row/col rules already read.
+.catalog-page .pgn__data-table-card-view {
+  --pgn-spacing-grid-gutter-width: 20px;
+  --pgn-spacing-card-margin-grid-bottom: 20px;
+}
+
+// Empty results.
+.catalog-page .pgn__data-table-empty {
+  border: 1px dashed brand.$border-color;
+  border-radius: brand.$border-radius-lg;
+  padding: 44px 30px;
+  text-align: center;
+  font-family: brand.$font-family-brand-ui;
+  color: brand.$text-color-primary;
+}
+
+// Pagination footer. The divider and spacing live on the pager itself, not
+// on this wrapper (and Paragon's own border-top on it is cleared) — the pager
+// renders nothing when there's only one page of results, and a wrapper-level
+// border would otherwise leave a line floating under the cards with nothing
+// beneath it.
+.catalog-page .pgn__data-table-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 0;
+  border-top: 0;
+
+  // The pager's own <nav> wrapper — full width so the divider spans the
+  // results column, and it's the element that disappears along with the
+  // pager, taking the divider with it.
+  > nav {
+    width: 100%;
+    margin-top: 36px;
+    padding-top: 22px;
+    border-top: 1px solid brand.$color-sand;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    list-style: none;
+  }
+
+  // Borderless: numbers sit directly on the page background, and only the
+  // current page gets a filled square. Arrows are icon-only (see .previous
+  // below) and match the numbers' plain-text treatment.
+  .page-item {
+    .page-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: brand.$minimum-touch-target;
+      height: brand.$minimum-touch-target;
+      padding: 0 12px;
+      border-radius: brand.$border-radius-md;
+      border: none;
+      background: transparent;
+      color: brand.$color-deep-brown;
+      font-family: brand.$font-family-brand-ui;
+      font-weight: 600;
+      transition: background 150ms, color 150ms;
+
+      &:hover:not(:disabled) {
+        background: rgba(107, 51, 0, .08);
+        color: brand.$color-deep-saffron;
+      }
+
+      &:focus-visible {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 2px;
+      }
+
+      // Same as the sidebar checkboxes: Paragon's own focus box fires on
+      // every click, not just keyboard use — cleared in favor of the outline.
+      &:focus::before {
+        content: none;
+      }
+
+      // Icon-only "Previous"/"Next" — Paragon's own Button always renders the
+      // "Previous"/"Next" text alongside the arrow icon with no prop to hide
+      // just the text, so it's hidden here instead. The accessible name is
+      // unaffected: it comes from Pagination's own aria-label (built from the
+      // same "Previous"/"Next" strings), not from the visible text, so a
+      // screen reader still announces "Previous" / "Next, Page 2" as before.
+      // .previous matches both buttons — a long-standing Paragon quirk gives
+      // the "Next" button this class too — but never the numbered buttons,
+      // whose text this must not touch.
+      // Circular, not the numbers' rounded square: with the text hidden
+      // there's only the icon left, and the numbers' left/right padding would
+      // otherwise stretch this into a rectangle rather than a square — which
+      // then shows up as a rectangular, not circular, hover/active background.
+      &.previous {
+        font-size: 0;
+        color: brand.$color-clay;
+        width: brand.$minimum-touch-target;
+        padding: 0;
+        border-radius: 50%;
+
+        // The icon's own margin-inline-end (Button's default spacing before
+        // its now-hidden text) otherwise pushes it off-center within the
+        // circle.
+        .btn-icon-before {
+          margin: 0;
+        }
+      }
+    }
+
+    &.active .page-link {
+      background: brand.$color-saffron;
+      color: brand.$color-espresso;
+
+      // Already the active page — a hover color/background shift here would
+      // read as if a click had done something, when it hasn't.
+      &:hover {
+        background: brand.$color-saffron;
+        color: brand.$color-espresso;
+      }
+    }
+
+    &.disabled .page-link {
+      opacity: .35;
+      cursor: default;
+
+      &:hover {
+        background: transparent;
+        color: brand.$color-clay;
+      }
+    }
+  }
+
+  // The "3 of 6" dropdown Pagination's own 'reduced' variant swaps in below
+  // a viewport breakpoint (see CatalogPagination) — an unstyled Paragon
+  // tertiary Dropdown, same as the number buttons were before this file
+  // branded them.
+  .dropdown-toggle {
+    border: none;
+    border-radius: brand.$border-radius-md;
+    background: transparent;
+    color: brand.$color-deep-brown;
+    font-family: brand.$font-family-brand-ui;
+    font-weight: 600;
+
+    &:hover,
+    &:focus,
+    &.show {
+      background: rgba(107, 51, 0, .08);
+      color: brand.$color-deep-saffron;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+
+    // Same as elsewhere on this page: Paragon's own focus box fires on every
+    // click, not just keyboard use.
+    &:focus::before {
+      content: none;
+    }
+  }
+
+  .pagination-reduced-dropdown-menu {
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    box-shadow: 0 12px 32px rgba(28, 10, 0, 0.13);
+    padding: brand.$spacing-2;
+  }
+
+  .pgn__dropdown-item {
+    border-radius: brand.$border-radius-sm;
+    color: brand.$color-deep-brown;
+    font-family: brand.$font-family-brand-ui;
+    text-align: center;
+
+    &:hover,
+    &:focus {
+      background: brand.$color-sand;
+      color: brand.$color-espresso;
     }
   }
 }
