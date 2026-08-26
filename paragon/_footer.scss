@@ -1,41 +1,57 @@
-// WeBuddhist MFE footer: layout and brand styling.
+// WeBuddhist MFE footer: LMS-approved layout with brand tokens.
 @use "./variables" as brand;
 
 .site-footer {
-  --ft-shell: 1120px;
-  --ft-columns: minmax(240px, 1.5fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(190px, 1.2fr);
-  --ft-gap: clamp(#{brand.$spacing-8}, 3.2vw, #{brand.$spacing-12});
-
   display: flex;
   flex-direction: column;
-  padding: brand.$spacing-16 brand.$spacing-12 brand.$spacing-8;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: brand.$spacing-16 0 brand.$spacing-8;
   background-color: brand.$color-espresso;
   color: brand.$color-parchment;
   font-family: brand.$font-family-brand-ui;
+  box-sizing: border-box;
+}
+
+.site-footer *,
+.site-footer *::before,
+.site-footer *::after {
+  box-sizing: border-box;
 }
 
 .footer-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
+  justify-content: space-evenly;
+  align-items: start;
   width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
   padding: 0;
+  row-gap: brand.$spacing-12;
 }
 
 .ft-grid {
-  display: grid;
-  grid-template-columns: var(--ft-columns);
-  gap: var(--ft-gap);
-  align-items: start;
-  width: 100%;
-  max-width: var(--ft-shell);
-  margin: 0 auto;
-  padding-bottom: brand.$spacing-12;
+  display: contents;
+}
+
+.site-footer nav {
+  margin: 0;
+  padding: 0;
+  background: none;
 }
 
 .ft-brand {
+  display: table;
+  justify-self: start;
+  width: auto;
   min-width: 0;
+  padding-top: 0;
+  padding-right: brand.$spacing-8;
 }
 
 .ft-brand .logo-link {
@@ -43,16 +59,16 @@
   display: flex;
   align-items: center;
   gap: brand.$spacing-3;
-  margin-bottom: brand.$spacing-4;
+  margin-bottom: brand.$spacing-6;
   width: fit-content;
-  color: inherit;
+  color: brand.$color-parchment;
   text-decoration: none;
   transition: opacity brand.$interaction-transition;
 }
 
 .ft-brand .logo-link:hover,
 .ft-brand .logo-link-hover {
-  color: inherit;
+  color: brand.$color-parchment;
   text-decoration: none;
   opacity: 0.85;
 }
@@ -67,7 +83,7 @@
   outline-offset: brand.$focus-ring-offset;
 }
 
-.ft-brand .logo-image {
+.logo-image {
   display: block;
   flex: 0 0 auto;
   width: brand.$spacing-8;
@@ -76,6 +92,7 @@
 }
 
 .ft-brand-name {
+  color: brand.$color-parchment;
   font-family: brand.$font-family-brand-display;
   font-size: brand.$font-size-h3;
   font-weight: brand.$font-weight-label;
@@ -85,13 +102,17 @@
 }
 
 .ft-tagline {
-  // Structural width from the rebrand prototype.
-  max-width: 340px;
+  display: table-caption;
+  caption-side: bottom;
+  width: auto;
+  max-width: none;
   margin: 0;
+  padding: 0;
   color: rgba(brand.$color-parchment, 0.5);
   font-size: brand.$font-size-caption;
   line-height: brand.$line-height-body;
-  text-wrap: pretty;
+  text-align: left;
+  text-wrap: wrap;
 }
 
 .custom-tooltip {
@@ -126,13 +147,24 @@
   min-width: 0;
 }
 
+.ft-col-app {
+  width: max-content;
+  max-width: 100%;
+}
+
 .ft-col-title {
   display: block;
   width: 100%;
-  margin-bottom: brand.$spacing-4;
+  margin-top: 0;
+  margin-bottom: brand.$spacing-6;
   padding: 0;
-  border: 0;
+  min-height: 0;
+  height: auto;
+  appearance: none;
+  box-shadow: none;
+  text-shadow: none;
   background: none;
+  border: 0;
   color: brand.$color-saffron;
   font-family: brand.$font-family-brand-ui;
   font-size: brand.$font-size-label;
@@ -182,23 +214,24 @@
 }
 
 .ft-col-app .footer-badges {
-  align-items: flex-start;
-  gap: brand.$spacing-2;
+  align-items: stretch;
+  gap: brand.$spacing-3;
   width: 100%;
-  max-width: 150px;
+  max-width: none;
 }
 
 .ft-store {
   display: flex;
   align-items: center;
-  gap: brand.$spacing-2;
+  gap: brand.$spacing-3;
   box-sizing: border-box;
   width: 100%;
-  max-width: 150px;
-  min-width: 0;
-  padding: brand.$spacing-2;
+  max-width: none;
+  min-width: 170px;
+  padding: brand.$spacing-3 brand.$spacing-4;
   border: 1px solid rgba(brand.$color-parchment, 0.44);
   border-radius: brand.$border-radius-md;
+  background-color: transparent;
   color: brand.$color-parchment;
   text-decoration: none;
   transition:
@@ -220,9 +253,10 @@
 
 .ft-store-icon {
   flex: 0 0 auto;
-  width: brand.$font-size-caption;
-  height: brand.$font-size-caption;
-  font-size: brand.$font-size-caption;
+  width: brand.$font-size-h3;
+  height: brand.$font-size-h3;
+  font-size: brand.$font-size-h3;
+  line-height: 1;
 }
 
 .ft-store-text {
@@ -235,29 +269,29 @@
   color: rgba(brand.$color-parchment, 0.6);
   font-size: brand.$font-size-label;
   letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 
 .ft-store-name {
   color: brand.$color-parchment;
-  font-size: brand.$font-size-label;
+  font-size: brand.$font-size-h4;
   font-weight: brand.$font-weight-h4;
   letter-spacing: -0.2px;
 }
 
 .ft-bottom {
-  display: grid;
-  grid-template-columns: var(--ft-columns);
-  gap: var(--ft-gap);
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  max-width: var(--ft-shell);
-  margin: 0 auto;
+  width: auto;
+  max-width: none;
+  margin: 0;
   padding-top: brand.$spacing-6;
   border-top: 1px solid rgba(brand.$color-parchment, 0.09);
 }
 
 .ft-copy {
-  grid-column: 1 / span 3;
   color: rgba(brand.$color-parchment, 0.6);
   font-size: brand.$font-size-caption;
   line-height: brand.$line-height-caption;
@@ -266,7 +300,6 @@
 .footer-social-icons {
   display: flex;
   align-items: center;
-  justify-self: start;
   gap: brand.$spacing-3;
 }
 
@@ -278,6 +311,7 @@
   height: brand.$minimum-touch-target;
   border: 1px solid rgba(brand.$color-parchment, 0.44);
   border-radius: brand.$border-radius-full;
+  background: transparent;
   color: rgba(brand.$color-parchment, 0.52);
   font-size: brand.$font-size-caption;
   text-decoration: none;
@@ -302,41 +336,62 @@
 .language-selector-wrapper {
   display: flex;
   align-items: center;
-  max-width: var(--ft-shell);
-  margin: brand.$spacing-6 auto 0;
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
+  margin: brand.$spacing-6 0 0;
 }
 
-// Tablet: brand as a full-width banner, then three even link columns.
 @media (min-width: 601px) and (max-width: 960px) {
   .site-footer {
-    --ft-columns: repeat(3, minmax(0, 1fr));
+    padding: brand.$spacing-16 0 brand.$spacing-8;
+  }
+
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: space-evenly;
+    align-items: start;
+    row-gap: brand.$spacing-12;
   }
 
   .ft-grid {
-    gap: brand.$spacing-8;
-    padding-bottom: brand.$spacing-8;
+    display: contents;
   }
 
   .ft-brand {
+    display: block;
     grid-column: 1 / -1;
+    justify-self: stretch;
+    width: auto;
+    padding-right: 0;
     padding-bottom: brand.$spacing-8;
     border-bottom: 1px solid rgba(brand.$color-parchment, 0.09);
   }
 
   .ft-tagline {
+    display: block;
+    width: auto;
     max-width: 560px;
   }
 
-  .ft-bottom {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: brand.$spacing-4 brand.$spacing-6;
+  .ft-col-app {
+    justify-self: end;
+    width: max-content;
+    max-width: 100%;
   }
 
-  .ft-copy {
-    grid-column: auto;
+  .ft-col-app .ft-col-title {
+    text-align: right;
+  }
+
+  .ft-bottom {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: auto;
+    padding-top: brand.$spacing-6;
   }
 }
 
@@ -348,21 +403,59 @@
 
 @media (max-width: 600px) {
   .site-footer {
-    --ft-columns: 1fr;
     padding: brand.$spacing-12 brand.$spacing-6 brand.$spacing-6;
   }
 
+  .ft-brand-name {
+    white-space: normal;
+  }
+
+  .ft-store {
+    min-width: 0;
+  }
+
+  .footer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    row-gap: 0;
+  }
+
   .ft-grid {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: brand.$spacing-3;
+    width: 100%;
     padding-bottom: brand.$spacing-8;
   }
 
   .ft-bottom {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     gap: brand.$spacing-4;
+    width: 100%;
   }
 
-  // Collapse each link column behind a tappable title.
+  .ft-brand {
+    display: block;
+    width: 100%;
+    padding-right: 0;
+  }
+
+  .ft-tagline {
+    display: block;
+    width: auto;
+    max-width: 340px;
+  }
+
+  .ft-col,
+  .ft-col-app {
+    width: 100%;
+    max-width: none;
+    justify-self: stretch;
+  }
+
   .ft-col-title {
     display: flex;
     align-items: center;
@@ -386,25 +479,12 @@
   .ft-col-body {
     overflow: hidden;
     max-height: 0;
-    transition: max-height brand.$interaction-transition;
+    transition: max-height 220ms ease-out;
   }
 
   .ft-col.is-open .ft-col-body {
-    margin-top: brand.$spacing-3;
-    // Cap only needs to clear the tallest column (two store buttons).
+    margin-top: brand.$spacing-4;
     max-height: 340px;
-  }
-}
-
-@media (min-width: 1600px) {
-  .site-footer {
-    --ft-shell: 1360px;
-  }
-}
-
-@media (min-width: 2000px) {
-  .site-footer {
-    --ft-shell: 1480px;
   }
 }
 
