@@ -1166,6 +1166,17 @@
 // if the header's height changes, this needs changing with it.
 $filter-panel-sticky-top: 88px;
 
+// Paragon sets `overflow-x: scroll` on this wrapper below 1400px (a fallback
+// for its own layout on narrow screens), but that turns it into the nearest
+// scrolling ancestor and hijacks the sidebar's `position: sticky` below —
+// sticking it to this wrapper's scroll position instead of the viewport, so
+// between 1200px (where the sidebar layout takes over from the mobile
+// dropdown) and 1400px it renders in the wrong place. Our card grid doesn't
+// need the scroll fallback, so it's turned off outright.
+.catalog-page .pgn__data-table-layout-wrapper {
+  overflow-x: visible;
+}
+
 // Filter sidebar panel. The collapsible groups are a custom component
 // (CollapsibleFilterGroup) — Paragon only renders a flat, non-collapsing list.
 .catalog-page .pgn__data-table-layout-sidebar {
@@ -1695,11 +1706,22 @@ $filter-panel-sticky-top: 88px;
         padding: 0;
         border-radius: 50%;
 
-        // The icon's own margin-inline-end (Button's default spacing before
-        // its now-hidden text) otherwise pushes it off-center within the
-        // circle.
-        .btn-icon-before {
+        // The icon's own margin (Button's default spacing next to its now-
+        // hidden text) otherwise pushes it off-center within the circle —
+        // -before for the Previous button's iconBefore, -after for Next's
+        // iconAfter.
+        .btn-icon-before,
+        .btn-icon-after {
           margin: 0;
+        }
+
+        // In the mobile "reduced" pagination (< > with a page dropdown
+        // between them), these arrows render as IconButton rather than
+        // Button — a different component with its own focus treatment: a
+        // navy box-shadow ring (from its default `primary` variant) instead
+        // of Button's `::before` overlay, so the fix above doesn't reach it.
+        &:focus {
+          box-shadow: none;
         }
       }
     }
