@@ -16,6 +16,14 @@ $color-clay: #8B6A50;
 $color-deep-brown: #5A2D0C;
 $color-warm-gray: #4A4035;
 
+// Softer browns for low-emphasis/subtle actions (e.g. the header's sign-out
+// row), which are deliberately styled apart from other items so they don't
+// shout. Reusable wherever else a similarly muted affordance is needed.
+$color-terracotta: #8A5A3A;
+$color-terracotta-light: #C08A60;
+$color-terracotta-dark: #7A3F1E;
+$color-blush: #FBEFE6;
+
 // Semantic colors. These names match the older Indigo/Paragon Sass convention.
 $primary: $color-deep-saffron;
 $primary-light: $color-parchment;
@@ -34,10 +42,17 @@ $section-bg: $color-sand;
 $border-color: $color-dusk;
 $link-color: $color-dharma-teal;
 
+// Subtle/low-emphasis action affordance (e.g. sign-out). Not an error state,
+// so it does not reuse $error-*.
+$subtle-action-text: $color-terracotta;
+$subtle-action-icon: $color-terracotta-light;
+$subtle-action-hover-bg: $color-blush;
+$subtle-action-hover-text: $color-terracotta-dark;
+
 // Interactive states
 $primary-hover: #8B4400;
 $primary-active: #4F2500;
-$secondary-hover: #0E6080;
+$secondary-hover: #0E6080; 
 $secondary-active: #093C52;
 $accent-hover: #C9712A;
 $accent-active: #B05E1A;
@@ -82,6 +97,14 @@ $font-weight-h4: 600;
 $font-weight-body: 400;
 $font-weight-caption: 400;
 $font-weight-label: 600;
+
+// Plain weight names. The role-based weights above cover headings and body copy,
+// but chrome like the header needs to ask for a weight directly - and the scale
+// had no 500 or 700 at all, which is why nav links and their active state used to
+// come out identical.
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
 $line-height-display: 1.08;
 $line-height-h1: 1.12;
 $line-height-h2: 1.18;

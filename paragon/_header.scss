@@ -1,1 +1,849 @@
-/// header style
+// WeBuddhist MFE site header. Companion to _footer.scss: the markup lives in
+// frontend-component-header (src/site-header/), every value here comes from
+// _variables.scss, and this file is imported after Paragon so it wins.
+//
+// One bar serves every screen width. Above the mobile breakpoint the nav links,
+// locale button and profile avatar are visible; at or below it they are replaced
+// by a single burger menu holding all of them. `display: none` is used for the
+// hidden half deliberately, so assistive technology is never offered the
+// navigation twice.
+@use "./variables" as brand;
+
+// The bar tracks the page content column on wide screens rather than sitting at a
+// fixed inset, so the header edges line up with the content beneath them.
+// Interpolated so Sass emits CSS max() verbatim instead of trying to resolve it.
+$nav-gutter: brand.$spacing-12;
+$nav-shell-md: 1120px;
+$nav-shell-lg: 1360px;
+$nav-shell-xl: 1480px;
+
+// Below this width the bar collapses to the burger menu.
+$nav-collapse: 600px;
+
+$nav-menu-shadow: 0 12px 32px rgba(brand.$color-espresso, 0.13);
+$nav-underline-height: 2px;
+$nav-underline-radius: 2px;
+
+// ---------------------------------------------------------------- shell
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: brand.$spacing-2;
+  width: 100%;
+  min-width: 0;
+  height: brand.$spacing-16;
+  padding: 0 brand.$spacing-4;
+  background-color: brand.$color-white;
+  border-bottom: 1px solid brand.$color-dusk;
+  font-family: brand.$font-family-brand-ui;
+  box-sizing: border-box;
+  // Slides away rather than a bare `sticky` -> `static` swap: `position` isn't
+  // itself animatable (a browser can't tween between two positioning schemes),
+  // so the header stays sticky at all times and a transform carries it out of
+  // view instead - see .header-releases-sticky below.
+  transform: translateY(0);
+  transition: transform 240ms ease;
+}
+
+// Slides the header out of view once the page's footer scrolls into view, so it
+// moves away with the page instead of sitting pinned on top of it. The header
+// applies this class to itself - see `useReleaseNearFooter` in
+// frontend-component-header (src/site-header/) - so no consuming app needs its
+// own scroll-watching code. .site-nav keeps `position: sticky` throughout; only
+// the transform changes, which is what makes this an animation rather than a
+// jump.
+.site-nav.header-releases-sticky {
+  transform: translateY(-100%);
+}
+
+// Set by `useReleaseNearFooter` for a release that isn't the visitor's own
+// scrolling - most plausibly, it correcting an early misreading of the
+// footer's position while the page's real content was still loading, on a
+// page short enough that the footer sat inside the viewport for a moment.
+// Animating that looks like the header sliding onto the page for no reason,
+// since nothing the visitor did caused it; snapping straight to the correct
+// state reads as though nothing happened, which here is the correct read.
+.site-nav.header-releases-sticky-instant {
+  transition: none;
+}
+
+.site-nav *,
+.site-nav *::before,
+.site-nav *::after {
+  box-sizing: border-box;
+}
+
+.site-nav a {
+  text-decoration: none;
+}
+
+@media (min-width: #{$nav-collapse + 1px}) {
+  .site-nav {
+    padding: 0 brand.$spacing-6;
+  }
+}
+
+@media (min-width: 1000px) {
+  .site-nav {
+    padding: 0 #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-md}) / 2))"};
+  }
+}
+
+@media (min-width: 1600px) {
+  .site-nav {
+    padding: 0 #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-lg}) / 2))"};
+  }
+}
+
+@media (min-width: 2000px) {
+  .site-nav {
+    padding: 0 #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-xl}) / 2))"};
+  }
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-6;
+  min-width: 0;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-4;
+  flex-shrink: 0;
+}
+
+// ---------------------------------------------------------------- brand lockup
+
+// Logo and wordmark are a single link: clicking either goes home.
+// Shrinkable, so a long site name gives way instead of colliding with the links.
+.nav-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-2;
+  min-width: 0;
+  overflow: hidden;
+  padding: brand.$spacing-2;
+  margin-left: -#{brand.$spacing-2};
+  border-radius: brand.$border-radius-md;
+  transition: background brand.$interaction-transition, opacity brand.$interaction-transition;
+}
+
+.nav-brand:hover {
+  background-color: brand.$color-sand;
+}
+
+.nav-brand:active {
+  opacity: 0.75;
+}
+
+.nav-brand-logo {
+  display: block;
+  flex: 0 0 auto;
+  width: brand.$spacing-8;
+  height: brand.$spacing-8;
+  object-fit: contain;
+}
+
+.nav-brand-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: brand.$color-espresso;
+  font-size: brand.$font-size-h4;
+  font-weight: brand.$font-weight-semibold;
+  line-height: brand.$line-height-h4;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+// Active-page marker underlines the wordmark only, never the logo, so the inset
+// clears the logo width plus the lockup gap and the wrapper padding.
+.nav-brand-active::after {
+  content: '';
+  position: absolute;
+  left: brand.$spacing-12;
+  right: brand.$spacing-2;
+  bottom: 1px;
+  height: $nav-underline-height;
+  border-radius: $nav-underline-radius;
+  background-color: brand.$color-saffron;
+}
+
+// ---------------------------------------------------------------- nav links
+
+.site-nav .nav-links {
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-1;
+  flex-shrink: 0;
+}
+
+// Unlike the icon buttons and menu rows, a nav link carries no hover background -
+// only the text darkens and the underline animates in. border-radius stays even
+// so, purely so the keyboard focus-visible outline below renders rounded.
+.site-nav .nav-link {
+  position: relative;
+  padding: brand.$spacing-2 brand.$spacing-3;
+  border-radius: brand.$border-radius-md;
+  color: brand.$color-deep-brown;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-medium;
+  line-height: brand.$line-height-caption;
+  white-space: nowrap;
+  transition: color brand.$interaction-transition;
+}
+
+.site-nav .nav-link::after {
+  content: '';
+  position: absolute;
+  left: brand.$spacing-3;
+  right: brand.$spacing-3;
+  bottom: 1px;
+  height: $nav-underline-height;
+  border-radius: $nav-underline-radius;
+  background-color: brand.$color-saffron;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform brand.$interaction-transition;
+}
+
+.site-nav .nav-link:hover {
+  color: brand.$color-espresso;
+}
+
+.site-nav .nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+.site-nav .nav-link:active {
+  color: brand.$color-espresso;
+}
+
+.site-nav .nav-link:active::after {
+  transform: scaleX(1);
+  background-color: brand.$color-deep-saffron;
+}
+
+.site-nav .nav-link-active {
+  color: brand.$color-espresso;
+  font-weight: brand.$font-weight-semibold;
+}
+
+.site-nav .nav-link-active::after {
+  transform: scaleX(1);
+}
+
+// ---------------------------------------------------------------- icon buttons
+
+.nav-locale-wrap,
+.nav-profile-wrap,
+.nav-burger-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+// The burger only exists below the collapse breakpoint.
+.nav-burger-wrap {
+  display: none;
+}
+
+.nav-locale {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: brand.$minimum-touch-target;
+  height: brand.$minimum-touch-target;
+  padding: 0;
+  border: none;
+  border-radius: brand.$border-radius-full;
+  background: none;
+  color: brand.$color-deep-brown;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background brand.$interaction-transition, color brand.$interaction-transition;
+}
+
+.nav-locale:hover {
+  background-color: brand.$color-sand;
+  color: brand.$color-espresso;
+}
+
+.nav-locale:active {
+  background-color: brand.$color-dusk;
+}
+
+.nav-locale[aria-expanded="true"] {
+  background-color: brand.$color-sand;
+  color: brand.$color-saffron;
+}
+
+// The border lives here, on the button, not on the photo inside it. Putting it
+// on the photo instead (an earlier version of this rule did) means two
+// independently-rounded shapes - the button's own circle and the photo's own
+// clipped circle - sit almost but not quite on top of each other, and their
+// separately anti-aliased edges leave a hairline gap where this button's own
+// saffron background (below) shows through as a thin orange line. One rounded
+// shape, clipped once by `overflow: hidden` below, has no seam to leave.
+.nav-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  width: brand.$minimum-touch-target;
+  height: brand.$minimum-touch-target;
+  padding: 0;
+  border: 2px solid brand.$color-sand;
+  border-radius: brand.$border-radius-full;
+  background-color: brand.$color-saffron;
+  color: brand.$color-espresso;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-bold;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: box-shadow brand.$interaction-transition;
+}
+
+// Solid, not alpha-blended: the photo's own border (below) is fully opaque
+// sand, and a semi-transparent ring here would render as a visibly different
+// shade right where the two meet, once blended with the page behind it - a
+// thin seam at the boundary. Matching it exactly erases that seam. Hover and
+// open are told apart by ring thickness instead of by opacity.
+.nav-profile:hover {
+  box-shadow: 0 0 0 3px brand.$color-sand;
+}
+
+.nav-profile[aria-expanded="true"] {
+  box-shadow: 0 0 0 5px brand.$color-sand;
+}
+
+// Just fills the button - the border and the round clip both belong to
+// .nav-profile above, not to this image.
+.nav-profile-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// ---------------------------------------------------------------- auth buttons
+
+.nav-auth {
+  display: inline-flex;
+  align-items: center;
+  padding: brand.$spacing-2 brand.$spacing-4;
+  border-radius: brand.$border-radius-md;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-medium;
+  line-height: brand.$line-height-caption;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background brand.$interaction-transition, border-color brand.$interaction-transition,
+    color brand.$interaction-transition;
+}
+
+.nav-auth-register {
+  border: 2px solid brand.$color-deep-saffron;
+  background: none;
+  color: brand.$color-deep-saffron;
+}
+
+.nav-auth-register:hover {
+  border-color: brand.$primary-hover;
+  background-color: rgba(brand.$color-deep-saffron, 0.08);
+  color: brand.$primary-hover;
+}
+
+.nav-auth-register:active {
+  border-color: brand.$primary-active;
+  background-color: rgba(brand.$color-deep-saffron, 0.16);
+  color: brand.$primary-active;
+}
+
+// Saffron never carries white label text; the accent contrast token is espresso.
+.nav-auth-signin {
+  border: 2px solid transparent;
+  background-color: brand.$color-saffron;
+  color: brand.$accent-contrast;
+}
+
+.nav-auth-signin:hover {
+  background-color: brand.$accent-hover;
+  color: brand.$accent-contrast;
+}
+
+.nav-auth-signin:active {
+  background-color: brand.$accent-active;
+}
+
+// ---------------------------------------------------------------- dropdown shell
+
+// The Menu component mounts this only while open, so the resting state is the
+// visible one and the closed state lives in the transition classes below.
+.site-nav .nav-menu {
+  position: absolute;
+  top: calc(100% + #{brand.$spacing-3});
+  right: 0;
+  left: auto;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 256px;
+  // Matches border-radius below, not spacing-2: padding smaller than the
+  // corner radius leaves a sliver where the curve cuts into the content box,
+  // so a row sitting flush against the edge (the top row, or the bottom one
+  // when scrolled all the way down) has its icon visibly touch the curve even
+  // though it never crosses the padding edge itself.
+  padding: brand.$border-radius-lg;
+  border: 1px solid brand.$color-dusk;
+  border-radius: brand.$border-radius-lg;
+  background-color: brand.$color-white;
+  box-shadow: $nav-menu-shadow;
+  transform-origin: top right;
+  // Every dropdown built on this class anchors below the same fixed-height
+  // header, at every screen width - not just the mobile burger menu, which is
+  // the only variant this used to be scoped to. Without a cap, a long list (the
+  // language menu with many released languages, most plausibly) can grow past
+  // the viewport with no way to reach what's below the fold.
+  max-height: #{"calc(100vh - #{brand.$spacing-16} - #{brand.$spacing-8})"};
+  overflow-y: auto;
+}
+
+.site-nav .nav-menu-lang {
+  min-width: 192px;
+}
+
+// The burger trigger sits on the right of the bar, same side as the locale
+// and profile triggers, so this dropdown needs no anchor override of its own
+// - it inherits the base `.nav-menu` rule's right edge. Only its width is
+// narrower than theirs.
+.site-nav .nav-menu-main {
+  min-width: 240px;
+}
+
+.site-nav .nav-menu-anim-enter {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+}
+
+.site-nav .nav-menu-anim-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.site-nav .nav-menu-anim-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.site-nav .nav-menu-anim-exit-active {
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+// ---------------------------------------------------------------- dropdown rows
+
+.nav-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-2;
+  width: 100%;
+  padding: brand.$spacing-2 brand.$spacing-3;
+  border: none;
+  border-radius: brand.$border-radius-md;
+  background: none;
+  color: brand.$color-deep-brown;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-medium;
+  line-height: brand.$line-height-caption;
+  text-align: left;
+  cursor: pointer;
+  transition: background brand.$interaction-transition, color brand.$interaction-transition;
+}
+
+.nav-menu-item svg {
+  flex-shrink: 0;
+  color: brand.$color-clay;
+  transition: color brand.$interaction-transition;
+}
+
+.nav-menu-item:hover {
+  background-color: brand.$color-sand;
+  color: brand.$color-espresso;
+}
+
+.nav-menu-item:active {
+  background-color: brand.$color-dusk;
+}
+
+.nav-menu-item[aria-current="page"],
+.nav-menu-item[aria-checked="true"] {
+  background-color: brand.$color-sand;
+  color: brand.$color-espresso;
+  font-weight: brand.$font-weight-semibold;
+}
+
+.nav-menu-item[aria-current="page"] svg,
+.nav-menu-item[aria-checked="true"] svg {
+  color: brand.$color-saffron;
+}
+
+// Selected marker sits inside the shell padding, vertically centred on the row.
+.nav-menu-item[aria-current="page"]::before,
+.nav-menu-item[aria-checked="true"]::before {
+  content: '';
+  position: absolute;
+  left: brand.$spacing-1;
+  top: 50%;
+  width: 3px;
+  height: brand.$spacing-4;
+  border-radius: $nav-underline-radius;
+  background-color: brand.$color-saffron;
+  transform: translateY(-50%);
+}
+
+.nav-menu-sep {
+  height: 1px;
+  margin: brand.$spacing-1 brand.$spacing-2;
+  background-color: brand.$color-sand;
+}
+
+.nav-menu-label {
+  padding: brand.$spacing-2 brand.$spacing-3 brand.$spacing-1;
+  color: brand.$color-clay;
+  font-size: brand.$font-size-label;
+  font-weight: brand.$font-weight-bold;
+  line-height: brand.$line-height-label;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+// Sign out is deliberately set apart from the rest of the menu.
+.nav-menu-signout {
+  color: brand.$subtle-action-text;
+}
+
+.nav-menu-signout svg {
+  color: brand.$subtle-action-icon;
+}
+
+.nav-menu-signout:hover {
+  background-color: brand.$subtle-action-hover-bg;
+  color: brand.$subtle-action-hover-text;
+}
+
+.nav-menu-signout:hover svg {
+  color: brand.$subtle-action-hover-text;
+}
+
+// ---------------------------------------------------------------- identity block
+
+.nav-menu-id {
+  display: flex;
+  align-items: center;
+  gap: brand.$spacing-2;
+  padding: brand.$spacing-2 brand.$spacing-3;
+}
+
+// Border and round clip belong here, on the one shape, for the same reason as
+// .nav-profile above: putting the border on the img instead leaves a hairline
+// gap between two separately-rounded edges, where the saffron background here
+// shows through as a thin line.
+.nav-menu-id-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  width: brand.$spacing-8;
+  height: brand.$spacing-8;
+  border: 1.5px solid brand.$color-sand;
+  border-radius: brand.$border-radius-full;
+  background-color: brand.$color-saffron;
+  color: brand.$color-espresso;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-bold;
+  letter-spacing: 0.3px;
+}
+
+.nav-menu-id-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-menu-id-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nav-menu-id-name,
+.nav-menu-id-email {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: brand.$line-height-label;
+}
+
+.nav-menu-id-name {
+  color: brand.$color-espresso;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-semibold;
+}
+
+.nav-menu-id-email {
+  color: brand.$color-clay;
+  font-size: brand.$font-size-label;
+}
+
+// ---------------------------------------------------------------- language rows
+
+// Native names only; the Tibetan and Chinese faces are appended so those
+// scripts render even though the brand UI face does not cover them.
+.lang-native {
+  font-family: brand.$font-family-brand-ui, "Noto Sans SC", sans-serif;
+  font-size: brand.$font-size-caption;
+  line-height: brand.$line-height-caption;
+  white-space: nowrap;
+}
+
+.lang-tick {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-left: brand.$spacing-3;
+  opacity: 0;
+}
+
+.nav-menu-item[aria-checked="true"] .lang-tick {
+  opacity: 1;
+}
+
+// The tick keeps the saffron of a selected row rather than the muted icon colour.
+.nav-menu-item .lang-tick {
+  color: brand.$color-saffron;
+}
+
+// ---------------------------------------------------------------- focus
+
+// Bar controls take the brand ring on the outside. Menu rows take the same ring
+// inset, because the shell's padding is narrower than the ring offset and an
+// outside ring would be clipped at the shell edge.
+.nav-brand:focus,
+.site-nav .nav-link:focus,
+.nav-locale:focus,
+.nav-profile:focus,
+.nav-auth:focus,
+.nav-help:focus,
+.nav-menu-item:focus {
+  outline: none;
+}
+
+.nav-brand:focus-visible,
+.site-nav .nav-link:focus-visible,
+.nav-locale:focus-visible,
+.nav-profile:focus-visible,
+.nav-auth:focus-visible,
+.nav-help:focus-visible {
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+  outline-offset: brand.$focus-ring-offset;
+}
+
+.nav-menu-item:focus-visible {
+  outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+  outline-offset: -#{brand.$focus-ring-width};
+}
+
+// ---------------------------------------------------------------- learning variant
+
+// The course player's header. Same bar, same controls, same collapse into a
+// burger below the breakpoint - the course title just stands where the
+// wordmark and navigation links do on the site bar. The burger holds the
+// locale list, the account rows and, when configured, a Help row; it has no
+// nav-link rows of its own to add, since this header carries none.
+//
+// Static rather than sticky, unlike the site bar: the courseware page already
+// stacks its own `position: sticky; top: 0` elements - the sequence navigation
+// and both sidebars - and a second sticky bar at z-index 100 would sit on top of
+// them. The height is deliberately left at the inherited $spacing-16, because
+// .nav-menu's max-height is measured against exactly that.
+.site-nav-learning {
+  position: static;
+  transform: none;
+  transition: none;
+}
+
+// The logo arrives through LogoSlot, whose inner <img> takes no class of ours,
+// so it is sized by descendant rather than through .nav-brand-logo.
+.nav-brand-learning img {
+  display: block;
+  flex: 0 0 auto;
+  width: brand.$spacing-8;
+  height: brand.$spacing-8;
+  object-fit: contain;
+}
+
+// The course title takes the wordmark's place beside the logo: same type scale,
+// and the same shrink-before-the-actions-do behaviour, but it is not a link.
+//
+// Line-height is explicit and taller than `$line-height-h4` on purpose: this
+// is the one line in the header that can carry a Tibetan run - see
+// `.course-title-tibetan` below - and `overflow: hidden` below clips to
+// whatever height this line box actually is. A generous explicit value,
+// rather than leaving the browser's own per-font "normal" calculation to
+// size the box, is what guarantees headroom for a stacking consonant-and-
+// vowel combination taller than this particular sample happened to need.
+.nav-course-title {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+  color: brand.$color-espresso;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-h4;
+  font-weight: brand.$font-weight-semibold;
+  line-height: 2;
+}
+
+// One line, clipped with an ellipsis. A course title is arbitrary length and
+// wrapping it would grow the bar past the height .nav-menu is measured against.
+.nav-course-title .course-title {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Applied by `LearningHeaderCourseInfo` to the Tibetan-Unicode run within a
+// mixed-script title, matching it to the em-size of the rest of the line
+// (1em, not larger) and dropping the bold weight `.course-title` applies to
+// everything else. Jomolhari has no true bold face of its own, so asking for
+// one makes the browser fake it by stretching the glyphs - and its stacked
+// consonant clusters and vowel signs are already visually tall for their
+// nominal font-size, so that synthetic bold was pushing marks taller than
+// `.nav-course-title`'s line-height, clipped by the `overflow: hidden` above.
+.course-title-tibetan {
+  font-family: brand.$font-family-jomolhari, serif;
+  font-size: 1em;
+  font-weight: normal;
+}
+
+// Sits beside the locale button, so it is styled as a quiet link rather than as
+// a third button competing with the avatar.
+.nav-help {
+  display: inline-flex;
+  align-items: center;
+  padding-block: brand.$spacing-2;
+  padding-inline: brand.$spacing-3;
+  border-radius: brand.$border-radius-md;
+  color: brand.$color-deep-brown;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-caption;
+  font-weight: brand.$font-weight-medium;
+  line-height: brand.$line-height-caption;
+  white-space: nowrap;
+  transition: background brand.$interaction-transition, color brand.$interaction-transition;
+}
+
+.nav-help:hover {
+  background-color: brand.$color-sand;
+  color: brand.$color-espresso;
+}
+
+.nav-help:active {
+  background-color: brand.$color-dusk;
+}
+
+
+// ---------------------------------------------------------------- collapse
+
+// Both header variants collapse into a burger the same way - the learning
+// header has no navigation links of its own, but its burger still holds the
+// locale list, the account rows and (when configured) a Help row, so hiding
+// the wide-only controls here is correct for it too.
+@media (max-width: $nav-collapse) {
+  // `.nav-links` and `.nav-menu-main` are matched at `.site-nav .nav-links` /
+  // `.site-nav .nav-menu-main` above (two classes), so their overrides here
+  // need the same `.site-nav` prefix to win at equal specificity - a bare
+  // single-class selector loses to that base rule regardless of which comes
+  // later in the file.
+  .site-nav .nav-links,
+  .nav-locale-wrap,
+  .nav-profile-wrap,
+  .nav-auth,
+  .nav-help {
+    display: none;
+  }
+
+  .nav-burger-wrap {
+    display: block;
+  }
+
+  .nav-left {
+    gap: brand.$spacing-2;
+  }
+
+  // max-height, overflow-y and scroll-snap now live on the shared .nav-menu
+  // base rule above; only the narrower width is specific to this variant.
+  .site-nav .nav-menu-main {
+    min-width: #{"min(292px, calc(100vw - #{brand.$spacing-8}))"};
+  }
+
+  .nav-brand-name {
+    font-size: #{"clamp(14px, 4.4vw, #{brand.$font-size-h4})"};
+  }
+
+  .nav-course-title {
+    font-size: brand.$font-size-caption;
+  }
+}
+
+// A tighter gap at tablet widths than the full-width bar uses, so the nav
+// links (which never shrink, unlike .nav-brand) have more room before
+// crowding the wordmark. The wordmark itself doesn't need hiding here: it
+// already shrinks and truncates with an ellipsis (.nav-brand-name) before
+// .nav-links would ever be pushed off, so it can just be left to do that.
+@media (min-width: #{$nav-collapse + 1px}) and (max-width: 899px) {
+  .nav-left {
+    gap: brand.$spacing-4;
+  }
+}
+
+// ---------------------------------------------------------------- overrides
+
+// Hides the learning header's Help link at every width. Last in the file so it
+// wins the cascade at matching specificity, regardless of where `.nav-help` is
+// otherwise styled or unhidden (e.g. the collapse media query above already
+// hides it below 600px; this hides it above that width too).
+.nav-help {
+  display: none;
+}
+
+// The same Help entry, as it appears inside the learning header's burger menu:
+// a plain `.nav-menu-item` row rendered by `MobileNavItems`, indistinguishable
+// by class from any other row - `MobileNavItems` gives every row the same
+// class regardless of what it links to. It is always the first (and, today,
+// only) item in that header's `navItems`, so `:first-child` picks it out
+// without touching the site header's own nav-link rows, which live under
+// plain `.site-nav .nav-menu-main`, not `.site-nav-learning`.
+.site-nav-learning .nav-menu-main > .nav-menu-item:first-child {
+  display: none;
+}

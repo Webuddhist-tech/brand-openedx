@@ -93,7 +93,9 @@
 
 .ft-brand-name {
   color: brand.$color-parchment;
-  font-family: brand.$font-family-brand-display;
+  // Matches the header's .nav-brand-name, which just inherits the bar's own
+  // $font-family-brand-ui rather than setting its own font-family.
+  font-family: brand.$font-family-brand-ui;
   font-size: brand.$font-size-h3;
   font-weight: brand.$font-weight-label;
   line-height: brand.$line-height-h3;
