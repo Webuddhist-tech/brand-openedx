@@ -225,12 +225,12 @@
 .ft-store {
   display: flex;
   align-items: center;
-  gap: brand.$spacing-3;
+  gap: brand.$footer-store-badge-gap;
   box-sizing: border-box;
   width: 100%;
   max-width: none;
   min-width: 170px;
-  padding: brand.$spacing-3 brand.$spacing-4;
+  padding: brand.$footer-store-badge-padding-y brand.$spacing-4 brand.$footer-store-badge-padding-y brand.$footer-store-badge-padding-start;
   border: 1px solid rgba(brand.$color-parchment, 0.44);
   border-radius: brand.$border-radius-md;
   background-color: transparent;
@@ -255,9 +255,9 @@
 
 .ft-store-icon {
   flex: 0 0 auto;
-  width: brand.$font-size-h3;
-  height: brand.$font-size-h3;
-  font-size: brand.$font-size-h3;
+  width: brand.$footer-store-badge-icon-size;
+  height: brand.$footer-store-badge-icon-size;
+  font-size: brand.$footer-store-badge-icon-size;
   line-height: 1;
 }
 
@@ -276,7 +276,7 @@
 
 .ft-store-name {
   color: brand.$color-parchment;
-  font-size: brand.$font-size-h4;
+  font-size: brand.$footer-store-badge-name-font-size;
   font-weight: brand.$font-weight-h4;
   letter-spacing: -0.2px;
 }

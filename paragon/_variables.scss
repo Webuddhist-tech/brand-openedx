@@ -138,3 +138,12 @@ $minimum-touch-target: 44px;
 
 $learning-section-title-font-size: 1.35rem;
 $learning-sequence-title-font-size: 1.25rem;
+
+// Footer app store badge (Google Play / App Store links). Sized straight from
+// the design spec rather than the 4px spacing / type scale above, since none
+// of those steps land on these values.
+$footer-store-badge-icon-size: 20px;
+$footer-store-badge-name-font-size: 16px;
+$footer-store-badge-gap: 10px;
+$footer-store-badge-padding-y: 9px;
+$footer-store-badge-padding-start: 13px;
