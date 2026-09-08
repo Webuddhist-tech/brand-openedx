@@ -21,3 +21,19 @@
     --pgn-typography-input-btn-font-family: #{brand.$font-family-brand-ui};
     --font-family-sans-serif: #{brand.$font-family-brand-ui};
 }
+
+/* ========================================================================
+   SAFE GLOBAL LOADING SPINNER LAYOUT FIX
+   Targets only the specific top-level page wrappers across the 3 main MFEs,
+   ignoring small spinners in Modals, Buttons, or Alerts.
+   ======================================================================== */
+.course-list-loading:has(> .spinner-border),                                      /* Learner Dashboard */
+.d-flex.align-items-center.flex-column:has(> .spinner-border),                    /* Account MFE */
+.d-flex.justify-content-center.align-items-center.flex-column:has(> .spinner-border) /* Learning MFE */
+{
+  min-height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
