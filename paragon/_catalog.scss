@@ -2153,21 +2153,6 @@ $course-about-narrow-breakpoint: 960px;
       margin-top: brand.$spacing-4;
     }
 
-    // Only Course Overview's header has an `actions` slot (the staff-only
-    // "View About Page in Studio" button) — Paragon gives that slot its own
-    // 16px margin-top, unconditionally, which pushes the button down and out
-    // of alignment with the title. Left alone, that grows the whole header
-    // (title column + actions column, whichever is taller) by the same 16px
-    // on top of the fixed gap above, so the section that happens to have a
-    // button reads with roughly double the gap of every section that doesn't.
-    // !important: Paragon's own rule (.pgn__card .pgn__card-header
-    // .pgn__card-header-actions) ties this selector on class count, so which
-    // one wins would otherwise depend on which stylesheet's <link> the page
-    // happens to load second.
-    .pgn__card-header-actions {
-      margin-top: 0 !important;
-    }
-
     @media (max-width: 560px) {
       .pgn__card-header .pgn__card-header-title-md h2 {
         font-size: 21px;
@@ -2187,37 +2172,18 @@ $course-about-narrow-breakpoint: 960px;
     line-height: brand.$line-height-body;
     color: brand.$color-warm-gray;
     text-wrap: pretty;
-  }
 
-  // The staff-only "View About Page in Studio" button — smaller and outlined,
-  // unlike the hero's full-size CTAs, so it gets its own sizing rather than
-  // reusing the hero's .btn rule (which is scoped to .course-about-hero
-  // anyway and wouldn't reach this one). Appears either inside a section's
-  // header (Course Overview, when it has content) or standalone in the panel
-  // (when Course Overview has none yet) — this reaches both.
-  .btn-outline-primary {
-    --pgn-btn-color: #{brand.$secondary};
-    --pgn-btn-bg: #{brand.$color-white};
-    --pgn-btn-border-color: #{brand.$secondary};
-    --pgn-btn-hover-color: #{brand.$secondary};
-    --pgn-btn-hover-bg: #{brand.$info-bg};
-    --pgn-btn-hover-border-color: #{brand.$secondary};
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-family: brand.$font-family-brand-ui;
-    font-size: 12.5px;
-
-    // Paragon draws a focus box as a ::before overlay on plain :focus, which
-    // fires on every click, not just keyboard use.
-    &:focus::before {
-      content: none;
-    }
-
-    &:focus-visible {
-      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
-      outline-offset: 2px;
+    // Author HTML commonly ends in a <p>, which carries its own bottom
+    // margin (Bootstrap's default, 1rem) — that stacks on top of the 30px
+    // gap the divider rule above already adds before the next section,
+    // making this specific gap read as bigger than the others. The short
+    // description doesn't need this: it's a single <p> with its own mb-0,
+    // not a wrapper around author content.
+    > *:last-child {
+      margin-bottom: 0;
     }
   }
+
 }
 
 // "What you will learn": a checklist, with the tick drawn as a background
@@ -2352,10 +2318,19 @@ $course-about-narrow-breakpoint: 960px;
     padding: 18px 20px;
   }
 
-  // Each fact is a Stack followed by a Card.Divider, so the divider is the only
-  // rule between rows — a border on the row itself would double them up.
-  .pgn__card-divider {
-    border-top-color: brand.$border-color;
+  // Draws the divider between rows itself, rather than each row (or
+  // Prerequisites) carrying its own trailing Card.Divider: a divider baked
+  // into an item assumes something always follows it, which breaks the
+  // moment that item happens to be last — e.g. Prerequisites, when there's
+  // no About Sidebar HTML and the visitor isn't staff, so Studio Link
+  // renders nothing — leaving a trailing line with nothing below it. This
+  // rule only ever lands *between* two elements that both actually exist, so
+  // it can't produce that trailing line. SidebarDetails' own wrapping Stack
+  // is the only .pgn__vstack this scope contains, so this reaches exactly
+  // its direct children (each fact row, price, Prerequisites, About Sidebar
+  // HTML, Studio Link) and nothing nested deeper.
+  .pgn__vstack > * + * {
+    border-top: 1px solid brand.$border-color;
   }
 
   // The fact rows, which arrive with Paragon's p-3. !important because that
@@ -2452,6 +2427,42 @@ $course-about-narrow-breakpoint: 960px;
   @media (prefers-reduced-motion: reduce) {
     header .pgn__hstack a {
       transition-duration: 0s;
+    }
+  }
+
+  // The staff-only "View About Page in Studio" button (see
+  // studio-link/index.tsx). The line above it and the padding around it are
+  // both owned by this wrapper directly — not left to the .pgn__vstack > *
+  // + * rule above — so this section's own divider can never go missing
+  // depending on what does or doesn't precede it in the stack.
+  .course-about-studio-link-section {
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid brand.$border-color;
+    padding: 18px 20px;
+  }
+
+  .course-about-studio-link {
+    --pgn-btn-color: #{brand.$secondary};
+    --pgn-btn-bg: #{brand.$color-white};
+    --pgn-btn-border-color: #{brand.$secondary};
+    --pgn-btn-hover-color: #{brand.$secondary};
+    --pgn-btn-hover-bg: #{brand.$info-bg};
+    --pgn-btn-hover-border-color: #{brand.$secondary};
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 12.5px;
+
+    // Paragon draws a focus box as a ::before overlay on plain :focus, which
+    // fires on every click, not just keyboard use.
+    &:focus::before {
+      content: none;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
     }
   }
 }
