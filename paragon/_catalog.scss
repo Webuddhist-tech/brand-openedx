@@ -1801,6 +1801,706 @@ $filter-panel-sticky-top: 88px;
   }
 }
 
+// Course About page. Three grid items — hero, body, sidebar rail — laid out by
+// .course-about-page. The React side is unchanged apart from the wrappers these
+// selectors hang off; all the enrollment logic still comes from the slots.
+//
+// Where the page collapses to one column, and where the sidebar steps down from
+// 300px. Named because several blocks below share them, and the two have to move
+// together with the grid definition to stay coherent.
+$course-about-stack-breakpoint: 662px;
+$course-about-narrow-breakpoint: 960px;
+
+// The card treatment the hero, the body panels and the sidebar all share.
+@mixin course-about-card {
+  background: brand.$color-white;
+  border: 1px solid brand.$border-color;
+  border-radius: brand.$border-radius-xl;
+  box-shadow: 0 2px 8px rgba(28, 10, 0, 0.06);
+}
+
+// Matches .catalog-page's max-width/gutter scheme so the side whitespace reads
+// the same across the MFE. `Container fluid` is deliberate: `size="xl"` would
+// add .pgn__container-size-xl's own max-width on top of this one, which is what
+// forced .catalog-page above into !important.
+.course-about-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  // 28px: the spacing scale steps 24 -> 32, and the design's column gap sits
+  // between them. Side padding keeps to the scale, matching the sibling pages'
+  // gutter rather than the mockup's 40px, so the whitespace reads the same
+  // across the MFE.
+  gap: 28px;
+  align-items: start;
+  max-width: 75rem;
+  margin: 0 auto;
+  padding: 36px brand.$spacing-8 72px;
+  font-family: brand.$font-family-brand-ui;
+  color: brand.$color-espresso;
+
+  @media (max-width: $course-about-narrow-breakpoint) {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: 22px;
+  }
+
+  @media (max-width: 900px) {
+    padding: brand.$spacing-8 brand.$spacing-6 56px;
+  }
+
+  @media (max-width: $course-about-stack-breakpoint) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    padding: 26px 20px 44px;
+  }
+
+  // Matches .home-hero / .course-categories / .catalog-page's ultra-wide scale-up.
+  @media (min-width: 1600px) {
+    max-width: 90rem;
+  }
+
+  @media (min-width: 2000px) {
+    max-width: 97.5rem;
+  }
+}
+
+// Hero: course title, org, enrollment CTA and the course image, as one card
+// spanning both columns.
+.course-about-hero {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  // The image column sizes to the image rather than taking a fixed fraction,
+  // so a short title doesn't strand it mid-row — but it's capped, because
+  // course images come in every aspect ratio and a wide one would otherwise
+  // crowd the title out of the first column. 420px matches the ceiling the
+  // design's own sizing script applies.
+  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  gap: clamp(22px, 3vw, 36px);
+  align-items: start;
+  min-width: 0;
+  padding: clamp(26px, 3vw, 34px) clamp(24px, 3vw, 34px) clamp(24px, 2.6vw, 30px);
+
+  @include course-about-card;
+
+  &__text {
+    min-width: 0;
+  }
+
+  &__media {
+    min-width: 0;
+    justify-self: end;
+    border-radius: brand.$border-radius-lg;
+    overflow: hidden;
+    background: brand.$color-sand;
+
+    // CourseMedia fixes the image's height and object-fit; this keeps a wide
+    // one inside the capped column instead of overflowing it.
+    img {
+      max-width: 100%;
+    }
+  }
+
+  // CourseIntro brings its own Container + Card; the hero is the card here, so
+  // the inner one is flattened rather than nested inside it.
+  .course-about-intro .pgn__card {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    // Overrides the intro card's own min-height (set in CourseAboutPage.scss
+    // off a theming custom property) — the hero's height comes from the image
+    // and the copy, and the floor leaves dead space under short titles.
+    min-height: 0;
+  }
+
+  // Paragon's own ancestors are named throughout this block rather than
+  // restating each declaration with !important. It styles the card's parts from
+  // three-class selectors (.pgn__card .pgn__card-header .pgn__card-header-*),
+  // which quietly outrank a two-class override — the org kept Paragon's h4 size
+  // and grey while picking up everything Paragon doesn't set, which reads as a
+  // half-applied rule rather than a specificity loss.
+  .pgn__card {
+    .pgn__card-header {
+      padding: 0;
+    }
+
+    // Paragon renders the title first and the subtitle second; the design shows
+    // the org above the title, so the column is reversed rather than the props
+    // swapped — `subtitle` still carries the org for anything reading the DOM.
+    .pgn__card-header .pgn__card-header-content {
+      flex-direction: column-reverse;
+      margin-top: 0;
+      // Paragon sets overflow: auto here, which clips the descenders on the
+      // display face at some widths.
+      overflow: visible;
+    }
+
+    .pgn__card-header .pgn__card-header-title-md {
+      // The h1 inside carries the type; this wrapper only has to stop
+      // Paragon's h3 sizing cascading into it.
+      font-size: inherit;
+      font-weight: inherit;
+
+      h1 {
+        font-family: brand.$font-family-brand-display;
+        font-size: clamp(32px, 2.9vw, 38px);
+        font-weight: brand.$font-weight-display;
+        line-height: 1.16;
+        color: brand.$color-espresso;
+        text-wrap: pretty;
+      }
+    }
+
+    .pgn__card-header .pgn__card-header-subtitle-md {
+      font-size: brand.$font-size-label;
+      font-weight: brand.$font-weight-semibold;
+      letter-spacing: 2.6px;
+      text-transform: uppercase;
+      color: brand.$text-color-muted;
+      // Paragon's own margin-top would sit between the org and the title once
+      // the column is reversed; the gap belongs under the org instead.
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .pgn__card-section {
+      padding: 10px 0 0;
+      font-size: 16px;
+      line-height: brand.$line-height-body;
+      color: brand.$color-warm-gray;
+      text-wrap: pretty;
+    }
+
+    // The CTA row. Paragon's vertical footer right-aligns and indents its
+    // children; the design runs them left, wrapping on narrow screens.
+    .pgn__card-footer {
+      padding: 0;
+      margin-top: 26px;
+      gap: brand.$spacing-3;
+      flex-wrap: wrap;
+
+      > * + * {
+        margin-inline-start: 0;
+      }
+    }
+  }
+
+  // Enrollment CTA. Paragon's Button reads its colours from these custom
+  // properties, so they're redefined rather than fought declaration by
+  // declaration through its `:not(:disabled, .disabled, .btn-link)` rule.
+  .btn-primary {
+    --pgn-btn-bg: #{brand.$accent};
+    --pgn-btn-color: #{brand.$accent-contrast};
+    --pgn-btn-border-color: #{brand.$accent};
+    --pgn-btn-hover-bg: #{brand.$accent-hover};
+    --pgn-btn-hover-color: #{brand.$accent-contrast};
+    --pgn-btn-hover-border-color: #{brand.$accent-hover};
+    --pgn-btn-active-bg: #{brand.$accent-active};
+    --pgn-btn-active-color: #{brand.$accent-contrast};
+    --pgn-btn-active-border-color: #{brand.$accent-active};
+    --pgn-btn-focus-bg: #{brand.$accent};
+    --pgn-btn-focus-color: #{brand.$accent-contrast};
+    --pgn-btn-focus-border-color: #{brand.$accent};
+  }
+
+  // The teal secondary action ("View course" once enrolled).
+  .btn-outline-primary {
+    --pgn-btn-color: #{brand.$secondary};
+    --pgn-btn-bg: #{brand.$color-white};
+    --pgn-btn-border-color: #{brand.$secondary};
+    --pgn-btn-hover-color: #{brand.$secondary};
+    --pgn-btn-hover-bg: #{brand.$info-bg};
+    --pgn-btn-hover-border-color: #{brand.$secondary};
+  }
+
+  .btn {
+    min-height: brand.$minimum-touch-target;
+    padding: 13px 26px;
+    border-radius: 10px;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 15px;
+    font-weight: brand.$font-weight-semibold;
+
+    // Paragon draws a focus box as a ::before overlay on plain :focus, which
+    // fires on every click, not just keyboard use.
+    &:focus::before {
+      content: none;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  // Below the stacking breakpoint the hero stops being a card and its two
+  // halves each become one, image first — there isn't width for them to sit
+  // side by side. Scoped to the hero's own wrappers so the sidebar's card,
+  // which is also a .pgn__card, keeps its chrome.
+  @media (max-width: $course-about-stack-breakpoint) {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+
+    &__media {
+      order: -1;
+      justify-self: stretch;
+
+      @include course-about-card;
+    }
+
+    &__text {
+      padding: 26px 22px 24px;
+
+      @include course-about-card;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .pgn__card-footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .btn {
+      justify-content: center;
+    }
+  }
+}
+
+// Main column: the text sections as one card, instructors as another.
+.course-about-body {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+
+  @media (max-width: $course-about-stack-breakpoint) {
+    grid-column: 1;
+    // Below the hero and the rail: the rail carries the course facts, which the
+    // design leads with on a phone.
+    grid-row: 3;
+  }
+
+  // Every section renders its own Container + Card; inside a panel those are
+  // flattened so the panel reads as one surface, with a rule between sections.
+  &__panel {
+    padding: 34px 34px 30px;
+
+    @include course-about-card;
+
+    // All four sections render null when they have no content, which leaves
+    // this genuinely childless — an empty bordered box otherwise.
+    &:empty {
+      display: none;
+    }
+
+    .pgn__card {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    > * + * {
+      margin-top: 30px;
+      padding-top: 30px;
+      border-top: 1px solid brand.$color-sand;
+    }
+
+    @media (max-width: 760px) {
+      padding: 26px 22px 24px;
+    }
+  }
+
+  // Paragon's ancestors named here for the same reason as in the hero: its
+  // card-part rules are three-class and would otherwise keep their own padding.
+  .pgn__card {
+    .pgn__card-header {
+      padding: 0;
+    }
+
+    .pgn__card-header .pgn__card-header-content {
+      margin-top: 0;
+    }
+
+    .pgn__card-section {
+      padding: 0;
+    }
+
+    // Section headings, on the display face. Set on the h2 itself because each
+    // component renders one inside Paragon's title wrapper.
+    .pgn__card-header .pgn__card-header-title-md h2 {
+      font-family: brand.$font-family-brand-display;
+      font-size: 22px;
+      font-weight: brand.$font-weight-h2;
+      line-height: brand.$line-height-h3;
+      letter-spacing: -0.2px;
+      color: brand.$color-espresso;
+    }
+
+    // Paragon's header carries no bottom margin of its own, so the gap down to
+    // the section it titles is stated once here.
+    .pgn__card-header + .pgn__card-section {
+      margin-top: brand.$spacing-4;
+    }
+
+    // Only Course Overview's header has an `actions` slot (the staff-only
+    // "View About Page in Studio" button) — Paragon gives that slot its own
+    // 16px margin-top, unconditionally, which pushes the button down and out
+    // of alignment with the title. Left alone, that grows the whole header
+    // (title column + actions column, whichever is taller) by the same 16px
+    // on top of the fixed gap above, so the section that happens to have a
+    // button reads with roughly double the gap of every section that doesn't.
+    // !important: Paragon's own rule (.pgn__card .pgn__card-header
+    // .pgn__card-header-actions) ties this selector on class count, so which
+    // one wins would otherwise depend on which stylesheet's <link> the page
+    // happens to load second.
+    .pgn__card-header-actions {
+      margin-top: 0 !important;
+    }
+
+    @media (max-width: 560px) {
+      .pgn__card-header .pgn__card-header-title-md h2 {
+        font-size: 21px;
+      }
+    }
+  }
+
+  // Author-authored HTML, so the type is set on the container and inherited
+  // rather than enumerated tag by tag. The short description is plain text
+  // rather than HTML, but reads as one more section here, not a distinct
+  // lead-in style, so it shares the same rule.
+  .course-about-overview,
+  .course-about-description,
+  .course-about-requirements,
+  .course-about-short-description {
+    font-size: 15px;
+    line-height: brand.$line-height-body;
+    color: brand.$color-warm-gray;
+    text-wrap: pretty;
+  }
+
+  // The staff-only "View About Page in Studio" button — smaller and outlined,
+  // unlike the hero's full-size CTAs, so it gets its own sizing rather than
+  // reusing the hero's .btn rule (which is scoped to .course-about-hero
+  // anyway and wouldn't reach this one). Appears either inside a section's
+  // header (Course Overview, when it has content) or standalone in the panel
+  // (when Course Overview has none yet) — this reaches both.
+  .btn-outline-primary {
+    --pgn-btn-color: #{brand.$secondary};
+    --pgn-btn-bg: #{brand.$color-white};
+    --pgn-btn-border-color: #{brand.$secondary};
+    --pgn-btn-hover-color: #{brand.$secondary};
+    --pgn-btn-hover-bg: #{brand.$info-bg};
+    --pgn-btn-hover-border-color: #{brand.$secondary};
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 12.5px;
+
+    // Paragon draws a focus box as a ::before overlay on plain :focus, which
+    // fires on every click, not just keyboard use.
+    &:focus::before {
+      content: none;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// "What you will learn": a checklist, with the tick drawn as a background
+// image so it stays put against author-authored markup inside each item.
+.course-about-learning-outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: brand.$spacing-4;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
+  li {
+    padding-inline-start: 29px;
+    font-size: 15px;
+    line-height: brand.$line-height-body;
+    color: brand.$color-warm-gray;
+    text-wrap: pretty;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231A5C2A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    // Nudged down to sit on the first line's baseline rather than its box.
+    background-position: 0 5px;
+    background-size: 17px 17px;
+  }
+
+  strong {
+    font-weight: brand.$font-weight-semibold;
+    color: brand.$color-espresso;
+  }
+}
+
+// Instructor bios: a bordered block each, photo and name on one row with the
+// bio beneath.
+.course-about-instructors {
+  display: flex;
+  flex-direction: column;
+  gap: brand.$spacing-4;
+}
+
+.course-about-instructor {
+  display: flex;
+  flex-direction: column;
+  gap: brand.$spacing-4;
+  padding: 22px 24px;
+  border: 1px solid brand.$color-sand;
+  border-radius: brand.$border-radius-lg;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__image {
+    flex: 0 0 84px;
+    width: 84px;
+    height: 84px;
+    border-radius: brand.$border-radius-full;
+    object-fit: cover;
+    // Shows through while the photo loads, and stands in for the ones that 404.
+    background: brand.$color-sand;
+  }
+
+  &__identity {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-1;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: 17px;
+    font-weight: brand.$font-weight-semibold;
+    color: brand.$color-espresso;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: brand.$font-size-caption;
+    color: brand.$text-color-muted;
+  }
+
+  &__bio {
+    font-size: 15px;
+    line-height: brand.$line-height-body;
+    color: brand.$color-warm-gray;
+    text-wrap: pretty;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 560px) {
+    &__head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+    }
+  }
+}
+
+// Sidebar rail. A real grid item rather than the mockup's `display: contents`:
+// the sidebar is a plugin slot, so a plugin inserting alongside the default
+// would otherwise drop each root into its own grid cell.
+.course-about-rail {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
+  min-width: 0;
+
+  @media (max-width: $course-about-stack-breakpoint) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}
+
+.course-about-sidebar.pgn__card {
+  overflow: hidden;
+
+  @include course-about-card;
+
+  // Social share row, above the course facts. Scoped to the <header> that
+  // SidebarSocial renders it in: every fact row is a Stack too, as is the
+  // label group inside each one, and an unscoped rule here lands padding and
+  // the wrong gap on all of them — enough extra width to push the longer
+  // values onto a line of their own.
+  header .pgn__hstack {
+    justify-content: center;
+    gap: 14px;
+    padding: 18px 20px;
+  }
+
+  // Each fact is a Stack followed by a Card.Divider, so the divider is the only
+  // rule between rows — a border on the row itself would double them up.
+  .pgn__card-divider {
+    border-top-color: brand.$border-color;
+  }
+
+  // The fact rows, which arrive with Paragon's p-3. !important because that
+  // utility class sets padding on all four sides at the same specificity, and
+  // load order between Paragon and this file isn't guaranteed.
+  .pgn__hstack.justify-content-between {
+    padding: 15px 20px !important;
+    // The row keeps its two halves on one line; Bootstrap's flex-wrap utility
+    // would otherwise drop a long value onto a line of its own, where it reads
+    // as a separate row rather than this row's value. The label gives up the
+    // space instead (see below), which matters most in translation — several
+    // of these labels are markedly longer in other languages.
+    flex-wrap: nowrap;
+  }
+
+  [data-testid="sidebar-details-item-label"] {
+    font-size: brand.$font-size-caption;
+    color: brand.$color-warm-gray;
+  }
+
+  [data-testid="sidebar-details-item-value"] {
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+    color: brand.$color-espresso;
+    text-align: right;
+    // Never squeezed: a wrapped date or price is harder to read than a label
+    // that takes a second line.
+    flex: 0 0 auto;
+  }
+
+  // The icon + label group. min-width lets it shrink below its content width,
+  // which flex items don't do by default, so the label wraps instead of
+  // overflowing the rail.
+  .pgn__hstack .pgn__hstack {
+    min-width: 0;
+  }
+
+  // Sized on the wrapper span itself, not the svg inside it: Paragon's own
+  // .pgn__icon rule fixes that span at 1.5rem (or larger still, at 1.75rem,
+  // for the share icons' `size="lg"`) and then stretches the svg to fill it
+  // — so shrinking only the svg leaves it floating in the top-left corner of
+  // a bigger invisible box instead of centered on the label, which is what
+  // made the row read as misaligned rather than just small.
+  .pgn__icon {
+    color: brand.$text-color-muted;
+    width: 17px;
+    height: 17px;
+  }
+
+  a {
+    color: brand.$link-color;
+  }
+
+  // Share links: circles, on the teal used for links elsewhere on the page.
+  // Scoped to the same <header> — the prerequisite row further down the rail
+  // renders a plain course link that shouldn't become a circle.
+  header .pgn__hstack a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: brand.$minimum-touch-target;
+    height: brand.$minimum-touch-target;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-full;
+    color: brand.$secondary;
+    transition:
+      background brand.$interaction-transition,
+      border-color brand.$interaction-transition;
+
+    &:hover {
+      background: brand.$info-bg;
+      border-color: brand.$secondary;
+      color: brand.$secondary;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  // Design draws these a touch smaller than the fact-row icons (15px for the
+  // X/Facebook glyphs, 16px for the envelope) — close enough to round to one
+  // value rather than target each of the three individually. Color is
+  // restated too: the plain .pgn__icon rule above sets color directly on the
+  // icon (not just on an ancestor), so it wins over the teal these should
+  // inherit from the circle around them unless overridden here explicitly.
+  header .pgn__icon {
+    width: 15px;
+    height: 15px;
+    color: brand.$secondary;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    header .pgn__hstack a {
+      transition-duration: 0s;
+    }
+  }
+}
+
+// The prerequisite course fact: unlike the other sidebar rows, its value is a
+// course title, not a short date or number, so it gets its own label-then-
+// content layout rather than SidebarDetailsItem's single label/value line.
+.course-about-sidebar-prerequisite {
+  display: flex;
+  flex-direction: column;
+  gap: brand.$spacing-2;
+  padding: 15px 20px;
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: brand.$font-size-caption;
+    color: brand.$color-warm-gray;
+
+    .pgn__icon {
+      width: 17px;
+      height: 17px;
+      color: brand.$text-color-muted;
+    }
+  }
+
+  &__course {
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+    color: brand.$link-color;
+  }
+
+  &__completion {
+    margin: 0;
+    font-size: brand.$font-size-caption;
+    line-height: brand.$line-height-body;
+    color: brand.$color-warm-gray;
+
+    // !important: Paragon has its own rule for a link inside a paragraph
+    // (`p > a[href]:not(.btn)`), which — two elements plus the :not()
+    // argument — outranks a single class-scoped selector here.
+    a {
+      color: brand.$link-color !important;
+      font-weight: brand.$font-weight-semibold;
+    }
+  }
+}
+
 @keyframes home-hero-float-front {
   0%,
   100% { transform: translateY(0) rotate(5deg); }
