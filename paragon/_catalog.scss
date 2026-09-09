@@ -2110,6 +2110,37 @@ $course-about-narrow-breakpoint: 960px;
       box-shadow: none;
     }
 
+    // Paragon's ancestors named here for the same reason as in the hero: its
+    // card-part rules are three-class and would otherwise keep their own
+    // padding. Scoped to the panel itself (not `.course-about-body .pgn__card`
+    // generally) — Instructors renders its own real Card as a sibling of this
+    // panel, and that one should keep Paragon's own header/section padding
+    // rather than being flattened like the panel's nested cards are.
+    .pgn__card {
+      .pgn__card-header {
+        padding: 0;
+      }
+
+      .pgn__card-header .pgn__card-header-content {
+        margin-top: 0;
+      }
+
+      .pgn__card-section {
+        padding: 0;
+      }
+
+      // Paragon's header carries no bottom margin of its own; with the
+      // section's own padding zeroed above, this is the only thing left to
+      // put a gap between the panel's heading and its first section.
+      // Instructors keeps Card.Section's real padding (see the comment
+      // above), which already spaces its content from its own header, so
+      // this stays scoped here rather than on the broader `.pgn__card` rule
+      // below where it would double up with that padding.
+      .pgn__card-header + .pgn__card-section {
+        margin-top: brand.$spacing-4;
+      }
+    }
+
     > * + * {
       margin-top: 30px;
       padding-top: 30px;
@@ -2121,23 +2152,11 @@ $course-about-narrow-breakpoint: 960px;
     }
   }
 
-  // Paragon's ancestors named here for the same reason as in the hero: its
-  // card-part rules are three-class and would otherwise keep their own padding.
   .pgn__card {
-    .pgn__card-header {
-      padding: 0;
-    }
-
-    .pgn__card-header .pgn__card-header-content {
-      margin-top: 0;
-    }
-
-    .pgn__card-section {
-      padding: 0;
-    }
-
     // Section headings, on the display face. Set on the h2 itself because each
-    // component renders one inside Paragon's title wrapper.
+    // component renders one inside Paragon's title wrapper. Shared by the
+    // panel's flattened cards and by Instructors' own real Card, so both
+    // headings read the same.
     .pgn__card-header .pgn__card-header-title-md h2 {
       font-family: brand.$font-family-brand-display;
       font-size: 22px;
@@ -2147,15 +2166,44 @@ $course-about-narrow-breakpoint: 960px;
       color: brand.$color-espresso;
     }
 
-    // Paragon's header carries no bottom margin of its own, so the gap down to
-    // the section it titles is stated once here.
-    .pgn__card-header + .pgn__card-section {
-      margin-top: brand.$spacing-4;
-    }
-
     @media (max-width: 560px) {
       .pgn__card-header .pgn__card-header-title-md h2 {
         font-size: 21px;
+      }
+    }
+  }
+
+  // Instructors keeps a real Paragon Card rather than being flattened into
+  // __panel, so unlike that panel it doesn't get its chrome for free from a
+  // plain wrapping div — it's stated explicitly here, the same way __panel,
+  // the hero, and the sidebar each state theirs, rather than left to
+  // Paragon/Bootstrap's own card defaults (which round the corners far less
+  // and carry no shadow at all).
+  .course-about-instructors-card.pgn__card {
+    @include course-about-card;
+
+    .pgn__card-header {
+      padding: 34px 34px 0;
+
+      .pgn__card-header-content {
+        margin-top: 0;
+      }
+    }
+
+    // 16px between the heading and the instructor list, then the section's
+    // own bottom padding closes out the card — matching the design's h2
+    // margin-bottom rather than stacking a separate margin on top of it.
+    .pgn__card-section {
+      padding: 16px 34px 30px;
+    }
+
+    @media (max-width: 760px) {
+      .pgn__card-header {
+        padding: 26px 22px 0;
+      }
+
+      .pgn__card-section {
+        padding: 16px 22px 24px;
       }
     }
   }
@@ -2316,6 +2364,17 @@ $course-about-narrow-breakpoint: 960px;
     justify-content: center;
     gap: 14px;
     padding: 18px 20px;
+  }
+
+  // The one divider in this card that isn't drawn by the rule below: it
+  // separates the share row from the facts list, and those two aren't
+  // siblings in the same .pgn__vstack (the share row's <header> and the
+  // facts' <Stack> are siblings of each other instead), so there's no shared
+  // parent for a `* + *` rule to land on. Paragon's own Card.Divider colors
+  // it with --pgn-color-card-divider-bg, a gray that doesn't match the warm
+  // border color every other line on this card uses.
+  header .pgn__card-divider {
+    border-top-color: brand.$border-color;
   }
 
   // Draws the divider between rows itself, rather than each row (or
