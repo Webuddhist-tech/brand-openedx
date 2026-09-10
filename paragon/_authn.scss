@@ -603,6 +603,10 @@ body.authn-register-page {
                 outline: brand.$focus-ring-width solid brand.$focus-ring-color;
                 outline-offset: brand.$focus-ring-offset;
             }
+
+            &:focus::before {
+                border: unset !important;
+            }
         }
     }
 
