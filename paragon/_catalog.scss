@@ -2230,6 +2230,16 @@ $course-about-narrow-breakpoint: 960px;
     > *:last-child {
       margin-bottom: 0;
     }
+
+    // Some authored content (Course Overview, in practice) wraps its
+    // paragraphs in an extra div rather than putting them directly inside
+    // this container, so the child-combinator rule above never reaches the
+    // actual trailing <p> — it's nested one level deeper. Reaches it at any
+    // depth instead, scoped to <p> specifically so it doesn't zero margins
+    // on unrelated last-child elements (list items, table cells, etc.).
+    p:last-of-type {
+      margin-bottom: 0;
+    }
   }
 
 }
@@ -2523,6 +2533,38 @@ $course-about-narrow-breakpoint: 960px;
       outline: brand.$focus-ring-width solid brand.$focus-ring-color;
       outline-offset: 2px;
     }
+  }
+}
+
+// Per-button tooltip on the social share icons (see SocialLinks.tsx) — an
+// espresso bubble matching the rest of the brand palette, in place of
+// Paragon's own default gray tooltip. The arrow's border-color is restated
+// per side because Paragon colors it separately from the bubble background.
+.course-about-social-tooltip {
+  .tooltip-inner {
+    background-color: brand.$color-espresso;
+    color: brand.$color-white;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 12.5px;
+    font-weight: brand.$font-weight-semibold;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+
+  &.bs-tooltip-top .arrow::before {
+    border-top-color: brand.$color-espresso;
+  }
+
+  &.bs-tooltip-bottom .arrow::before {
+    border-bottom-color: brand.$color-espresso;
+  }
+
+  &.bs-tooltip-left .arrow::before {
+    border-left-color: brand.$color-espresso;
+  }
+
+  &.bs-tooltip-right .arrow::before {
+    border-right-color: brand.$color-espresso;
   }
 }
 
