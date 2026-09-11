@@ -1,4 +1,5 @@
 @use "./variables" as brand;
+@import "./overrides";
 
 // Learning MFE-specific font overrides for course-authored content
 // This file can be imported only by frontend-app-learning and other course-delivery MFEs.
