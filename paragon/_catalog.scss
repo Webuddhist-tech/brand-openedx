@@ -1900,6 +1900,37 @@ $course-about-narrow-breakpoint: 960px;
     img {
       max-width: 100%;
     }
+
+    // The "watch intro" badge (see CourseAboutIntroVideoButtonSlot) — top-right
+    // corner, its own solid-ish pill background rather than a centered icon
+    // over the image: a plain icon sitting in the middle has no contrast of
+    // its own, so it disappears against a photo that happens to be a similar
+    // tone. A badge with its own fill is legible regardless of what's
+    // underneath it, and the shadow keeps it reading as a floating element
+    // rather than something pasted onto the photo.
+    .course-media-video-badge {
+      top: 12px;
+      right: 12px;
+      left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: brand.$border-radius-full;
+      background: #{rgba(brand.$accent, 0.9)};
+      color: brand.$color-espresso;
+      font-family: brand.$font-family-brand-ui;
+      font-size: 12.5px;
+      font-weight: brand.$font-weight-semibold;
+      line-height: 1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+
+      svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+    }
   }
 
   // CourseIntro brings its own Container + Card; the hero is the card here, so
@@ -1926,11 +1957,10 @@ $course-about-narrow-breakpoint: 960px;
       padding: 0;
     }
 
-    // Paragon renders the title first and the subtitle second; the design shows
-    // the org above the title, so the column is reversed rather than the props
-    // swapped — `subtitle` still carries the org for anything reading the DOM.
+    // Paragon renders the title first and the subtitle second, which already
+    // matches the design's course-name-then-organisation order — nothing to
+    // reverse here.
     .pgn__card-header .pgn__card-header-content {
-      flex-direction: column-reverse;
       margin-top: 0;
       // Paragon sets overflow: auto here, which clips the descenders on the
       // display face at some widths.
@@ -1950,6 +1980,9 @@ $course-about-narrow-breakpoint: 960px;
         line-height: 1.16;
         color: brand.$color-espresso;
         text-wrap: pretty;
+        // The gap down to the organisation line below it — the design states
+        // this on the title itself, not on the organisation line.
+        margin-bottom: 10px;
       }
     }
 
@@ -1959,10 +1992,10 @@ $course-about-narrow-breakpoint: 960px;
       letter-spacing: 2.6px;
       text-transform: uppercase;
       color: brand.$text-color-muted;
-      // Paragon's own margin-top would sit between the org and the title once
-      // the column is reversed; the gap belongs under the org instead.
+      // No margin of its own: the title above supplies the gap above it, and
+      // the CTA row below supplies its own margin-top.
       margin-top: 0;
-      margin-bottom: 10px;
+      margin-bottom: 0;
     }
 
     .pgn__card-section {
@@ -1990,6 +2023,12 @@ $course-about-narrow-breakpoint: 960px;
   // Enrollment CTA. Paragon's Button reads its colours from these custom
   // properties, so they're redefined rather than fought declaration by
   // declaration through its `:not(:disabled, .disabled, .btn-link)` rule.
+  // --pgn-btn-disabled-* included even though this button is never disabled
+  // outright: StatefulButton's "pending" state ("Enrolling...") applies a
+  // `.disabled` class (not the native attribute) while keeping the button
+  // clickable-looking, and Paragon's own CSS forces that state's opacity
+  // back to 1 — so without these, "Enrolling..." would show Paragon's
+  // generic grey instead of a muted version of this button's own colour.
   .btn-primary {
     --pgn-btn-bg: #{brand.$accent};
     --pgn-btn-color: #{brand.$accent-contrast};
@@ -2003,16 +2042,194 @@ $course-about-narrow-breakpoint: 960px;
     --pgn-btn-focus-bg: #{brand.$accent};
     --pgn-btn-focus-color: #{brand.$accent-contrast};
     --pgn-btn-focus-border-color: #{brand.$accent};
+    // A solid mixed colour, not a translucent rgba one: a semi-transparent
+    // border reads as a different shade from a semi-transparent fill of the
+    // same rgba value (one's a thin stroke, the other a large area — they
+    // don't blend against the white card behind them the same way), so
+    // bg and border only look identical if they're the same opaque colour.
+    --pgn-btn-disabled-bg: #{mix(brand.$accent, brand.$color-white, 60%)};
+    --pgn-btn-disabled-color: #{brand.$accent-contrast};
+    --pgn-btn-disabled-border-color: #{mix(brand.$accent, brand.$color-white, 60%)};
   }
 
-  // The teal secondary action ("View course" once enrolled).
-  .btn-outline-primary {
-    --pgn-btn-color: #{brand.$secondary};
-    --pgn-btn-bg: #{brand.$color-white};
+  // The teal secondary action ("View course" once enrolled) — a solid teal
+  // pill, the same treatment as .btn-primary above but on the secondary
+  // colour instead of the accent.
+  .btn-secondary {
+    --pgn-btn-bg: #{brand.$secondary};
+    --pgn-btn-color: #{brand.$secondary-contrast};
     --pgn-btn-border-color: #{brand.$secondary};
-    --pgn-btn-hover-color: #{brand.$secondary};
-    --pgn-btn-hover-bg: #{brand.$info-bg};
-    --pgn-btn-hover-border-color: #{brand.$secondary};
+    --pgn-btn-hover-bg: #{brand.$secondary-hover};
+    --pgn-btn-hover-color: #{brand.$secondary-contrast};
+    --pgn-btn-hover-border-color: #{brand.$secondary-hover};
+    --pgn-btn-active-bg: #{brand.$secondary-active};
+    --pgn-btn-active-color: #{brand.$secondary-contrast};
+    --pgn-btn-active-border-color: #{brand.$secondary-active};
+    --pgn-btn-focus-bg: #{brand.$secondary};
+    --pgn-btn-focus-color: #{brand.$secondary-contrast};
+    --pgn-btn-focus-border-color: #{brand.$secondary};
+    --pgn-btn-disabled-bg: #{mix(brand.$secondary, brand.$color-white, 60%)};
+    --pgn-btn-disabled-color: #{brand.$secondary-contrast};
+    --pgn-btn-disabled-border-color: #{mix(brand.$secondary, brand.$color-white, 60%)};
+  }
+
+  // The Wishlist button: a third, neutral tone (not the orange primary or the
+  // teal secondary) — the same white/tan-border/brown look as the catalog
+  // page's filter chips (.catalog-page .pgn__data-table-filters .dropdown-toggle),
+  // reused here rather than invented fresh.
+  .course-about-wishlist-btn {
+    --pgn-btn-color: #{brand.$color-deep-brown};
+    --pgn-btn-bg: #{brand.$color-white};
+    --pgn-btn-border-color: #{brand.$border-color};
+    --pgn-btn-hover-color: #{brand.$color-deep-saffron};
+    --pgn-btn-hover-bg: #{rgba(brand.$color-deep-saffron, 0.08)};
+    --pgn-btn-hover-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-active-color: #{brand.$color-deep-saffron};
+    --pgn-btn-active-bg: #{rgba(brand.$color-deep-saffron, 0.12)};
+    --pgn-btn-active-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-focus-color: #{brand.$color-deep-brown};
+    --pgn-btn-focus-bg: #{brand.$color-white};
+    --pgn-btn-focus-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-disabled-color: #{brand.$color-deep-brown};
+    --pgn-btn-disabled-bg: #{brand.$color-white};
+    --pgn-btn-disabled-border-color: #{brand.$border-color};
+
+    // The heart, at the sidebar's own line-icon size rather than Paragon's
+    // 24px default — a Button's iconBefore renders through the same .pgn__icon
+    // wrapper as everywhere else, whose child <svg> is forced to fill it
+    // (width/height: 100%), so the wrapper's own size is what needs stating.
+    // position: relative so the burst ring below (an ::after on this same
+    // wrapper) can place itself around the heart rather than the button.
+    .pgn__icon {
+      position: relative;
+      width: 17px;
+      height: 17px;
+    }
+
+    // A quick press-down, released the instant the click registers rather
+    // than waiting for :active to clear on its own — tactile feedback that
+    // something happened, independent of whether it ends up wishlisted or not.
+    &:active {
+      transform: scale(0.94);
+    }
+
+    // Plays once whenever the filled heart mounts (see icons.tsx) — the
+    // outline and filled hearts are two different components, not one
+    // element changing appearance, so there's nothing to CSS-*transition*
+    // between; this is a one-shot "pop" instead, timed on the icon itself
+    // rather than its wrapper so the 17px sizing above isn't affected.
+    @keyframes course-about-heart-pop {
+      0% {
+        transform: scale(0.6);
+      }
+
+      55% {
+        transform: scale(1.3);
+      }
+
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    .course-about-heart-pop {
+      transform-origin: center;
+      animation: course-about-heart-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    // A ring that blooms outward from the heart and fades, alongside the pop
+    // above — reads as a little "confirmed!" flourish rather than just the
+    // icon swapping. :has() rather than a class toggled from React: the ring
+    // only ever needs to exist at the exact moment the filled heart itself
+    // mounts, and this ties the two together without another prop/class to
+    // keep in sync.
+    @keyframes course-about-heart-burst {
+      0% {
+        transform: scale(0.3);
+        opacity: 0.55;
+      }
+
+      100% {
+        transform: scale(1.9);
+        opacity: 0;
+      }
+    }
+
+    .pgn__icon:has(.course-about-heart-pop)::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid #8B0000;
+      border-radius: 50%;
+      // forwards: without it, a finished animation reverts to the element's
+      // un-animated base style (full opacity, no transform) rather than
+      // holding its last keyframe — which left this ring stuck, permanently
+      // visible at full size, right on top of the heart instead of fading
+      // out once.
+      animation: course-about-heart-burst 0.5s ease-out forwards;
+      pointer-events: none;
+    }
+  }
+
+  // Status banners (course full, enrollment closed, invitation only, errors):
+  // a coloured strip rather than plain coloured text, so a notice reads as
+  // "something to notice" instead of blending into the row around it. Variant
+  // colours reuse the same tokens the rest of the app's info/success/error
+  // states already use — see StatusMessage.tsx for how the modifier is picked.
+  .course-about-status-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: brand.$border-radius-lg;
+    font-size: 14.5px;
+    font-weight: brand.$font-weight-semibold;
+
+    &--info {
+      background: brand.$info-bg;
+      color: brand.$info-text;
+    }
+
+    &--success {
+      background: brand.$success-bg;
+      color: brand.$success-text;
+    }
+
+    &--danger {
+      background: brand.$error-bg;
+      color: brand.$error-text;
+    }
+  }
+
+  // The "how to get an invite" trigger next to the invitation-only banner —
+  // Paragon's own HelpOutline icon (a properly drawn circle-plus-question-mark
+  // in one piece, not a hand-drawn stand-in), teal to match the banner's own
+  // info colour. No border or background of its own at rest: the icon already
+  // draws a circle, so a bordered button around it would double up into two
+  // concentric rings — this is an IconButton, not a Button, so it reads its
+  // colours from plain properties rather than Paragon's --pgn-btn-* set.
+  .course-about-invite-info-btn {
+    color: brand.$info-text;
+    background: transparent;
+
+    .pgn__icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    // No ring on press or focus — a background tint is feedback enough for a
+    // button this small and this close to the info banner it belongs to.
+    &:focus,
+    &:focus-visible {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: brand.$info-text;
+      background: brand.$info-bg;
+    }
   }
 
   .btn {
@@ -2033,6 +2250,14 @@ $course-about-narrow-breakpoint: 960px;
       outline: brand.$focus-ring-width solid brand.$focus-ring-color;
       outline-offset: 2px;
     }
+  }
+
+  // The Buy Course button's cart icon — Paragon's icons default to 24px
+  // (.pgn__icon's own base size), noticeably larger than the 15px label next
+  // to it.
+  .course-about-buy-course-btn .pgn__icon {
+    width: 17px;
+    height: 17px;
   }
 
   // Below the stacking breakpoint the hero stops being a card and its two
@@ -2070,6 +2295,94 @@ $course-about-narrow-breakpoint: 960px;
 
     .btn {
       justify-content: center;
+    }
+  }
+}
+
+// The "how to get an invite" modal (see InviteOnlyStatus.tsx). Paragon's own
+// modal renders through a portal at the document root, not inside
+// .course-about-hero, so this is its own top-level rule rather than nested —
+// but it's scoped to this one modal's own class, not every .pgn__modal on the
+// page, since other modals (e.g. the video player) have their own look.
+.course-about-invite-modal.pgn__modal {
+  border-radius: brand.$border-radius-xl;
+  border-color: brand.$border-color;
+  box-shadow: 0 8px 28px rgba(28, 10, 0, 0.14);
+
+  // Stated explicitly rather than left to Paragon's own
+  // `:first-child`/`:last-child` corner-rounding rule: the close button
+  // below is a real DOM child of this modal (needed so it's reachable in
+  // the tab order), and depending on where it sits among its siblings it
+  // could end up wearing the rounding meant for the header or the body
+  // instead of them.
+  .pgn__modal-header {
+    padding: 30px 32px 0;
+    border-top-left-radius: brand.$border-radius-xl;
+    border-top-right-radius: brand.$border-radius-xl;
+  }
+
+  .pgn__modal-title {
+    font-family: brand.$font-family-brand-display;
+    font-size: 24px;
+    font-weight: brand.$font-weight-h2;
+    letter-spacing: -0.2px;
+    color: brand.$color-espresso;
+  }
+
+  .pgn__modal-body {
+    padding: 16px 32px 32px;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 15px;
+    line-height: brand.$line-height-body;
+    color: brand.$color-warm-gray;
+    text-wrap: pretty;
+    border-bottom-left-radius: brand.$border-radius-xl;
+    border-bottom-right-radius: brand.$border-radius-xl;
+  }
+
+  // A plain custom button (see InviteOnlyStatus.tsx) rather than Paragon's
+  // own ModalDialog close button — that one renders through several layers
+  // of Paragon's own components, each carrying its own size/colour tied to
+  // its own internal classes, which kept winning specificity ties against
+  // attempts to override them from here. Nothing to fight on a plain button
+  // with a plain icon and no inherited styling of its own.
+  .course-about-invite-modal-close-btn {
+    position: absolute;
+    top: 20px;
+    inset-inline-end: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: brand.$text-color-muted;
+    padding: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    // :hover for a real mouse hover; :focus-visible rather than plain
+    // :focus for keyboard/tab navigation specifically — ModalDialog's own
+    // focus trap moves focus to this button the instant the modal opens,
+    // and plain :focus fires for that too, which made the tint appear
+    // immediately on open rather than only on an actual hover or tab press.
+    // :focus-visible's own browser heuristics don't count that kind of
+    // programmatic auto-focus, only focus a real keyboard user caused.
+    &:hover,
+    &:focus-visible {
+      background: brand.$color-sand;
+      color: brand.$color-espresso;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
     }
   }
 }
