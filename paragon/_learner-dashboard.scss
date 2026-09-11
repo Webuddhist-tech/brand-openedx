@@ -1,5 +1,6 @@
 // Learner Dashboard MFE-specific overrides.
 @use "./variables" as brand;
+@import "./overrides";
 
 button {
     &:focus:not(:focus-visible),
