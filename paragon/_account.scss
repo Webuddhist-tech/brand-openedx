@@ -1,1 +1,3 @@
 // Account MFE-specific overrides.
+@use "./variables" as brand;
+@import "./overrides";
