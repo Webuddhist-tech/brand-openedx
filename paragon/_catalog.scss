@@ -1,6 +1,7 @@
 // Catalog MFE-specific overrides.
 
 @use "./variables" as brand;
+@import "./overrides";
 
 // --pc-per-view lives here, not set inline like the other vars, so the media
 // queries below can override it — an inline style always beats a media query.

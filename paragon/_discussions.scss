@@ -1,4 +1,6 @@
 // Discussions MFE-specific overrides.
+@use "./variables" as brand;
+@import "./overrides";
 
 main#main {
   min-height: 100vh;
