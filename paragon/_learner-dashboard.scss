@@ -478,6 +478,26 @@ button {
                 border-radius: 0 !important;
                 object-fit: fill !important;
             }
+
+            &.is-fallback,
+            &:has(img[src*="/logo."]),
+            &:has(img[src*="/logo-"]),
+            &:has(img[src*="/images/logo"]),
+            &:has(img[src*="/theming/"]) {
+                max-height: 227px;
+                min-height: 200px;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+
+                .pgn__card-image-cap {
+                    width: 100% !important;
+                    height: 100% !important;
+                    object-fit: contain !important;
+                    padding: brand.$spacing-4;
+                    box-sizing: border-box;
+                }
+            }
         }
 
         .pgn__card-body {
@@ -792,14 +812,16 @@ button {
                 padding: 0 12px;
                 border: 0;
                 border-radius: brand.$border-radius-md !important;
-                color: brand.$color-deep-brown;
+                color: brand.$color-deep-brown !important;
                 background: transparent;
                 font-family: brand.$font-family-brand-ui;
+                font-size: 18px !important;
                 font-weight: 600;
+                line-height: 1.5;
                 transition: background 150ms, color 150ms;
 
                 &:hover:not(:disabled) {
-                    color: brand.$color-deep-saffron;
+                    color: brand.$color-deep-saffron !important;
                     background: rgba(brand.$color-deep-saffron, 0.08);
                 }
 
@@ -814,14 +836,26 @@ button {
 
                 &.previous {
                     width: brand.$minimum-touch-target;
+                    height: brand.$minimum-touch-target;
                     padding: 0;
                     border-radius: 50% !important;
-                    color: brand.$color-clay;
+                    color: brand.$color-clay !important;
                     font-size: 0;
 
                     .btn-icon-before,
                     .btn-icon-after {
                         margin: 0;
+                    }
+
+                    .pgn__icon,
+                    svg {
+                        width: 24px;
+                        height: 24px;
+                    }
+
+                    &:hover:not(:disabled) {
+                        color: brand.$color-deep-saffron !important;
+                        background: rgba(brand.$color-deep-saffron, 0.08);
                     }
 
                     &:focus {
@@ -831,11 +865,11 @@ button {
             }
 
             &.active .page-link {
-                color: brand.$color-espresso;
+                color: brand.$color-espresso !important;
                 background: brand.$color-saffron;
 
                 &:hover {
-                    color: brand.$color-espresso;
+                    color: brand.$color-espresso !important;
                     background: brand.$color-saffron;
                 }
             }
@@ -845,7 +879,7 @@ button {
                 opacity: 0.35;
 
                 &:hover {
-                    color: brand.$color-clay;
+                    color: brand.$color-clay !important;
                     background: transparent;
                 }
             }
@@ -855,15 +889,25 @@ button {
             border: 0;
             border-radius: brand.$border-radius-md;
             background: transparent;
-            color: brand.$color-deep-brown;
+            color: brand.$color-deep-brown !important;
             font-family: brand.$font-family-brand-ui;
+            font-size: 18px !important;
             font-weight: 600;
+            line-height: 1.5;
+
+            &::after {
+                border-top-color: currentColor;
+            }
 
             &:hover,
             &:focus,
             &.show {
-                color: brand.$color-deep-saffron;
+                color: brand.$color-deep-saffron !important;
                 background: rgba(brand.$color-deep-saffron, 0.08);
+
+                &::after {
+                    border-top-color: currentColor;
+                }
             }
 
             &:focus-visible {
@@ -885,13 +929,14 @@ button {
 
         .pgn__dropdown-item {
             border-radius: brand.$border-radius-sm;
-            color: brand.$color-deep-brown;
+            color: brand.$color-deep-brown !important;
             font-family: brand.$font-family-brand-ui;
+            font-size: 18px !important;
             text-align: center;
 
             &:hover,
             &:focus {
-                color: brand.$color-espresso;
+                color: brand.$color-espresso !important;
                 background: brand.$color-sand;
             }
         }
