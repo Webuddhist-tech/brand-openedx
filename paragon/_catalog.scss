@@ -2016,6 +2016,17 @@ $course-about-narrow-breakpoint: 960px;
         // The gap down to the organisation line below it — the design states
         // this on the title itself, not on the organisation line.
         margin-bottom: 10px;
+
+        // Jomolhari (the font Tibetan text falls through to) stacks
+        // consonants and vowel signs well above/below a normal line — 1.16
+        // is tuned for Latin text and isn't tall enough for that, letting a
+        // Tibetan title's own second line collide with its first. Scoped to
+        // this modifier (added only when the title is actually Tibetan
+        // script, same convention as .home-hero__title-accent--tibetan) so
+        // an English title keeps the tighter spacing it doesn't need.
+        &.course-about-intro-title--tibetan {
+          line-height: 1.5;
+        }
       }
     }
 
