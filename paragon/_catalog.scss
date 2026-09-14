@@ -1883,11 +1883,11 @@ $course-about-narrow-breakpoint: 960px;
   grid-row: 1;
   display: grid;
   // The image column sizes to the image rather than taking a fixed fraction,
-  // so a short title doesn't strand it mid-row — but it's capped, because
-  // course images come in every aspect ratio and an unusually wide one would
-  // otherwise crowd the title out of the first column. 520px matches
-  // .course-media-image's own max-width below, so the column and the image
-  // hit their ceiling together.
+  // so a short title doesn't strand it mid-row — but it's capped, so an
+  // unusually wide column on a big screen can't crowd the title out of the
+  // first one. .course-media-image always fills however wide this column
+  // ends up being (see below), so narrowing this cap is what actually makes
+  // the image smaller at each of the breakpoints further down.
   grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
   gap: clamp(22px, 3vw, 36px);
   align-items: start;
@@ -1907,25 +1907,19 @@ $course-about-narrow-breakpoint: 960px;
     overflow: hidden;
     background: brand.$color-sand;
 
-    // The image's height is fixed (matching the design), but its width
-    // follows the image's own proportions rather than being stretched to
-    // fill a fixed box — course images arrive in every aspect ratio, and
-    // stretch-then-crop always sliced off whichever part didn't match the
-    // box. min/max-width only exist to stop an outlier (an unusually
-    // narrow or wide upload) from shrinking the box to nothing or
-    // ballooning it over the title; object-fit: contain is what makes THAT
-    // edge case show a slightly shorter, letterboxed image (against this
-    // panel's own sand background) instead of cropping or distorting it —
-    // for every image in between, width and height already match its real
-    // shape, so contain has nothing to do and nothing gets cropped.
+    // Always fills this column's own width, whatever that is at the current
+    // breakpoint — that's what makes the image genuinely smaller on a
+    // smaller screen, rather than staying one fixed size and needing to
+    // crop or letterbox to fit wherever it lands. Height is left to follow
+    // that specific image's own real proportions (no fixed aspect-ratio
+    // here) rather than assuming every course uses the same shape — actual
+    // course images on this site range from nearly square to wide banners,
+    // so any one fixed ratio leaves a gap (revealing this panel's own sand
+    // background) for most of them, not just an occasional outlier.
     .course-media-image {
       display: block;
-      height: var(--catalog-course-about-page-course-media-image-height, 15.75rem);
-      width: auto;
-      min-width: 360px;
-      max-width: 520px;
-      margin: 0 auto;
-      object-fit: contain;
+      width: 100%;
+      height: auto;
     }
 
     // The "watch intro" badge (see CourseAboutIntroVideoButtonSlot) — top-right
@@ -1958,6 +1952,18 @@ $course-about-narrow-breakpoint: 960px;
         flex-shrink: 0;
       }
     }
+  }
+
+  // Below full desktop width there still isn't 520px to spare for the image
+  // without crowding the title and buttons out of the first column, but
+  // there's more than enough for the two to sit side by side once the image
+  // is willing to be smaller — so this only turns the column's own cap down,
+  // rather than dropping to the single-column layout the way
+  // $course-about-stack-breakpoint (below) does for phone-width screens.
+  // .course-media-image itself needs no matching override: it always fills
+  // 100% of this column, at any width, on its own.
+  @media (max-width: $course-about-narrow-breakpoint) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
   }
 
   // CourseIntro brings its own Container + Card; the hero is the card here, so
@@ -2212,6 +2218,14 @@ $course-about-narrow-breakpoint: 960px;
     font-size: 14.5px;
     font-weight: brand.$font-weight-semibold;
 
+    // A smaller size fits noticeably more of a longer message (e.g. the
+    // invitation-only banner) on one line before it needs to wrap, without
+    // the banner reading as a different, shrunken component on a phone.
+    @media (max-width: $course-about-stack-breakpoint) {
+      font-size: 13px;
+      padding: 8px 14px;
+    }
+
     &--info {
       background: brand.$info-bg;
       color: brand.$info-text;
@@ -2294,6 +2308,14 @@ $course-about-narrow-breakpoint: 960px;
   @media (max-width: $course-about-stack-breakpoint) {
     display: flex;
     flex-direction: column;
+    // align-items: start above is a grid-era leftover — it still applies
+    // here since nothing has overridden it yet, and in a column flex layout
+    // it also governs width, not just vertical position: "start" sizes each
+    // child to its own content instead of the full row. __media never showed
+    // it (the image inside is separately told to fill 100% on its own), but
+    // __text has nothing like that, so it was shrinking to fit the title
+    // instead of matching its siblings' width.
+    align-items: stretch;
     gap: 22px;
     background: none;
     border: 0;
@@ -2305,15 +2327,6 @@ $course-about-narrow-breakpoint: 960px;
       justify-self: stretch;
 
       @include course-about-card;
-
-      // The desktop min-width would force a floor wider than a phone screen
-      // once the layout stacks and there's no grid track to hold it to —
-      // dropped here so the image just takes whatever width it naturally
-      // wants, capped to the card's own width instead.
-      .course-media-image {
-        min-width: 0;
-        max-width: 100%;
-      }
     }
 
     &__text {
@@ -2333,6 +2346,22 @@ $course-about-narrow-breakpoint: 960px;
       justify-content: center;
     }
   }
+}
+
+// The intro/promo video popup (see generic/video-modal). Shared by the
+// course-about page's "Watch intro" button and the homepage's promo video —
+// neither passes the iframe a real size, so without this it renders at
+// whatever fixed size the browser defaults an iframe to, spilling off the
+// edges of a phone screen rather than shrinking to fit it. Sized off its own
+// width instead: youtube's embed is always this same 16:9 shape, so letting
+// height follow width (rather than guessing a fixed number) keeps the video
+// filling the popup exactly, at any screen size, with nothing to crop or
+// letterbox.
+.video-modal-iframe {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
 }
 
 // The "how to get an invite" modal (see InviteOnlyStatus.tsx). Paragon's own
@@ -2756,12 +2785,16 @@ $course-about-narrow-breakpoint: 960px;
   // load order between Paragon and this file isn't guaranteed.
   .pgn__hstack.justify-content-between {
     padding: 15px 20px !important;
-    // The row keeps its two halves on one line; Bootstrap's flex-wrap utility
-    // would otherwise drop a long value onto a line of its own, where it reads
-    // as a separate row rather than this row's value. The label gives up the
-    // space instead (see below), which matters most in translation — several
-    // of these labels are markedly longer in other languages.
-    flex-wrap: nowrap;
+    // The row keeps its two halves on one line; Bootstrap's own flex-wrap
+    // utility class (SidebarDetailsItem's className) would otherwise drop a
+    // long value onto a line of its own, where it reads as a separate row
+    // rather than this row's value. That utility sets it !important, so this
+    // needs to as well — without it, this rule compiles fine but silently
+    // loses to Bootstrap's regardless of source order, and the wrap it's
+    // meant to prevent happens anyway. The label gives up the space instead
+    // (see below), which matters most in translation — several of these
+    // labels are markedly longer in other languages.
+    flex-wrap: nowrap !important;
   }
 
   [data-testid="sidebar-details-item-label"] {
