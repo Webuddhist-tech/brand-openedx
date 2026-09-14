@@ -2218,14 +2218,6 @@ $course-about-narrow-breakpoint: 960px;
     font-size: 14.5px;
     font-weight: brand.$font-weight-semibold;
 
-    // A smaller size fits noticeably more of a longer message (e.g. the
-    // invitation-only banner) on one line before it needs to wrap, without
-    // the banner reading as a different, shrunken component on a phone.
-    @media (max-width: $course-about-stack-breakpoint) {
-      font-size: 13px;
-      padding: 8px 14px;
-    }
-
     &--info {
       background: brand.$info-bg;
       color: brand.$info-text;
