@@ -491,6 +491,17 @@
     font-style: italic;
     font-weight: brand.$font-weight-display;
     color: brand.$color-deep-saffron;
+
+    // Jomolhari (the font Tibetan text falls through to) stacks consonants
+    // and vowel signs well above/below a normal line — .home-hero__title's
+    // own line-height (1.06) is tuned for the Latin heading above it and
+    // isn't tall enough for that, letting a Tibetan name collide with the
+    // line above. Scoped to this modifier (HomePageOverlay only adds it when
+    // the text actually contains Tibetan characters) so an English name
+    // keeps the tighter spacing it doesn't need.
+    &--tibetan {
+      line-height: 1.5;
+    }
   }
 
   // Paragon SearchField restyled as one pill; submit control kept (not the
@@ -1873,10 +1884,11 @@ $course-about-narrow-breakpoint: 960px;
   display: grid;
   // The image column sizes to the image rather than taking a fixed fraction,
   // so a short title doesn't strand it mid-row — but it's capped, because
-  // course images come in every aspect ratio and a wide one would otherwise
-  // crowd the title out of the first column. 420px matches the ceiling the
-  // design's own sizing script applies.
-  grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+  // course images come in every aspect ratio and an unusually wide one would
+  // otherwise crowd the title out of the first column. 520px matches
+  // .course-media-image's own max-width below, so the column and the image
+  // hit their ceiling together.
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px);
   gap: clamp(22px, 3vw, 36px);
   align-items: start;
   min-width: 0;
@@ -1895,10 +1907,25 @@ $course-about-narrow-breakpoint: 960px;
     overflow: hidden;
     background: brand.$color-sand;
 
-    // CourseMedia fixes the image's height and object-fit; this keeps a wide
-    // one inside the capped column instead of overflowing it.
-    img {
-      max-width: 100%;
+    // The image's height is fixed (matching the design), but its width
+    // follows the image's own proportions rather than being stretched to
+    // fill a fixed box — course images arrive in every aspect ratio, and
+    // stretch-then-crop always sliced off whichever part didn't match the
+    // box. min/max-width only exist to stop an outlier (an unusually
+    // narrow or wide upload) from shrinking the box to nothing or
+    // ballooning it over the title; object-fit: contain is what makes THAT
+    // edge case show a slightly shorter, letterboxed image (against this
+    // panel's own sand background) instead of cropping or distorting it —
+    // for every image in between, width and height already match its real
+    // shape, so contain has nothing to do and nothing gets cropped.
+    .course-media-image {
+      display: block;
+      height: var(--catalog-course-about-page-course-media-image-height, 15.75rem);
+      width: auto;
+      min-width: 360px;
+      max-width: 520px;
+      margin: 0 auto;
+      object-fit: contain;
     }
 
     // The "watch intro" badge (see CourseAboutIntroVideoButtonSlot) — top-right
@@ -2278,6 +2305,15 @@ $course-about-narrow-breakpoint: 960px;
       justify-self: stretch;
 
       @include course-about-card;
+
+      // The desktop min-width would force a floor wider than a phone screen
+      // once the layout stacks and there's no grid track to hold it to —
+      // dropped here so the image just takes whatever width it naturally
+      // wants, capped to the card's own width instead.
+      .course-media-image {
+        min-width: 0;
+        max-width: 100%;
+      }
     }
 
     &__text {
