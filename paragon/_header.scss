@@ -318,65 +318,30 @@ $nav-underline-radius: 2px;
   letter-spacing: 0.3px;
   cursor: pointer;
   flex-shrink: 0;
-  // The ring is one continuous shape across all three states: the 2px border
-  // at rest, then this shadow growing outward from it on hover and again when
-  // the menu opens. Every state below therefore declares the same shadow in
-  // the same shape and the same fully-opaque colour, and varies only the
-  // spread, so each transition is a single interpolating number.
-  //
-  // Both halves of that matter. Leaving box-shadow undeclared here would make
-  // the rest state `none`, and `none` is not a shadow list, so browsers snap
-  // to it rather than interpolating - the ring collapses before it grows.
-  // Declaring it as `transparent` instead would fix the shape but not the
-  // colour: `transparent` is rgba(0, 0, 0, 0), so fading from it to sand
-  // passes through murky semi-opaque black. A zero-spread sand shadow paints
-  // nothing at all while keeping both the shape and the colour constant.
+  // Only the spread animates. `none` can't interpolate with a spread value,
+  // and `transparent` is rgba(0,0,0,0) so it fades through murky black.
   box-shadow: 0 0 0 0 brand.$color-sand !important;
   transition: box-shadow brand.$interaction-transition;
 }
 
-// Solid, not alpha-blended: the photo's own border (below) is fully opaque
-// sand, and a semi-transparent ring here would render as a visibly different
-// shade right where the two meet, once blended with the page behind it - a
-// thin seam at the boundary. Matching it exactly erases that seam. Hover and
-// open are told apart by ring thickness instead of by opacity.
-//
-// !important throughout: something outside this file was winning the
-// box-shadow on click even after the specificity fix below, which left the
-// ring able to drop to a foreign value mid-interaction. Forcing all three
-// states means the only shadows this button can ever hold are these, and any
-// transition between them is smooth by construction.
+// Solid, not alpha-blended: a semi-transparent ring would meet the photo's
+// opaque sand border at a visibly different shade, leaving a seam.
 .nav-profile:hover {
   box-shadow: 0 0 0 3px brand.$color-sand !important;
 }
 
-// The compound `[aria-expanded="true"]:hover` selector (not just
-// `[aria-expanded="true"]`) is deliberate: that attribute selector alone ties
-// in specificity with `.nav-profile:hover` above, so which one wins while the
-// pointer is still over the button after the click that opened the menu would
-// depend on source order alone - the open ring could lose to the hover ring.
-// The extra `:hover` here raises specificity so the open state always wins
-// while hovering, and it's harmless when not hovering since `:hover` just
-// won't match.
+// The `:hover` variant outranks `.nav-profile:hover`, which it would
+// otherwise only tie with on specificity.
 .nav-profile[aria-expanded="true"],
 .nav-profile[aria-expanded="true"]:hover {
   box-shadow: 0 0 0 5px brand.$color-sand !important;
 }
 
-// The app ships a global `button:focus:not(:focus-visible), button:active {
-// box-shadow: none !important }` reset. It matches this button the moment a
-// click focuses it, and at (0,2,1) it outranks the plain `:hover` rule above
-// at (0,2,0) - an element selector breaks the tie when the class counts are
-// equal, and !important on both sides doesn't change that. The ring therefore
-// snapped to `none` on mousedown and only came back once `aria-expanded` made
-// the compound selector above apply: the ring visibly collapsed, then grew.
-//
-// Each stage is restated here against `:focus`/`:active` with `:not(:disabled)`
-// padding the specificity past that reset, so the ring holds its value through
-// the whole click instead of dropping out mid-transition. The Sherab LMS theme
-// carries the same three pairs for the edx v1 equivalent of this reset; keep
-// the two in step. Order matters within the (0,4,0) group below - the open
-// state comes last so it wins the tie while hovered and focused at once.
+// Each stage restated to outrank the app's global
+// `button:focus:not(:focus-visible), button:active { box-shadow: none }`,
+// which otherwise blanks the ring on click. `:not(:disabled)` pads the
+// specificity past it. Open state stays last so it wins the tie when hovered
+// and focused at once. Mirrored in the Sherab LMS theme.
 .nav-profile:focus:not(:disabled),
 .nav-profile:active:not(:disabled) {
   box-shadow: 0 0 0 0 brand.$color-sand !important;
@@ -569,9 +534,8 @@ $nav-underline-radius: 2px;
   color: brand.$color-saffron;
 }
 
-// Selected marker sits inside the shell padding, vertically centred on the row.
-// Current-page rows only: a checked language row already carries the tick at
-// its trailing edge, and the bar as well read as two markers for one state.
+// Sits inside the shell padding, vertically centred. Current-page rows only:
+// a checked language row is already marked by its tick.
 .nav-menu-item[aria-current="page"]::before {
   content: '';
   position: absolute;
