@@ -308,23 +308,42 @@ $nav-underline-radius: 2px;
   font-family: brand.$font-family-brand-ui;
   font-size: brand.$font-size-caption;
   font-weight: brand.$font-weight-bold;
+
+  line-height: 1;
   letter-spacing: 0.3px;
   cursor: pointer;
   flex-shrink: 0;
+  // Only the spread animates; `none` and `transparent` both break the fade.
+  box-shadow: 0 0 0 0 brand.$color-sand !important;
   transition: box-shadow brand.$interaction-transition;
 }
 
-// Solid, not alpha-blended: the photo's own border (below) is fully opaque
-// sand, and a semi-transparent ring here would render as a visibly different
-// shade right where the two meet, once blended with the page behind it - a
-// thin seam at the boundary. Matching it exactly erases that seam. Hover and
-// open are told apart by ring thickness instead of by opacity.
+// Solid sand, not alpha-blended - a translucent ring seams against the border.
 .nav-profile:hover {
-  box-shadow: 0 0 0 3px brand.$color-sand;
+  box-shadow: 0 0 0 3px brand.$color-sand !important;
 }
 
-.nav-profile[aria-expanded="true"] {
-  box-shadow: 0 0 0 5px brand.$color-sand;
+// The :hover variant breaks the specificity tie with .nav-profile:hover.
+.nav-profile[aria-expanded="true"],
+.nav-profile[aria-expanded="true"]:hover {
+  box-shadow: 0 0 0 5px brand.$color-sand !important;
+}
+
+// Outranks the global button:focus/:active reset that blanks the ring on
+// click. Open state last so it wins when hovered and focused at once.
+.nav-profile:focus:not(:disabled),
+.nav-profile:active:not(:disabled) {
+  box-shadow: 0 0 0 0 brand.$color-sand !important;
+}
+
+.nav-profile:hover:focus:not(:disabled),
+.nav-profile:hover:active:not(:disabled) {
+  box-shadow: 0 0 0 3px brand.$color-sand !important;
+}
+
+.nav-profile[aria-expanded="true"]:focus:not(:disabled),
+.nav-profile[aria-expanded="true"]:active:not(:disabled) {
+  box-shadow: 0 0 0 5px brand.$color-sand !important;
 }
 
 // Just fills the button - the border and the round clip both belong to
@@ -504,9 +523,8 @@ $nav-underline-radius: 2px;
   color: brand.$color-saffron;
 }
 
-// Selected marker sits inside the shell padding, vertically centred on the row.
-.nav-menu-item[aria-current="page"]::before,
-.nav-menu-item[aria-checked="true"]::before {
+// Current-page rows only - a checked language row is marked by its tick.
+.nav-menu-item[aria-current="page"]::before {
   content: '';
   position: absolute;
   left: brand.$spacing-1;
@@ -579,6 +597,9 @@ $nav-underline-radius: 2px;
   color: brand.$color-espresso;
   font-size: brand.$font-size-caption;
   font-weight: brand.$font-weight-bold;
+  // See .nav-profile above: explicit and tight, rather than the browser's own
+  // per-font "normal", so the initials center consistently everywhere.
+  line-height: 1;
   letter-spacing: 0.3px;
 }
 
@@ -601,18 +622,24 @@ $nav-underline-radius: 2px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  line-height: brand.$line-height-label;
 }
 
+// Line-height is explicit and taller than `$line-height-label` on purpose,
+// same reasoning as `.nav-course-title` above: this is a real account name,
+// which can be a Tibetan run, and `overflow: hidden` clips to whatever height
+// this line box actually is. `.nav-menu-id-email` keeps the tighter role value
+// since an email address is always Latin/ASCII and never needs the headroom.
 .nav-menu-id-name {
   color: brand.$color-espresso;
   font-size: brand.$font-size-caption;
   font-weight: brand.$font-weight-semibold;
+  line-height: 2;
 }
 
 .nav-menu-id-email {
   color: brand.$color-clay;
   font-size: brand.$font-size-label;
+  line-height: brand.$line-height-label;
 }
 
 // ---------------------------------------------------------------- language rows
