@@ -308,40 +308,29 @@ $nav-underline-radius: 2px;
   font-family: brand.$font-family-brand-ui;
   font-size: brand.$font-size-caption;
   font-weight: brand.$font-weight-bold;
-  // Explicit rather than left at the browser's own per-font "normal" - the
-  // initials are centered by the flexbox rules above, which center the line
-  // box, not the glyph ink itself. `normal` is computed from each font's own
-  // ascent/descent metrics, so how close that gets to visually centered
-  // varies by browser and platform; a tight, deterministic value keeps it
-  // consistent everywhere. Same reasoning as `.nav-course-title` above.
+
   line-height: 1;
   letter-spacing: 0.3px;
   cursor: pointer;
   flex-shrink: 0;
-  // Only the spread animates. `none` can't interpolate with a spread value,
-  // and `transparent` is rgba(0,0,0,0) so it fades through murky black.
+  // Only the spread animates; `none` and `transparent` both break the fade.
   box-shadow: 0 0 0 0 brand.$color-sand !important;
   transition: box-shadow brand.$interaction-transition;
 }
 
-// Solid, not alpha-blended: a semi-transparent ring would meet the photo's
-// opaque sand border at a visibly different shade, leaving a seam.
+// Solid sand, not alpha-blended - a translucent ring seams against the border.
 .nav-profile:hover {
   box-shadow: 0 0 0 3px brand.$color-sand !important;
 }
 
-// The `:hover` variant outranks `.nav-profile:hover`, which it would
-// otherwise only tie with on specificity.
+// The :hover variant breaks the specificity tie with .nav-profile:hover.
 .nav-profile[aria-expanded="true"],
 .nav-profile[aria-expanded="true"]:hover {
   box-shadow: 0 0 0 5px brand.$color-sand !important;
 }
 
-// Each stage restated to outrank the app's global
-// `button:focus:not(:focus-visible), button:active { box-shadow: none }`,
-// which otherwise blanks the ring on click. `:not(:disabled)` pads the
-// specificity past it. Open state stays last so it wins the tie when hovered
-// and focused at once. Mirrored in the Sherab LMS theme.
+// Outranks the global button:focus/:active reset that blanks the ring on
+// click. Open state last so it wins when hovered and focused at once.
 .nav-profile:focus:not(:disabled),
 .nav-profile:active:not(:disabled) {
   box-shadow: 0 0 0 0 brand.$color-sand !important;
@@ -534,8 +523,7 @@ $nav-underline-radius: 2px;
   color: brand.$color-saffron;
 }
 
-// Sits inside the shell padding, vertically centred. Current-page rows only:
-// a checked language row is already marked by its tick.
+// Current-page rows only - a checked language row is marked by its tick.
 .nav-menu-item[aria-current="page"]::before {
   content: '';
   position: absolute;
