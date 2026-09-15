@@ -1916,10 +1916,13 @@ $course-about-narrow-breakpoint: 960px;
     // course images on this site range from nearly square to wide banners,
     // so any one fixed ratio leaves a gap (revealing this panel's own sand
     // background) for most of them, not just an occasional outlier.
+    // !important overrides CourseMedia.scss's own fixed height/object-fit
+    // rule, which ships unchanged in frontend-app-catalog and loads after
+    // this file — see that file's own comment for why it's left alone.
     .course-media-image {
       display: block;
-      width: 100%;
-      height: auto;
+      width: 100% !important;
+      height: auto !important;
     }
 
     // The "watch intro" badge (see CourseAboutIntroVideoButtonSlot) — top-right
