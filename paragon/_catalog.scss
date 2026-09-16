@@ -2121,26 +2121,47 @@ $course-about-narrow-breakpoint: 960px;
     --pgn-btn-disabled-border-color: #{mix(brand.$secondary, brand.$color-white, 60%)};
   }
 
-  // The Wishlist button: a third, neutral tone (not the orange primary or the
-  // teal secondary) — the same white/tan-border/brown look as the catalog
-  // page's filter chips (.catalog-page .pgn__data-table-filters .dropdown-toggle),
-  // reused here rather than invented fresh.
+  // The Wishlist button: a neutral fill (not the orange primary) with a teal
+  // border, tying it to the secondary colour without going full teal fill —
+  // the same white/border/brown look as the catalog page's filter chips
+  // (.catalog-page .pgn__data-table-filters .dropdown-toggle), just with the
+  // border swapped to brand.$secondary so it doesn't read as unstyled.
   .course-about-wishlist-btn {
     --pgn-btn-color: #{brand.$color-deep-brown};
     --pgn-btn-bg: #{brand.$color-white};
-    --pgn-btn-border-color: #{brand.$border-color};
+    --pgn-btn-border-color: #{brand.$secondary};
     --pgn-btn-hover-color: #{brand.$color-deep-saffron};
     --pgn-btn-hover-bg: #{rgba(brand.$color-deep-saffron, 0.08)};
-    --pgn-btn-hover-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-hover-border-color: #{brand.$secondary};
     --pgn-btn-active-color: #{brand.$color-deep-saffron};
     --pgn-btn-active-bg: #{rgba(brand.$color-deep-saffron, 0.12)};
-    --pgn-btn-active-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-active-border-color: #{brand.$secondary};
     --pgn-btn-focus-color: #{brand.$color-deep-brown};
     --pgn-btn-focus-bg: #{brand.$color-white};
-    --pgn-btn-focus-border-color: #{brand.$color-deep-saffron};
+    --pgn-btn-focus-border-color: #{brand.$secondary};
     --pgn-btn-disabled-color: #{brand.$color-deep-brown};
     --pgn-btn-disabled-bg: #{brand.$color-white};
-    --pgn-btn-disabled-border-color: #{brand.$border-color};
+    --pgn-btn-disabled-border-color: #{brand.$secondary};
+
+    // paragon/_overrides.scss sets the tertiary variant's whole border
+    // shorthand (`1px solid transparent !important`), which is why
+    // border-color needs its own !important override below rather than the
+    // --pgn-btn-border-color custom property alone -- and why the width is
+    // forced here too, to match the 2px used on the secondary/outline
+    // buttons instead of tertiary's thinner 1px default.
+    border-width: 2px !important;
+    border-color: #{brand.$secondary} !important;
+
+    // The class is repeated in this selector only to match the specificity
+    // of paragon/_overrides.scss's own
+    // `.btn-tertiary:not(.page-link):hover:not(:disabled):not(.disabled)`
+    // rule (5 class-equivalents vs. 3 here) -- without it, that rule's own
+    // !important border-color would still win on hover.
+    &:hover.course-about-wishlist-btn.course-about-wishlist-btn,
+    &:focus,
+    &:active {
+      border-color: #{brand.$secondary} !important;
+    }
 
     // The heart, at the sidebar's own line-icon size rather than Paragon's
     // 24px default — a Button's iconBefore renders through the same .pgn__icon
@@ -2207,7 +2228,7 @@ $course-about-narrow-breakpoint: 960px;
       content: '';
       position: absolute;
       inset: 0;
-      border: 1.5px solid #8B0000;
+      border: 1.5px solid #DC2626;
       border-radius: 50%;
       // forwards: without it, a finished animation reverts to the element's
       // un-animated base style (full opacity, no transform) rather than
