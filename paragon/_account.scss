@@ -306,8 +306,12 @@ $account-sticky-offset: brand.$spacing-16; // 64px — matches .site-nav height 
 }
 
 .page__account-settings .ac-nav {
-  top: $account-sticky-offset;
   min-width: 0;
+
+  &.jump-nav-sm {
+    top: $account-sticky-offset + brand.$spacing-8;
+    align-self:start;
+  }
 
   .ac-nav-list {
     display: flex;
