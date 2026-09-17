@@ -23,6 +23,7 @@ $color-terracotta: #8A5A3A;
 $color-terracotta-light: #C08A60;
 $color-terracotta-dark: #7A3F1E;
 $color-blush: #FBEFE6;
+$color-stone: #A08D78;
 
 // Semantic colors. These names match the older Indigo/Paragon Sass convention.
 $primary: $color-deep-saffron;
@@ -36,6 +37,7 @@ $text-color: $color-espresso;
 $text-color-primary: $color-deep-brown;
 $text-color-light: $color-warm-gray;
 $text-color-muted: $color-clay;
+$text-color-empty: $color-stone;
 $body-bg: $color-white;
 $card-bg: $color-parchment;
 $section-bg: $color-sand;
@@ -69,6 +71,14 @@ $warning-bg: #FEF3E2;
 $warning-text: #5C3000;
 $info-bg: #E3F1F7;
 $info-text: $color-dharma-teal;
+
+// Destructive action colors (Account delete flows — Material red).
+// Distinct from $error-* burgundy status messaging; do not merge the two systems.
+$color-danger: #B3261E;
+$color-danger-dark: #8C1D18;
+$color-danger-border: #E5A9A4;
+$color-danger-divider: #F3C9C5;
+$danger-bg: $error-bg;
 
 // Noto Serif Tibetan activates only for Tibetan chars (unicode-range: U+0F00-0FFF).
 // English/Latin chars fall through to the explicit sans-serif fallbacks below.
