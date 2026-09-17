@@ -526,6 +526,33 @@ $account-sticky-offset: brand.$spacing-16; // 64px — matches .site-nav height 
     font-size: brand.$font-size-caption;
   }
 
+  // Override legacy index.scss notification rules (kept in MFE for upgrade safety).
+    .notification-preferences {
+    .header-label {
+        color: brand.$text-color-muted !important;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-caption;
+    }
+
+    .notification-course-title {
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-ui;
+        font-size: brand.$footer-store-badge-name-font-size;
+        font-weight: brand.$font-weight-semibold;
+        line-height: brand.$line-height-h4;
+    }
+
+    .preference-app {
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-ui;
+        font-size: brand.$footer-store-badge-name-font-size;
+    }
+    }
+
+    .ac-empty .btn-link {
+    text-decoration: none;
+    }
+
   .custom-switch {
     max-width: 500px;
     padding: 0;
