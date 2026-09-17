@@ -1,3 +1,705 @@
 // Account MFE-specific overrides.
 @use "./variables" as brand;
 @import "./overrides";
+
+$account-sticky-offset: brand.$spacing-16; // 64px — matches .site-nav height in _header.scss
+
+.page__account-settings.ac-wrap {
+  // Match .catalog-page (Discover new) — overrides Paragon container-mw-xl !important.
+  max-width: 75rem !important;
+  margin: 0 auto;
+  padding-top: brand.$spacing-8 + brand.$spacing-2;
+  padding-bottom: brand.$spacing-16 + brand.$spacing-3;
+  padding-left: brand.$spacing-8 !important;
+  padding-right: brand.$spacing-8 !important;
+  display: grid;
+  grid-template-columns: 236px minmax(0, 1fr);
+  gap: brand.$spacing-6 + brand.$spacing-1 brand.$spacing-8 + brand.$spacing-1;
+  align-items: start;
+  color: brand.$text-color;
+  font-family: brand.$font-family-brand-ui;
+
+  .ac-head {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-2;
+    margin-bottom: brand.$spacing-2;
+  }
+
+  .ac-page-alert {
+    grid-column: 1 / -1;
+  }
+
+  .ac-eyebrow {
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: 2.6px;
+    text-transform: uppercase;
+  }
+
+  .ac-h1 {
+    margin: 0;
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display;
+    font-size: clamp(32px, 2.9vw, 40px);
+    font-weight: brand.$font-weight-h1;
+    letter-spacing: -0.4px;
+    line-height: 1.14;
+  }
+
+  .ac-main {
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-6;
+    min-width: 0;
+  }
+
+  .account-section {
+    scroll-margin-top: $account-sticky-offset;
+  }
+
+  .ac-card {
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-xl;
+    background: brand.$color-white;
+    box-shadow: 0 2px 8px rgba(brand.$color-espresso, 0.06);
+  }
+
+  .ac-card-head {
+    padding: brand.$spacing-6 + brand.$spacing-1 brand.$spacing-8 brand.$footer-store-badge-icon-size;
+    border-bottom: 1px solid brand.$section-bg;
+    background: brand.$card-bg;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .ac-card-head + .ac-row,
+  .ac-card-head + .pgn-transition-replace-group .ac-row,
+  .ac-card-head + .form-group.ac-row {
+    border-top: none;
+  }
+
+  .ac-h2,
+  .notification-heading {
+    margin: 0;
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display;
+    font-size: brand.$font-size-h3;
+    font-weight: brand.$font-weight-h2;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+  }
+
+  .ac-card-note {
+    margin-top: brand.$spacing-2;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-caption;
+    line-height: 1.6;
+  }
+
+  .ac-row {
+    display: flex;
+    align-items: flex-start;
+    gap: brand.$footer-store-badge-icon-size;
+    margin: 0;
+    padding: brand.$footer-store-badge-icon-size brand.$spacing-8;
+    border-top: 1px solid brand.$section-bg;
+
+    &.form-group {
+      margin-bottom: 0;
+    }
+  }
+
+  #social-media .ac-row,
+  .ac-linked-row {
+    padding-top: brand.$spacing-4;
+    padding-bottom: brand.$spacing-4;
+  }
+
+  .ac-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: brand.$spacing-2;
+    min-height: brand.$minimum-touch-target;
+    padding: brand.$footer-store-badge-gap brand.$font-size-h4;
+    border: none;
+    border-radius: brand.$border-radius-md;
+    color: inherit;
+    background: transparent;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background brand.$interaction-transition,
+      color brand.$interaction-transition,
+      border-color brand.$interaction-transition;
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  .ac-btn-ghost,
+  .ac-edit {
+    border: 1.5px solid brand.$border-color !important;
+    color: brand.$text-color-primary !important;
+    background: brand.$color-white !important;
+
+    &:hover:not(:disabled) {
+      border-color: brand.$color-bark !important;
+      color: brand.$text-color !important;
+      background: brand.$section-bg !important;
+      text-decoration: none;
+    }
+  }
+
+  .ac-btn-primary,
+  .ac-password-row .btn-primary {
+    margin-top: brand.$spacing-2;
+    border: 0 !important;
+    color: brand.$accent-contrast !important;
+    background: brand.$accent !important;
+
+    &:hover:not(:disabled) {
+      color: brand.$text-color !important;
+      background: brand.$accent-hover !important;
+    }
+  }
+
+  .ac-row-body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .ac-row-action {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: brand.$spacing-2;
+  }
+
+  .ac-label {
+    display: block;
+    margin: 0 0 brand.$spacing-2;
+    color: brand.$text-color-muted;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-bold;
+    letter-spacing: 1.6px;
+    line-height: brand.$line-height-label;
+    text-transform: uppercase;
+  }
+
+  .ac-value {
+    margin: 0;
+    color: brand.$text-color;
+    font-size: brand.$footer-store-badge-name-font-size;
+    font-weight: brand.$font-weight-medium;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+
+    // Saved social URLs — nav-link colors without the header underline treatment.
+    .pgn__hyperlink {
+      color: brand.$color-deep-brown;
+      font-weight: brand.$font-weight-medium;
+      text-decoration: none;
+      transition: color brand.$interaction-transition;
+
+      &:hover {
+        color: brand.$color-espresso;
+        text-decoration: none;
+      }
+
+      &:active {
+        color: brand.$color-espresso;
+      }
+
+      &:focus-visible {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-sm;
+      }
+    }
+  }
+
+  .ac-empty,
+  .ac-empty .btn-link {
+    color: brand.$text-color-empty !important;
+    font-style: italic;
+    font-weight: brand.$font-weight-body;
+  }
+
+  .ac-help,
+  .form-text {
+    max-width: 56ch;
+    margin: brand.$spacing-2 0 0;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-caption;
+    line-height: 1.6;
+  }
+
+  .ac-form {
+    width: 100%;
+
+    .form-group {
+      max-width: 420px;
+      margin: 0;
+    }
+  }
+
+  .ac-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: brand.$spacing-2;
+    margin-top: brand.$spacing-3;
+  }
+
+  .ac-lock {
+    display: inline-flex;
+    align-items: center;
+    gap: brand.$spacing-2;
+    padding: brand.$footer-store-badge-padding-y brand.$footer-store-badge-padding-start;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-full;
+    color: brand.$text-color-muted;
+    background: brand.$card-bg;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-semibold;
+    white-space: nowrap;
+  }
+
+  .form-control,
+  .pgn__form-control {
+    min-height: brand.$minimum-touch-target;
+    border: 1.5px solid brand.$color-bark;
+    border-radius: brand.$border-radius-md;
+    color: brand.$text-color;
+    background-color: brand.$color-white;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$footer-store-badge-name-font-size;
+
+    &:hover {
+      border-color: brand.$primary;
+    }
+
+    &:focus {
+      border-color: brand.$primary;
+      box-shadow: 0 0 0 3px rgba(brand.$color-deep-saffron, 0.18);
+    }
+  }
+
+  .alert {
+    margin: brand.$spacing-3 0 0;
+    border-radius: brand.$border-radius-lg;
+  }
+}
+
+.page__account-settings .ac-nav {
+  top: $account-sticky-offset;
+  min-width: 0;
+
+  .ac-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-1;
+    margin: 0;
+  }
+
+  li {
+    position: relative;
+    margin: 0;
+  }
+
+  .ac-navlink {
+    display: flex;
+    align-items: center;
+    gap: brand.$footer-store-badge-gap;
+    min-height: brand.$minimum-touch-target;
+    padding: brand.$footer-store-badge-padding-y brand.$spacing-3;
+    border-radius: brand.$border-radius-md;
+    color: brand.$text-color-primary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-medium;
+    text-decoration: none;
+    transition: background brand.$interaction-transition;
+
+    svg {
+      flex: 0 0 auto;
+      width: brand.$spacing-4;
+      height: brand.$spacing-4;
+      color: brand.$text-color-muted;
+      transition: color brand.$interaction-transition;
+    }
+
+    &:hover {
+      background: brand.$section-bg;
+      text-decoration: none;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: -2px;
+    }
+  }
+
+  li.is-active .ac-navlink {
+    color: brand.$text-color;
+    background: brand.$section-bg;
+    font-weight: brand.$font-weight-semibold;
+
+    svg {
+      color: brand.$accent;
+    }
+  }
+
+  .ac-nav-item-danger .ac-navlink {
+    color: brand.$color-danger;
+
+    &:hover {
+      background: brand.$danger-bg;
+    }
+  }
+}
+
+.page__account-settings {
+  .ac-reset-note {
+    display: flex;
+    gap: brand.$spacing-3;
+    max-width: 640px;
+    margin-top: brand.$spacing-3;
+    padding: brand.$spacing-4 brand.$font-size-h4;
+    border: 1px solid brand.$section-bg;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$card-bg;
+
+    .ac-reset-note-icon {
+      flex: 0 0 auto;
+      margin-top: 2px;
+      color: brand.$color-terracotta-dark;
+    }
+
+    p {
+      margin: 0;
+      color: brand.$text-color-muted;
+      font-size: brand.$font-size-caption;
+      line-height: 1.65;
+      text-wrap: pretty;
+    }
+  }
+
+  .ac-email-confirmation-title {
+    margin: 0 0 brand.$spacing-1;
+    color: brand.$text-color;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+  }
+
+  .ac-delete-intro {
+    margin-top: 0;
+  }
+
+  .ac-delete-action {
+    justify-content: flex-start;
+    margin-top: brand.$spacing-2;
+  }
+
+  .ac-linked-row {
+    align-items: center;
+  }
+
+  .ac-linked {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-3;
+    min-width: 0;
+  }
+
+  .ac-linked-mark {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: brand.$minimum-touch-target;
+    height: brand.$minimum-touch-target;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$color-white;
+    color: brand.$text-color-primary;
+  }
+
+  .ac-linked-mark-initial {
+    font-size: brand.$footer-store-badge-name-font-size;
+    font-weight: brand.$font-weight-semibold;
+  }
+
+  .ac-linked-copy {
+    min-width: 0;
+  }
+
+  .ac-linked-name {
+    margin: 0;
+    color: brand.$text-color;
+    font-size: brand.$footer-store-badge-name-font-size;
+    font-weight: brand.$font-weight-semibold;
+  }
+
+  .ac-linked-state {
+    display: block;
+    margin-top: brand.$spacing-1;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-caption;
+  }
+
+  .ac-danger {
+    border-color: brand.$color-danger-border;
+
+    .ac-card-head {
+      border-color: brand.$color-danger-divider;
+      background: brand.$danger-bg;
+    }
+
+    .ac-h2 {
+      color: brand.$color-danger-dark;
+    }
+  }
+
+  .ac-delete-body {
+    padding: brand.$footer-store-badge-icon-size brand.$spacing-8 brand.$spacing-6 + brand.$spacing-1;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-caption;
+    line-height: 1.6;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .ac-delete-warning {
+    color: brand.$color-terracotta-dark;
+    font-weight: brand.$font-weight-semibold;
+  }
+
+  .ac-btn-danger,
+  .btn-danger {
+    border-color: brand.$color-danger !important;
+    color: brand.$color-white !important;
+    background: brand.$color-danger !important;
+
+    &:hover:not(:disabled) {
+      border-color: brand.$color-danger-dark !important;
+      background: brand.$color-danger-dark !important;
+    }
+  }
+
+  .notification-preferences {
+    max-width: none;
+
+    .ac-card-head {
+      display: block;
+    }
+  }
+
+  .ac-notification-body {
+    padding: brand.$footer-store-badge-icon-size brand.$spacing-8 brand.$spacing-8;
+  }
+
+  .notification-course-title,
+  .preference-app {
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-ui;
+  }
+
+  .notification-sub-heading,
+  .header-label {
+    color: brand.$text-color-muted !important;
+    font-size: brand.$font-size-caption;
+  }
+
+  .custom-switch {
+    max-width: 500px;
+    padding: 0;
+
+    .custom-control-label {
+      left: 2.25rem; // Paragon switch geometry.
+      line-height: 1.6rem;
+    }
+  }
+
+  .grayed-out {
+    opacity: 0.6;
+  }
+}
+
+.pgn__modal {
+  border: 1px solid brand.$border-color;
+  border-radius: brand.$border-radius-xl;
+  box-shadow: 0 24px 60px rgba(brand.$color-espresso, 0.24);
+
+  .pgn__modal-title {
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display;
+    font-size: brand.$font-size-h3;
+    font-weight: brand.$font-weight-h2;
+  }
+
+  &.ac-delete-modal {
+    max-width: 560px;
+
+    .pgn__modal-header {
+      padding: brand.$spacing-8 - brand.$spacing-1 brand.$spacing-8 0;
+      border-bottom: 0;
+    }
+
+    .pgn__modal-body {
+      padding: 0 brand.$spacing-8;
+    }
+
+    .pgn__modal-footer {
+      padding: 0 brand.$spacing-8 brand.$spacing-6 + brand.$spacing-1;
+      border-top: 0;
+    }
+  }
+
+  .ac-modal-body {
+    padding-top: brand.$footer-store-badge-icon-size;
+  }
+
+  .ac-modal-error {
+    margin-bottom: brand.$spacing-4;
+  }
+
+  .ac-modal-note {
+    display: flex;
+    gap: brand.$spacing-3;
+    padding: brand.$footer-store-badge-icon-size brand.$spacing-6;
+    border: 1px solid brand.$section-bg;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$card-bg;
+
+    .ac-modal-note-icon {
+      flex: 0 0 auto;
+      margin-top: 2px;
+      color: brand.$color-terracotta-dark;
+    }
+
+    p {
+      margin: 0;
+      color: brand.$text-color-muted;
+      font-size: brand.$font-size-caption;
+      line-height: 1.65;
+      text-wrap: pretty;
+
+      & + p {
+        margin-top: brand.$spacing-3;
+      }
+
+      &:first-child {
+        color: brand.$text-color;
+        font-weight: brand.$font-weight-semibold;
+      }
+    }
+  }
+
+  .ac-modal-ask {
+    margin-top: brand.$spacing-6;
+    color: brand.$text-color;
+    font-size: brand.$footer-store-badge-name-font-size;
+    line-height: 1.6;
+    text-wrap: pretty;
+  }
+
+  .ac-modal-foot {
+    margin-top: brand.$spacing-6;
+    justify-content: flex-end;
+    gap: brand.$spacing-2;
+  }
+
+  .ac-btn-solid-danger {
+    border-color: brand.$color-danger !important;
+    color: brand.$color-white !important;
+    background: brand.$color-danger !important;
+
+    &:hover:not(:disabled) {
+      border-color: brand.$color-danger-dark !important;
+      background: brand.$color-danger-dark !important;
+    }
+  }
+}
+
+@media (min-width: 1600px) {
+  .page__account-settings.ac-wrap {
+    max-width: 90rem !important;
+  }
+}
+
+@media (min-width: 2000px) {
+  .page__account-settings.ac-wrap {
+    max-width: 97.5rem !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .page__account-settings.ac-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: brand.$spacing-6;
+    padding-top: brand.$spacing-8;
+    padding-bottom: brand.$spacing-16;
+    padding-left: brand.$spacing-6 !important;
+    padding-right: brand.$spacing-6 !important;
+
+    .ac-head {
+      grid-column: auto;
+    }
+
+    .ac-nav {
+      position: static !important;
+      padding-bottom: brand.$spacing-4;
+      border-bottom: 1px solid brand.$border-color;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .page__account-settings.ac-wrap {
+    padding-top: brand.$spacing-6 + brand.$spacing-1;
+    padding-bottom: brand.$spacing-12;
+    padding-left: brand.$spacing-4 !important;
+    padding-right: brand.$spacing-4 !important;
+
+    .ac-h2,
+    .notification-heading {
+      font-size: brand.$font-size-h3;
+    }
+
+    .ac-card-head {
+      padding: brand.$spacing-6 brand.$footer-store-badge-icon-size brand.$spacing-4;
+    }
+
+    .ac-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: brand.$spacing-3;
+      padding: brand.$font-size-h4 brand.$footer-store-badge-icon-size;
+    }
+
+    .ac-row-action {
+      justify-content: flex-start;
+    }
+
+    .ac-notification-body,
+    .ac-delete-body {
+      padding: brand.$font-size-h4 brand.$footer-store-badge-icon-size brand.$spacing-6;
+    }
+  }
+}
