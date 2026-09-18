@@ -25,6 +25,18 @@ $color-terracotta-dark: #7A3F1E;
 $color-blush: #FBEFE6;
 $color-stone: #A08D78;
 
+// Warm wash behind outlined buttons on hover (e.g. the profile's Edit and
+// Cancel buttons) — a touch deeper than parchment so it reads on white.
+$color-linen: #FBF4E6;
+
+// Profile MFE hero banner. CSS-only today; if a real uploadable banner image
+// is ever added, change only this variable to
+// `url("...") center / cover, linear-gradient(...)` and drop the image under
+// paragon/images/ (see card-imagecap-fallback.png for precedent) — no other
+// file, in brand-openedx or frontend-app-profile, needs to change.
+// "Parchment": light sand tones with the logo as an oversized watermark.
+$profile-banner-background: linear-gradient(120deg, $color-parchment 0%, $color-sand 55%, $color-dusk 100%);
+
 // Semantic colors. These names match the older Indigo/Paragon Sass convention.
 $primary: $color-deep-saffron;
 $primary-light: $color-parchment;
