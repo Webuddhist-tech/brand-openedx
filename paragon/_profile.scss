@@ -1,3 +1,779 @@
-// Profile MFE-specific overrides.
+// Profile MFE. Companion to _header.scss/_footer.scss/_account.scss: the
+// markup lives in frontend-app-profile (src/profile/), every value here
+// comes from _variables.scss, and this file is imported after Paragon so it
+// wins. Scoped under .profile-page (the app's own top-level wrapper) except
+// where noted — Paragon's Tooltip/Overlay render via a portal outside that
+// wrapper, so those rules override the relevant --pgn-* custom properties
+// instead.
 @use "./variables" as brand;
 @import "./overrides";
+
+.profile-page {
+
+  /*  ========================================================================
+      Hero: banner + avatar + identity block
+      ======================================================================== */
+
+  .pf-band {
+    background: brand.$color-white;
+  }
+
+  .pf-banner-wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 26px 40px 0;
+  }
+
+  .pf-banner {
+    position: relative;
+    overflow: hidden;
+    height: 210px;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(brand.$color-espresso, 0.16);
+    background: brand.$profile-banner-background;
+
+    // Watermark: the site's actual configured logo (LOGO_WHITE_URL) isn't a
+    // brand-package file — it's a runtime config value, so it can't be
+    // baked into a CSS url() at build time. ProfilePage.jsx sets the
+    // --pf-banner-logo custom property inline from getConfig(); this only
+    // paints anything once that's set, so nothing shows if the value is
+    // ever empty.
+    &::after {
+      content: '';
+      position: absolute;
+      right: 44px;
+      bottom: -34px;
+      width: 196px;
+      height: 196px;
+      opacity: 0.3;
+      background: var(--pf-banner-logo, none) no-repeat center / contain;
+      pointer-events: none;
+    }
+  }
+
+  .pf-id {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  // Avatar: driven off ProfileAvatar.jsx's existing internal classnames,
+  // scoped under .pf-id — no ProfileAvatar.jsx changes needed. The negative
+  // top margin is what makes it overlap the banner's bottom edge.
+  .pf-id {
+    .profile-avatar-wrap {
+      width: 132px;
+      height: 132px;
+      margin-top: -66px;
+      margin-left: 28px;
+    }
+
+    .profile-avatar {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: 4px solid brand.$color-white;
+      background: brand.$color-sand;
+      box-shadow: 0 2px 10px rgba(brand.$color-espresso, 0.1);
+
+      // Default (no-photo) placeholder icon — brand outline color instead
+      // of Bootstrap's gray `.text-muted`.
+      .text-muted {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 58%;
+        height: 58%;
+        color: brand.$color-clay !important;
+      }
+
+      // Upload/remove-in-progress spinner. `.text-primary` is a Bootstrap
+      // utility class baked into Paragon's compiled CSS with Paragon's own
+      // default (blue) primary color and `!important` — brand's `$primary`
+      // override only affects brand's own rules, not that pre-built
+      // utility, so it has to be overridden directly here too.
+      .spinner-border.text-primary {
+        color: brand.$color-deep-saffron !important;
+      }
+    }
+
+    .profile-avatar-button {
+      position: absolute;
+      left: auto;
+      top: auto;
+      right: -4px;
+      bottom: -4px;
+      z-index: 2;
+
+      .btn-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        min-height: 38px;
+        border: 2px solid brand.$color-white;
+        border-radius: 50%;
+        color: brand.$color-espresso;
+        background: brand.$color-saffron;
+
+        &:hover:not(:disabled) {
+          color: brand.$color-espresso;
+          background: brand.$accent-hover;
+        }
+      }
+
+      // Paragon's IconButton sizes its icon at 1.5rem (24px) by default,
+      // which fills most of this 38px button. Shrink it to sit comfortably
+      // inside the circle instead, matching the design's proportions.
+      .btn-icon__icon {
+        width: 17px;
+        height: 17px;
+      }
+
+      // Upload/remove-photo dropdown. Matches the site header's own dropdown
+      // panel treatment (.nav-menu / .nav-menu-item in _header.scss) so the
+      // two menus in the app read as one system. ProfileAvatar.jsx no longer
+      // passes Bootstrap's `p-0 m-0` utility classes here — those set
+      // padding/margin to 0 with `!important`, which silently defeated this
+      // rule regardless of selector specificity.
+      .dropdown-menu {
+        min-width: 200px;
+        margin-top: 10px;
+        padding: brand.$border-radius-lg;
+        border: 1px solid brand.$color-dusk;
+        border-radius: brand.$border-radius-lg;
+        background-color: brand.$color-white;
+        box-shadow: 0 12px 32px rgba(brand.$color-espresso, 0.13);
+
+        // Bootstrap toggles visibility via display:none -> .show{display:block};
+        // only add the flex layout once it's actually shown, so this rule
+        // (equal specificity, but later in the cascade) can't defeat that
+        // toggle by forcing display unconditionally.
+        &.show {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: brand.$spacing-2;
+        width: 100%;
+        padding: brand.$spacing-2 brand.$spacing-3;
+        border: none;
+        border-radius: brand.$border-radius-md;
+        background: none;
+        color: brand.$color-deep-brown;
+        font-family: brand.$font-family-brand-ui;
+        font-size: brand.$font-size-caption;
+
+        // No explicit color: the icon uses stroke="currentColor", so it
+        // matches the item's text color (and follows it on hover) for free.
+        svg {
+          flex-shrink: 0;
+        }
+
+        &:hover,
+        &:focus {
+          background-color: brand.$color-sand;
+          color: brand.$color-espresso;
+        }
+
+        &:active {
+          background-color: brand.$color-dusk;
+        }
+      }
+    }
+  }
+
+  .pf-user {
+    margin-top: 16px;
+    font-family: brand.$font-family-brand-display;
+    font-weight: 500;
+    font-size: clamp(30px, 3.6vw, 40px);
+    line-height: 1.1;
+    color: brand.$color-espresso;
+  }
+
+  .pf-name {
+    margin-top: 6px;
+    font-size: 18px;
+    color: brand.$color-deep-brown;
+  }
+
+  .pf-facts {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 22px;
+    font-size: 15px;
+    color: brand.$color-deep-brown;
+
+    // DateJoined/UserCertificateSummary render their text in a Bootstrap
+    // `.small` span (font-size: 80%, declared directly on the span) — a
+    // direct declaration on the element wins over this rule's inherited
+    // size regardless of specificity, shrinking it to ~12px. Restate the
+    // intended size directly on `.small` itself to win back.
+    .small {
+      font-size: 15px;
+    }
+
+    .font-weight-bold {
+      font-weight: 600;
+      color: brand.$color-espresso;
+    }
+  }
+
+  .pf-records {
+    margin-top: 14px;
+  }
+
+  /*  ========================================================================
+      Section headings
+      ======================================================================== */
+
+  .pf-h2 {
+    font-family: brand.$font-family-brand-display;
+    font-weight: 300;
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.1;
+    color: brand.$color-espresso;
+
+    .pf-accent {
+      color: brand.$color-deep-saffron;
+      font-style: italic;
+    }
+  }
+
+  .pf-lead {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.65;
+    color: brand.$color-deep-brown;
+  }
+
+  /*  ========================================================================
+      Profile information: field grid + field cards
+      ======================================================================== */
+
+  .pf-page {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 56px 40px 88px;
+  }
+
+  .pf-grid {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 56px;
+    align-items: start;
+  }
+
+  .pf-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  // The field-card boundary. This lands on SwitchContent's rendered root
+  // (Paragon's TransitionReplace puts `className` on its own top-level div),
+  // so every edit-mode case (editing/editable/empty/static) is wrapped
+  // automatically — no new wrapper element needed in any field component.
+  .pf-field {
+    background: brand.$color-white;
+    border: 1px solid brand.$color-dusk;
+    border-radius: 14px;
+    padding: 18px 20px;
+
+    // Field label ("Full name", "Country or region", ...). Existing markup
+    // (`<p data-hj-suppress className="h5 font-weight-bold ...">`) shared by
+    // every field component — no new class needed.
+    [data-hj-suppress].h5.font-weight-bold {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 !important;
+      font-family: brand.$font-family-brand-ui;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: brand.$color-clay;
+    }
+
+    // Field value. Existing class shared by EditableItemHeader.jsx and the
+    // standalone username display in ProfilePage.jsx.
+    .edit-section-header {
+      margin-top: 8px;
+      font-family: brand.$font-family-brand-ui;
+      font-size: 17px;
+      font-weight: 500;
+      color: brand.$color-espresso;
+      line-height: 1.45;
+    }
+
+    // Info-icon (username/full-name "About this" tooltip trigger).
+    .info-icon {
+      width: 15px;
+      height: 15px;
+      padding: 0;
+      color: brand.$color-bark;
+      cursor: pointer;
+    }
+
+    // Visibility line ("Everyone on ..." / "Just me"), Visibility.jsx's
+    // existing wrapper class — kept as FontAwesome, just recolored.
+    .text-muted {
+      margin: 8px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: brand.$color-clay;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    // Header row (label/value + Edit button), EditableItemHeader.jsx's
+    // existing outer row.
+    .d-flex.flex-nowrap.align-items-center {
+      justify-content: space-between;
+      gap: 16px;
+
+      @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    // Edit button. Once EditButton.jsx renders a visible label alongside its
+    // icon, this turns Paragon's plain `.btn-link` into the pilled outline
+    // button from the design — scoped to .pf-field so it doesn't affect
+    // link-buttons elsewhere on the page. Excludes .lh-36px: EmptyContent's
+    // "+ Add X" prompt is also a Paragon `Button variant="link"` (so it also
+    // carries `.btn-link`), but it should stay a plain text link, not get
+    // this bordered-pill treatment.
+    // _overrides.scss's global `.btn-link` rule sets border/color/background
+    // (and the hover color/background) with `!important`, since it's meant
+    // as a plain text link everywhere else. Matching `!important` here wins
+    // on specificity (.pf-field .btn-link > .btn-link) to get the design's
+    // bordered pill button instead.
+    .btn-link:not(.lh-36px) {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 38px;
+      padding: 9px 16px !important;
+      border: 1.5px solid brand.$color-dusk !important;
+      border-radius: brand.$border-radius-md;
+      color: brand.$color-deep-saffron !important;
+      background: brand.$color-white !important;
+      font-size: 14px;
+      font-weight: 600;
+
+      &:hover:not(:disabled) {
+        color: brand.$color-deep-brown !important;
+        background: #FBF4E6 !important;
+        text-decoration: none;
+        border-color: brand.$color-deep-saffron !important;
+      }
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    // "+ Add X" empty-state prompt, EmptyContent.jsx's existing button.
+    // Plain text link, no border/background, no underline on hover.
+    .lh-36px {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      min-height: auto;
+      color: brand.$color-deep-saffron;
+      font-size: 15px;
+      font-weight: 600;
+
+      &:hover:not(:disabled) {
+        color: brand.$color-deep-brown;
+        text-decoration: none;
+      }
+    }
+
+    /*  ------------------------------------------------------------------
+        Form controls (inputs/selects/textarea, visibility select, buttons)
+        ------------------------------------------------------------------ */
+
+    .form-control {
+      min-height: brand.$minimum-touch-target;
+      border: 1.5px solid brand.$color-dusk;
+      border-radius: brand.$border-radius-md;
+      padding: 11px 14px;
+      font-size: 15px;
+      color: brand.$color-espresso;
+      background-color: brand.$color-white;
+
+      &:hover {
+        border-color: brand.$color-deep-saffron;
+      }
+
+      &:focus {
+        border-color: brand.$color-deep-saffron;
+        box-shadow: 0 0 0 3px rgba(brand.$color-deep-saffron, 0.18);
+      }
+    }
+
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none' stroke='%236B3300' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='4 6 8 10 12 6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 42px;
+    }
+
+    textarea.form-control {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    // "Who can see this" visibility selector — FormControls.jsx/Visibility.jsx,
+    // existing classnames. Kept on every field per decision to preserve
+    // current behavior, styled consistently.
+    .col-form-label {
+      font-family: brand.$font-family-brand-ui;
+      font-size: 14px;
+      font-weight: 500;
+      color: brand.$color-deep-brown;
+    }
+
+    .width-24px {
+      width: 24px;
+      color: brand.$color-bark;
+    }
+  }
+
+  // Cancel button: slightly tighter to the design's "quiet" outline treatment
+  // than the global .btn-outline-primary (which uses the deep-saffron border
+  // brand-wide) — scoped here since it's a profile-specific nuance.
+  .btn-outline-primary {
+    border-color: brand.$color-bark !important;
+    color: brand.$color-deep-saffron !important;
+
+    &:hover:not(:disabled):not(.disabled) {
+      border-color: brand.$color-deep-saffron !important;
+      color: brand.$color-deep-brown !important;
+      background: #FBF4E6 !important;
+    }
+  }
+
+  /*  ========================================================================
+      Certificates
+      ======================================================================== */
+
+  .pf-certs {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 40px 96px;
+  }
+
+  .pf-certs-empty {
+    margin-top: 34px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: brand.$color-espresso;
+  }
+
+  .pf-cert-grid {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+  }
+
+  .certificate {
+    position: relative;
+    overflow: visible;
+    background: brand.$color-white;
+    border: 1px solid brand.$color-dusk;
+    border-radius: brand.$border-radius-xl;
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color brand.$interaction-transition,
+      background-color brand.$interaction-transition;
+
+    &:hover {
+      border-color: brand.$color-bark;
+      background-color: brand.$color-parchment;
+    }
+
+    .btn-primary {
+      align-self: flex-start;
+    }
+  }
+
+  // Verified-certificate treatment: brand-logo seal watermark, teal badge
+  // (deliberately overrides the mockup's brown/orange — see decision log).
+  .certificate-verified {
+    overflow: hidden;
+    border-color: brand.$color-bark;
+    box-shadow: 0 2px 10px rgba(brand.$color-espresso, 0.06);
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    // Seal watermark: same runtime-vs-build-time issue as the banner above
+    // — CertificateCard.jsx sets --certificate-seal inline from
+    // getConfig().LOGO_URL.
+    &::after {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      right: -42px;
+      bottom: -38px;
+      width: 240px;
+      height: 240px;
+      opacity: 0.07;
+      background: var(--certificate-seal, none) no-repeat center / contain;
+      pointer-events: none;
+    }
+  }
+
+  .certificate-eyebrow {
+    font-size: 11px;
+    letter-spacing: 2.4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: brand.$color-clay;
+  }
+
+  .certificate-eyebrow-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px 5px 8px;
+    border-radius: brand.$border-radius-full;
+    background: brand.$color-dharma-teal;
+    color: brand.$color-parchment;
+    letter-spacing: 1.8px;
+
+    svg {
+      flex: 0 0 auto;
+      color: brand.$color-parchment;
+    }
+  }
+
+  .certificate-title {
+    font-family: brand.$font-family-brand-display;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1.2;
+    color: brand.$color-espresso;
+  }
+
+  .certificate-meta {
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: brand.$color-deep-brown;
+
+    strong,
+    h5 {
+      display: inline;
+      font-weight: 600;
+      color: brand.$color-espresso;
+    }
+  }
+
+  .certificate-meta-verified {
+    color: brand.$color-dharma-teal;
+    font-weight: 600;
+  }
+
+  .certificate-id {
+    border-top: 1px solid brand.$color-sand;
+    padding-top: 12px;
+
+    span {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: brand.$color-clay;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      color: brand.$color-deep-brown;
+      word-break: break-all;
+    }
+  }
+
+  .certificate-verified .certificate-id {
+    border-top-color: brand.$color-dusk;
+  }
+
+  /*  ========================================================================
+      Page loading / not found
+      ======================================================================== */
+
+  .height-50vh {
+    height: 50vh;
+
+    .spinner-border.text-primary {
+      color: brand.$color-deep-saffron !important;
+    }
+  }
+
+  /*  ========================================================================
+      Responsive
+      ======================================================================== */
+
+  @media (max-width: 900px) {
+    .pf-id,
+    .pf-certs {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+
+    .pf-page {
+      padding: 48px 24px 72px;
+    }
+
+    .pf-certs {
+      padding-bottom: 72px;
+    }
+
+    .pf-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pf-banner-wrap {
+      padding: 16px 18px 0;
+    }
+
+    .pf-banner {
+      height: 150px;
+      border-radius: 16px;
+
+      &::after {
+        width: 140px;
+        height: 140px;
+        right: 20px;
+        bottom: -26px;
+      }
+    }
+
+    .pf-id {
+      padding: 0 18px;
+
+      .profile-avatar-wrap {
+        width: 104px;
+        height: 104px;
+        margin-top: -52px;
+        margin-left: 12px;
+      }
+    }
+
+    .pf-page {
+      padding: 44px 18px 64px;
+    }
+  }
+}
+
+/*  ==========================================================================
+    Utility classes still referenced by components this redesign didn't
+    touch (EditableItemHeader.jsx, ProfileAvatar.jsx, SocialLinks.jsx,
+    NotFoundPage.jsx). Kept top-level/unscoped like the file they were
+    migrated from, since NotFoundPage in particular renders outside
+    .profile-page (it's a sibling top-level route, not a child of
+    ProfilePage).
+    ========================================================================== */
+.w-90 {
+  max-width: 90%;
+}
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.overflowWrap-breakWord {
+  overflow-wrap: break-word;
+}
+
+.max-width-32em {
+  max-width: 32em;
+  font-family: brand.$font-family-brand-ui;
+  font-size: 17px;
+  color: brand.$color-clay;
+}
+
+/*  ==========================================================================
+    Paragon's Tooltip renders via a portal outside .profile-page, so it's
+    restyled globally here (this file only loads in the profile MFE bundle,
+    so this doesn't leak to other MFEs). Every tooltip in this app uses
+    variant="light", placement="top".
+    ========================================================================== */
+:root {
+  --pgn-color-tooltip-bg-light: #{brand.$color-espresso};
+  --pgn-color-tooltip-light: #{brand.$color-parchment};
+  --pgn-color-tooltip-arrow-light: #{brand.$color-espresso};
+  --pgn-size-tooltip-max-width: 268px;
+  --pgn-size-tooltip-border-radius: 12px;
+  --pgn-spacing-tooltip-padding-y: 12px;
+  --pgn-spacing-tooltip-padding-x: 14px;
+}
+
+// The --pgn-color-tooltip-* custom properties above should be enough on
+// their own, but Paragon's default theme CSS (light.css) is loaded as a
+// separate stylesheet from this app's own bundle, and depending on load
+// order can redeclare the same :root variables and win. Setting the actual
+// colors directly here (not just via the custom properties) guarantees the
+// tooltip is readable regardless of that load order — this was previously
+// rendering dark text on a dark background because only the background
+// custom property was reliably taking effect.
+.tooltip.tooltip-light {
+  &.bs-tooltip-top .arrow::before {
+    border-top-color: brand.$color-espresso !important;
+  }
+
+  .tooltip-inner {
+    background-color: brand.$color-espresso !important;
+    color: brand.$color-parchment !important;
+    font-family: brand.$font-family-brand-ui;
+    font-size: 13.5px;
+    font-weight: 400;
+    text-align: left;
+    box-shadow: 0 14px 34px rgba(brand.$color-espresso, 0.26);
+
+    // The tooltip content is authored as `<p className="h5 ...">` (reusing
+    // Bootstrap's h5 for its font-SIZE), but `.h5` also sets font-family to
+    // the brand's heading font (Cormorant Garamond) directly on the <p>
+    // itself — a direct declaration that wins over this rule's inherited
+    // font-family regardless of specificity. Force both back to the
+    // tooltip's own values so tooltip text stays in the UI font, not the
+    // display/heading serif.
+    p {
+      font-family: inherit !important;
+      color: inherit !important;
+    }
+  }
+}
