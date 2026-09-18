@@ -205,13 +205,15 @@ button {
 
 /* ========================================================================
    SAFE GLOBAL LOADING SPINNER LAYOUT FIX
-   Targets only the specific top-level page wrappers across the 3 main MFEs,
+   Targets only the specific top-level page wrappers across the main MFEs,
    ignoring small spinners in Modals, Buttons, or Alerts.
    ======================================================================== */
+.wishlist-page__loading,                                                          /* Extension MFE */
 .course-list-loading:has(> .spinner-border),                                      /* Learner Dashboard */
 .d-flex.align-items-center.flex-column:has(> .spinner-border),                    /* Account MFE */
 .d-flex.justify-content-center.align-items-center.flex-column:has(> .spinner-border) /* Learning MFE */
 {
+  width: 100% !important;
   min-height: 100vh !important;
   display: flex !important;
   flex-direction: column !important;
