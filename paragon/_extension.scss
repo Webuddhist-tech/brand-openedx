@@ -193,8 +193,7 @@
   }
 }
 
-.wishlist-card__open.btn,
-.wishlist-empty__explore.btn {
+.wishlist-card__open.btn {
   min-height: brand.$minimum-touch-target;
   border: 0;
   border-radius: 10px;
@@ -233,43 +232,39 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  height: 100%;
   padding: 88px brand.$spacing-8;
   border: 1px solid brand.$border-color;
-  border-radius: brand.$border-radius-xl;
+  border-radius: 14px;
   background: brand.$card-bg;
   text-align: center;
 
+  > * {
+    margin: brand.$spacing-2 0;
+  }
+
   h2 {
-    margin: 0;
     color: brand.$text-color;
     font-family: brand.$font-family-brand-display;
-    font-size: clamp(26px, 3.6vw, 36px);
+    font-size: brand.$font-size-h2;
     font-weight: brand.$font-weight-h2;
-    line-height: 1.2;
-    text-wrap: pretty;
+    line-height: brand.$line-height-h2;
   }
 
   > p {
-    max-width: 440px;
-    margin: 14px 0 0;
     color: brand.$text-color-muted;
-    font-size: brand.$font-size-body;
-    line-height: 1.65;
-    text-wrap: pretty;
   }
 }
 
 .wishlist-empty__illustration {
   width: min(240px, 70%);
-  height: auto;
   max-height: 180px;
-  margin-bottom: 28px;
 }
 
 .wishlist-empty__explore.btn {
-  margin-top: 30px;
-  padding: 12px 30px;
-  font-size: brand.$font-size-body;
+  margin-top: brand.$spacing-4;
 }
 
 nav.wishlist-pagination {
@@ -430,7 +425,7 @@ nav.wishlist-pagination {
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 767.98px) {
   .wishlist-page.container-mw-xl {
     padding-top: 34px;
   }
@@ -468,10 +463,6 @@ nav.wishlist-pagination {
   .wishlist-page.container-mw-xl {
     padding-right: brand.$spacing-4 + brand.$spacing-1;
     padding-left: brand.$spacing-4 + brand.$spacing-1;
-  }
-
-  .wishlist-empty__explore.btn {
-    width: 100%;
   }
 }
 
