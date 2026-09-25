@@ -316,6 +316,27 @@
       line-height: 1.45;
     }
 
+    // Name.jsx's "editing" state redirects to Account Settings rather than
+    // editing inline (a deliberate decision, kept from before this redesign)
+    // — the link is wrapped in a real <h4>, which otherwise inherits the
+    // heading/display serif font straight from the tag itself. Reset it to
+    // the body font and recolor to match the other inline text-links on the
+    // page (Edit, "+ Add X") instead of Paragon's default link color.
+    h4.font-weight-normal {
+      margin-top: 8px;
+      font-family: brand.$font-family-brand-ui;
+      font-size: 15px;
+      font-weight: 500;
+
+      .pgn__hyperlink {
+        color: brand.$color-dharma-teal;
+
+        &:hover {
+          color: brand.$secondary-hover;
+        }
+      }
+    }
+
     // Info-icon (username/full-name "About this" tooltip trigger).
     .info-icon {
       width: 15px;
