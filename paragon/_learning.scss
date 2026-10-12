@@ -1,5 +1,15 @@
+// Learning MFE (frontend-app-learning) styles. Everything for the learning MFE
+// lives in this one file; the MFE code only sets class names. Sections:
+//   1. Course-authored content fonts
+//   2. Dates tab: scheduled sections (frontend-app-learning
+//      src/course-home/dates-tab/section-schedule/)
 @use "./variables" as brand;
 @import "./overrides";
+
+
+// ============================================================================
+// 1. Course-authored content fonts
+// ============================================================================
 
 // Learning MFE-specific font overrides for course-authored content
 // This file can be imported only by frontend-app-learning and other course-delivery MFEs.
@@ -60,4 +70,52 @@ h1, h2, h3, h4, h5, h6,
 
 .sequence-title {
     font-size: brand.$learning-sequence-title-font-size;
+}
+
+
+// ============================================================================
+// 2. Dates tab: scheduled sections
+// ============================================================================
+
+.dates-section-schedule {
+    margin-bottom: brand.$spacing-2;
+    padding: brand.$spacing-2 brand.$spacing-3;
+    border-left: 3px solid brand.$accent;
+    border-radius: 0 brand.$border-radius-sm brand.$border-radius-sm 0;
+    background: brand.$card-bg;
+    color: brand.$text-color;
+}
+
+// The section name is course-authored and often Tibetan.
+.dates-section-schedule__title {
+    font-family: brand.$font-family-course-content;
+    font-weight: brand.$font-weight-bold;
+    color: brand.$text-color-primary;
+}
+
+.dates-section-schedule__when {
+    color: brand.$secondary;
+    font-weight: brand.$font-weight-medium;
+}
+
+.dates-section-schedule__detail {
+    color: brand.$text-color-light;
+}
+
+// Creators write notes on several lines; keep their line breaks.
+.dates-section-schedule__notes {
+    margin-top: brand.$spacing-1;
+    white-space: pre-line;
+    color: brand.$text-color-light;
+}
+
+.dates-section-schedule__notice {
+    display: inline-block;
+    margin-top: brand.$spacing-1;
+    padding: 0 brand.$spacing-2;
+    border-radius: brand.$border-radius-full;
+    background: brand.$warning-bg;
+    color: brand.$warning-text;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-semibold;
 }
