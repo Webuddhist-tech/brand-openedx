@@ -1,3 +1,1302 @@
-// Authoring MFE-specific overrides.
+// Authoring MFE (Studio) styles. Everything for frontend-app-authoring lives in
+// this one file; the MFE code only sets class names. Sections:
+//   1. Global overrides (shared brand button/typography rules)
+//   2. Course outline status bar
+//   3. Course section schedule (frontend-app-authoring src/course-schedule/)
 @use "./variables" as brand;
+
+
+// ============================================================================
+// 1. Global overrides
+// ============================================================================
+
 @import "./overrides";
+
+
+// ============================================================================
+// 2. Course outline status bar
+// ============================================================================
+
+// Studio course outline status bar (Start date, Pacing, Checklists, Highlight
+// emails, Course schedule, Course tags, Video sharing). Restyled into one calm
+// strip: small muted labels, same-size values, thin dividers, blue only for
+// links. Styling only, so frontend-app-authoring's StatusBar.jsx stays upstream.
+
+.outline-status-bar {
+    // Items size to their content (labels never wrap) and share any spare
+    // width, wrapping onto a new row on narrow screens.
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0 !important;
+    margin-bottom: brand.$spacing-6 !important;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$body-bg;
+    overflow: hidden;
+
+    // Each item. The dividers are inset shadows on the left and top, so the
+    // ones on the strip's outer edges are clipped away by overflow: hidden.
+    > * {
+        display: flex !important;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: flex-start !important;
+        gap: brand.$spacing-1;
+        min-width: 0;
+        margin: 0 !important;
+        padding: brand.$spacing-3 brand.$spacing-6;
+        box-shadow: -1px -1px 0 brand.$border-color;
+
+        // Value rows (some items nest one row inside another): even spacing
+        // between a value and its link, e.g. "0  Manage tags".
+        .d-flex.align-items-center {
+            flex-wrap: wrap;
+            gap: brand.$spacing-1 brand.$spacing-3;
+        }
+    }
+
+    // Labels
+    h5,
+    .h5 {
+        margin: 0 !important;
+        color: brand.$text-color-muted;
+        font-family: brand.$font-family-brand-ui;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-label;
+        letter-spacing: 0.06em;
+        line-height: brand.$line-height-label;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    // Values
+    .small,
+    select {
+        color: brand.$text-color;
+        font-size: brand.$font-size-caption;
+        line-height: brand.$line-height-caption;
+    }
+
+    a.small,
+    a.small:visited {
+        margin-left: 0 !important; // spacing comes from the row gap above
+        color: brand.$link-color;
+        white-space: nowrap;
+        text-decoration: none;
+
+        &:hover {
+            color: brand.$secondary-hover;
+            text-decoration: underline;
+        }
+    }
+
+    // "Learn more" next to Highlight emails: secondary, so it doesn't compete.
+    a.pgn__hyperlink.small {
+        color: brand.$text-color-muted;
+    }
+
+    // "18/30 scheduled" (course_schedule plugin) is a <button>; keep it a link colour
+    // rather than the plain value colour .small gets above.
+    .course-schedule-status__link {
+        color: brand.$link-color;
+
+        &:hover {
+            color: brand.$secondary-hover;
+        }
+    }
+
+    // "Enable now" for Highlight emails: a plain link instead of a big orange
+    // button. Needs !important to beat _overrides.scss's .btn-primary rules.
+    .btn.btn-primary[data-testid="highlights-enable-button"] {
+        min-height: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        color: brand.$link-color !important;
+        font-size: brand.$font-size-caption !important;
+        font-weight: brand.$font-weight-medium !important;
+        line-height: brand.$line-height-caption;
+        justify-content: flex-start !important;
+        white-space: nowrap;
+
+        &:hover:not(:disabled):not(.disabled),
+        &:focus-visible {
+            background: transparent !important;
+            color: brand.$secondary-hover !important;
+            text-decoration: underline;
+        }
+    }
+
+    // Tag count: a quieter icon and number, kept clear of "Manage tags".
+    .generic-tag-count {
+        color: brand.$text-color-light;
+        font-size: brand.$font-size-caption;
+        line-height: brand.$line-height-caption;
+
+        .pgn__icon {
+            width: 1rem;
+            height: 1rem;
+        }
+    }
+
+    // Video sharing select, when enabled.
+    .form-control {
+        height: auto;
+        padding: brand.$spacing-1 brand.$spacing-2;
+    }
+}
+
+
+// ============================================================================
+// 3. Course section schedule
+// ============================================================================
+
+// Section card chip, next to "Section highlights": a rounded, tinted pill so
+// it reads as clickable. Dashed and untinted when the section is unscheduled;
+// an orange border and dot when the server has warnings for it.
+// The MFE renders it as a plain <button> (not .btn), so _overrides.scss's
+// !important button styles don't apply and everything is set here.
+.course-schedule-badge {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    gap: brand.$spacing-2;
+    margin-left: brand.$spacing-4;
+    padding: brand.$spacing-1 brand.$spacing-2 brand.$spacing-1 brand.$spacing-3;
+    border: 1px solid brand.$color-bark;
+    border-radius: brand.$border-radius-full;
+    background: brand.$card-bg;
+    box-shadow: 0 1px 2px rgba(brand.$color-espresso, 0.08);
+    color: brand.$text-color-primary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-medium;
+    line-height: brand.$line-height-label;
+    font-family: brand.$font-family-brand-ui;
+    cursor: pointer;
+    transition: background brand.$interaction-transition, border-color brand.$interaction-transition,
+        box-shadow brand.$interaction-transition;
+
+    &:hover,
+    &:focus-visible {
+        border-color: brand.$accent;
+        background: brand.$section-bg;
+        box-shadow: 0 2px 6px rgba(brand.$color-espresso, 0.12);
+        color: brand.$text-color-primary;
+
+        .course-schedule-badge__edit {
+            color: brand.$secondary;
+        }
+    }
+
+    &:active {
+        box-shadow: none;
+    }
+
+    &:focus-visible {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 2px;
+    }
+
+    &.is-empty {
+        padding-right: brand.$spacing-3;
+        border-style: dashed;
+        border-color: brand.$color-bark;
+        background: transparent;
+        box-shadow: none;
+        color: brand.$text-color-muted;
+
+        &:hover,
+        &:focus-visible {
+            border-color: brand.$accent;
+            background: brand.$card-bg;
+            color: brand.$text-color-primary;
+        }
+
+        .course-schedule-badge__icon {
+            color: brand.$text-color-muted;
+        }
+    }
+
+    &.has-warnings {
+        border-color: brand.$accent;
+    }
+}
+
+// Pencil at the end: says "click to edit".
+.course-schedule-badge__edit {
+    flex-shrink: 0;
+    margin-left: brand.$spacing-1;
+    padding-left: brand.$spacing-2;
+    border-left: 1px solid brand.$border-color;
+    box-sizing: content-box;
+    color: brand.$text-color-muted;
+    transition: color brand.$interaction-transition;
+}
+
+.course-schedule-badge__icon {
+    flex-shrink: 0;
+    color: brand.$accent;
+}
+
+.course-schedule-badge__dot {
+    flex-shrink: 0;
+    width: 7px;
+    height: 7px;
+    border-radius: brand.$border-radius-full;
+    background: brand.$accent-active;
+}
+
+// Hover message on the chip: what this date means, then any warnings.
+.course-schedule-badge__tooltip .tooltip-inner {
+    max-width: 280px;
+    text-align: left;
+    line-height: brand.$line-height-caption;
+}
+
+.course-schedule-badge__tooltip-warnings {
+    margin: brand.$spacing-2 0 0;
+    padding: brand.$spacing-2 0 0 brand.$spacing-4;
+    border-top: 1px solid rgba(brand.$color-white, 0.3);
+}
+
+// Warning icon in the full schedule table; the warnings show in a tooltip.
+.course-schedule-table__warning {
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    margin-left: brand.$spacing-1;
+    border: 0;
+    background: none;
+    color: brand.$accent-active;
+    cursor: help;
+
+    &:focus-visible {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-sm;
+    }
+}
+
+// "18/30 scheduled" in the outline status bar: looks like the Checklists link
+// beside it. A plain <button>, so _overrides.scss's .btn-link styles don't apply.
+.course-schedule-status__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: brand.$link-color;
+    font-family: inherit;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &:hover {
+        color: brand.$secondary-hover;
+        text-decoration: underline;
+    }
+
+    &:focus-visible {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 2px;
+        border-radius: brand.$border-radius-sm;
+    }
+}
+
+// Per-section schedule form: a short header, "When" and "Details" groups,
+// a live preview of the learner Dates entry, then the auto-fill/shift callout.
+// Wider than Paragon's "lg" modal so the two columns have room.
+.pgn__modal.course-schedule-modal {
+    max-width: 1000px;
+}
+
+// Inputs at body size rather than the brand's larger default, to fit more calmly.
+.course-schedule-modal .form-control {
+    font-size: 1rem;
+}
+
+// Leave room on the right for the modal's close button, which Paragon
+// positions absolutely over the header's top-right corner.
+.course-schedule-modal__header {
+    display: block;
+    padding-inline-end: 4.5rem !important;
+    padding-bottom: brand.$spacing-2 !important;
+}
+
+.course-schedule-modal__eyebrow {
+    margin: 0;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.course-schedule-modal .course-schedule-modal__title {
+    margin: brand.$spacing-1 0 0;
+    margin-inline-end: 0;
+    font-size: brand.$font-size-h3;
+    line-height: brand.$line-height-h3;
+}
+
+.course-schedule-modal__subtitle {
+    margin: brand.$spacing-1 0 0;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-caption;
+}
+
+// Paragon wraps the body's children in .pgn__modal-body-content, so the
+// spacing between blocks goes on that wrapper.
+.course-schedule-modal__body > .pgn__modal-body-content {
+    display: grid;
+    gap: brand.$spacing-4;
+}
+
+.course-schedule-modal__body {
+    padding-top: brand.$spacing-6 !important;
+    padding-bottom: brand.$spacing-6 !important;
+
+    // Paragon's scroll hints are hard grey gradients pinned over the content,
+    // which look like the rows are being clipped. Thin dividers on the header
+    // and footer (below) mark the scroll edges instead.
+    &::before,
+    &::after {
+        display: none !important;
+    }
+}
+
+.course-schedule-modal .pgn__modal-footer {
+    border-top: 1px solid brand.$border-color;
+    padding-top: brand.$spacing-4 !important;
+}
+
+.course-schedule-modal .pgn__modal-header {
+    border-bottom: 1px solid transparent;
+}
+
+// Paragon marks a scrolled body; show the header divider only then.
+.course-schedule-modal .pgn__modal-header:has(+ .pgn__modal-body:not(.pgn__modal-body-scroll-top)) {
+    border-bottom-color: brand.$border-color;
+}
+
+// Wide screens: the form on the left; the preview and the auto-fill/shift
+// callout on the right, kept in view while the form scrolls.
+.course-schedule-modal__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+    gap: brand.$spacing-8;
+
+    @media (max-width: 767.98px) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.course-schedule-modal__main,
+.course-schedule-modal__side {
+    display: grid;
+    gap: brand.$spacing-6;
+    min-width: 0;
+}
+
+.course-schedule-modal__side {
+    gap: brand.$spacing-4;
+
+    @media (min-width: 768px) {
+        position: sticky;
+        top: 0;
+    }
+}
+
+.course-schedule-modal__group {
+    display: grid;
+    gap: brand.$spacing-4;
+    min-width: 0;
+    margin: 0;
+    padding: brand.$spacing-2 brand.$spacing-6 brand.$spacing-6;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+
+    // Paragon labels are large by default; keep every field label small and the same.
+    .pgn__form-label,
+    .form-label {
+        margin-bottom: brand.$spacing-1;
+        color: brand.$text-color-light;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-label;
+    }
+}
+
+.course-schedule-modal__group-title {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-2;
+    width: auto;
+    margin: 0 0 0 calc(-1 * #{brand.$spacing-2});
+    padding: 0 brand.$spacing-2;
+    color: brand.$text-color-primary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+}
+
+.course-schedule-modal__group-icon {
+    color: brand.$accent;
+}
+
+.course-schedule-modal__optional {
+    color: brand.$text-color-empty;
+    font-weight: brand.$font-weight-body;
+}
+
+.course-schedule-modal__label {
+    margin: 0 0 brand.$spacing-1;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-label;
+}
+
+// The date takes the space; the days stepper only needs room for "− 365 +".
+.course-schedule-modal__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9.5rem;
+    gap: brand.$spacing-4;
+
+    @media (max-width: 575.98px) {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+// "−  2  +" around the number-of-days field.
+.course-schedule-modal__stepper {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid brand.$color-bark;
+    border-radius: brand.$border-radius-md;
+    overflow: hidden;
+
+    &:focus-within {
+        outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+        outline-offset: 1px;
+    }
+
+    .form-control {
+        flex: 1;
+        min-width: 0;
+        border: 0;
+        border-radius: 0;
+        text-align: center;
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            margin: 0;
+            -webkit-appearance: none;
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+}
+
+.course-schedule-modal__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    padding: 0;
+    border: 0;
+    background: brand.$card-bg;
+    color: brand.$secondary;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+        background: brand.$section-bg;
+    }
+
+    &:disabled {
+        color: brand.$text-color-empty;
+        cursor: not-allowed;
+    }
+}
+
+.course-schedule-modal__date-range {
+    margin: calc(-1 * #{brand.$spacing-2}) 0 0;
+    color: brand.$secondary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-medium;
+}
+
+.course-schedule-modal__time-row {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-2;
+
+    .course-schedule-picker {
+        flex: 1;
+    }
+}
+
+.course-schedule-modal__dash {
+    color: brand.$text-color-muted;
+}
+
+.course-schedule-modal__error {
+    margin: brand.$spacing-1 0 0;
+    color: brand.$error-text;
+    font-size: brand.$font-size-label;
+}
+
+.course-schedule-modal__help {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: brand.$spacing-2;
+    margin: 0;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-label;
+}
+
+// "IST · Asia/Kolkata"
+.course-schedule-modal__tz {
+    display: inline-flex;
+    align-items: center;
+    gap: brand.$spacing-1;
+    padding: 2px brand.$spacing-2;
+    border-radius: brand.$border-radius-full;
+    background: brand.$info-bg;
+    color: brand.$info-text;
+    font-weight: brand.$font-weight-medium;
+}
+
+.btn.course-schedule-modal__add-notes {
+    justify-self: start;
+    min-height: 0;
+}
+
+// "👁 LEARNER PREVIEW"
+.course-schedule-modal__section-label {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-1;
+    margin: 0 0 brand.$spacing-3;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+// A slice of the learner Dates timeline: a dot and the day's heading, the
+// session card under it, and the timeline's line down the left.
+.course-schedule-modal__timeline {
+    position: relative;
+    padding-left: brand.$spacing-6;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0.55rem;
+        bottom: 0;
+        left: 5px;
+        width: 2px;
+        border-radius: 1px;
+        background: brand.$border-color;
+    }
+}
+
+.course-schedule-modal__timeline-day {
+    position: relative;
+    margin: 0 0 brand.$spacing-2;
+    color: brand.$text-color-primary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0.3rem;
+        left: calc(-1 * #{brand.$spacing-6});
+        width: 12px;
+        height: 12px;
+        border: 2px solid brand.$body-bg;
+        border-radius: brand.$border-radius-full;
+        background: brand.$accent;
+        box-shadow: 0 0 0 1px brand.$accent;
+    }
+}
+
+// Mirrors the learner Dates entry (section 2 of _learning.scss).
+.course-schedule-modal__preview {
+    padding: brand.$spacing-3 brand.$spacing-4;
+    border-left: 3px solid brand.$accent;
+    border-radius: 0 brand.$border-radius-sm brand.$border-radius-sm 0;
+    background: brand.$card-bg;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-caption;
+    line-height: brand.$line-height-caption;
+}
+
+.course-schedule-modal__preview.is-empty {
+    background: transparent;
+    border: 1px dashed brand.$border-color;
+    border-radius: brand.$border-radius-md;
+    color: brand.$text-color-muted;
+}
+
+.course-schedule-modal__preview-title {
+    color: brand.$text-color-primary;
+    font-family: brand.$font-family-course-content;
+    font-weight: brand.$font-weight-bold;
+}
+
+.course-schedule-modal__preview-when {
+    color: brand.$secondary;
+    font-weight: brand.$font-weight-medium;
+}
+
+.course-schedule-modal__preview-notes {
+    margin-top: brand.$spacing-1;
+    white-space: pre-line;
+}
+
+// Date and time pickers (react-datepicker, see src/course-schedule/pickers.tsx).
+// Scoped to our wrapper/popper classes so Studio's other date pickers keep
+// their own look.
+.course-schedule-picker {
+    display: block;
+    width: 100%;
+    min-width: 0;
+
+    .react-datepicker__input-container {
+        display: block;
+    }
+
+    // Room for the clear (×) button react-datepicker adds to filled time fields.
+    .react-datepicker__close-icon {
+        padding-right: brand.$spacing-3;
+
+        &::after {
+            width: 18px;
+            height: 18px;
+            background-color: brand.$color-sand;
+            color: brand.$text-color-primary;
+            font-size: 14px;
+        }
+
+        &:hover::after {
+            background-color: brand.$color-dusk;
+        }
+    }
+}
+
+.course-schedule-picker__icon {
+    color: brand.$accent;
+}
+
+// Above the modal (Paragon modals sit around z-index 1050).
+.course-schedule-popper {
+    z-index: 2000;
+}
+
+.course-schedule-calendar.react-datepicker {
+    padding: brand.$spacing-2;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$body-bg;
+    box-shadow: 0 12px 32px rgba(brand.$color-espresso, 0.14);
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-caption;
+
+    .react-datepicker__header {
+        padding-top: brand.$spacing-2;
+        border-bottom: 1px solid brand.$border-color;
+        background: brand.$body-bg;
+    }
+
+    .react-datepicker__current-month,
+    .react-datepicker-time__header {
+        margin-bottom: brand.$spacing-2;
+        color: brand.$text-color-primary;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-semibold;
+    }
+
+    .react-datepicker__navigation {
+        top: brand.$spacing-3;
+    }
+
+    .react-datepicker__navigation-icon::before {
+        border-color: brand.$text-color-muted;
+    }
+
+    .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+        border-color: brand.$primary;
+    }
+
+    .react-datepicker__day-name {
+        width: 2.25rem;
+        color: brand.$text-color-muted;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-label;
+        text-transform: uppercase;
+    }
+
+    .react-datepicker__day {
+        width: 2.25rem;
+        line-height: 2.25rem;
+        margin: 2px;
+        border-radius: brand.$border-radius-full;
+        color: brand.$text-color;
+
+        &:hover {
+            border-radius: brand.$border-radius-full;
+            background: brand.$card-bg;
+        }
+    }
+
+    .react-datepicker__day--outside-month {
+        color: brand.$text-color-empty;
+    }
+
+    .react-datepicker__day--today {
+        font-weight: brand.$font-weight-bold;
+        box-shadow: inset 0 0 0 1px brand.$color-bark;
+    }
+
+    // Days other sections are scheduled on: a small saffron dot.
+    .react-datepicker__day--highlighted {
+        position: relative;
+        background: transparent;
+        color: brand.$text-color;
+
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            margin-left: -2.5px;
+            border-radius: brand.$border-radius-full;
+            background: brand.$accent;
+        }
+    }
+
+    .react-datepicker__day--selected,
+    .react-datepicker__day--keyboard-selected {
+        background: brand.$secondary;
+        color: brand.$secondary-contrast;
+        font-weight: brand.$font-weight-semibold;
+
+        &:hover {
+            background: brand.$secondary-hover;
+        }
+
+        &::after {
+            background: brand.$secondary-contrast;
+        }
+    }
+
+    .react-datepicker__day--keyboard-selected:not(.react-datepicker__day--selected) {
+        background: brand.$ghost-active-bg;
+        color: brand.$text-color;
+    }
+
+    // Date calendar only (the time list lays itself out beside the header):
+    // month, then the "other sessions" key, then the Today footer. The key is
+    // rendered after the Today button in the markup, so it is reordered here.
+    &:not(.course-schedule-calendar--time) {
+        display: flex;
+        flex-direction: column;
+
+        .react-datepicker__month-container {
+            float: none;
+            order: 1;
+        }
+
+        .react-datepicker__children-container {
+            order: 2;
+        }
+
+        .react-datepicker__today-button {
+            order: 3;
+        }
+    }
+
+    // An outlined button inside the calendar, filled on hover, so it reads as pressable.
+    .react-datepicker__today-button {
+        margin: 0 brand.$spacing-2 brand.$spacing-2;
+        padding: brand.$spacing-2 brand.$spacing-3;
+        border: 1px solid brand.$secondary;
+        border-radius: brand.$border-radius-md;
+        background: brand.$body-bg;
+        color: brand.$secondary;
+        font-weight: brand.$font-weight-semibold;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.15s, color 0.15s;
+
+        &:hover {
+            background: brand.$secondary;
+            color: brand.$secondary-contrast;
+        }
+
+        &:focus-visible {
+            outline: 2px solid brand.$accent;
+            outline-offset: 2px;
+        }
+    }
+
+    .react-datepicker__children-container {
+        width: auto;
+        margin: brand.$spacing-2 0 0;
+        padding: brand.$spacing-2 brand.$spacing-2 brand.$spacing-3;
+        border-top: 1px solid brand.$border-color;
+    }
+
+    // Time list
+    .react-datepicker__time-container {
+        width: 9rem;
+        border-left: 0;
+    }
+
+    .react-datepicker__time-container .react-datepicker__time,
+    .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+        width: 100%;
+        border-radius: 0 0 brand.$border-radius-lg brand.$border-radius-lg;
+        background: brand.$body-bg;
+    }
+
+    .react-datepicker__time-list {
+        height: 15rem !important;
+    }
+
+    .react-datepicker__time-list-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: auto !important;
+        margin: 1px brand.$spacing-1;
+        padding: brand.$spacing-2 !important;
+        border-radius: brand.$border-radius-md;
+        color: brand.$text-color;
+        font-size: brand.$font-size-caption;
+
+        &:hover {
+            background: brand.$card-bg !important;
+        }
+    }
+
+    .react-datepicker__time-list-item--selected {
+        background: brand.$secondary !important;
+        color: brand.$secondary-contrast !important;
+        font-weight: brand.$font-weight-semibold !important;
+    }
+
+    .react-datepicker__time-list-item--disabled {
+        display: none;
+    }
+}
+
+.course-schedule-calendar__legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: brand.$spacing-2;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-label;
+}
+
+.course-schedule-calendar__legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: brand.$border-radius-full;
+    background: brand.$accent;
+}
+
+// "1 hr 30 min" after the time range.
+.course-schedule-modal__duration {
+    flex-shrink: 0;
+    padding: 2px brand.$spacing-2;
+    border-radius: brand.$border-radius-full;
+    background: brand.$card-bg;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-medium;
+    white-space: nowrap;
+}
+
+// "Move later sections too" / "Schedule the remaining sections": icon, a
+// short title and one line of detail, and a switch.
+.course-schedule-modal__others {
+    display: flex;
+    align-items: flex-start;
+    gap: brand.$spacing-3;
+    padding: brand.$spacing-3 brand.$spacing-4;
+    border: 1px solid rgba(brand.$color-dharma-teal, 0.2);
+    border-radius: brand.$border-radius-md;
+    background: brand.$info-bg;
+    transition: background brand.$interaction-transition, border-color brand.$interaction-transition;
+
+    &.is-off {
+        border-color: brand.$border-color;
+        background: brand.$body-bg;
+
+        .course-schedule-modal__others-icon,
+        .course-schedule-modal__others-title {
+            color: brand.$text-color-muted;
+        }
+    }
+}
+
+.course-schedule-modal__others-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: brand.$secondary;
+}
+
+.course-schedule-modal__others-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.course-schedule-modal__others-title {
+    margin: 0;
+    color: brand.$secondary;
+    font-size: brand.$font-size-caption;
+    font-weight: brand.$font-weight-semibold;
+}
+
+.course-schedule-modal__others-description {
+    margin: 2px 0 0;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-label;
+    line-height: brand.$line-height-caption;
+}
+
+.course-schedule-modal__others-switch {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.course-schedule-modal__loading {
+    display: flex;
+    justify-content: center;
+    padding: brand.$spacing-8 0;
+}
+
+// _overrides.scss sets every .btn-link's colour with !important.
+.btn.btn-link.course-schedule-modal__remove {
+    min-height: 0;
+    color: brand.$color-danger !important;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        color: brand.$color-danger-dark !important;
+    }
+}
+
+// Server warnings in the form. Informational: they never block saving.
+.course-schedule-warnings {
+    margin-top: brand.$spacing-4;
+    padding: brand.$spacing-3 brand.$spacing-4;
+    border-radius: brand.$border-radius-md;
+    background: brand.$warning-bg;
+    color: brand.$warning-text;
+    font-size: brand.$font-size-caption;
+}
+
+.course-schedule-warnings__title {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-2;
+    margin: 0 0 brand.$spacing-1;
+    font-weight: brand.$font-weight-semibold;
+}
+
+.course-schedule-warnings__icon {
+    color: brand.$accent-active;
+}
+
+.course-schedule-warnings__list {
+    margin: 0;
+    padding-left: brand.$spacing-8;
+}
+
+// Full schedule editor: same header and pickers as the section form, a
+// compact toolbar (timezone + quick fill), then one calm table row per section.
+.pgn__modal.course-schedule-bulk-modal {
+    max-width: 1200px;
+}
+
+.course-schedule-bulk-modal .course-schedule-modal__body > .pgn__modal-body-content {
+    gap: brand.$spacing-6;
+}
+
+// No top padding on the scrolling body: a sticky table heading sticks inside
+// the scroll area's padding, which left a strip where rows showed through above
+// it. The space above the toolbar is a margin on the toolbar instead.
+.course-schedule-bulk-modal .course-schedule-modal__body {
+    padding-top: 0 !important;
+}
+
+// One slim row: timezone, the "move later sections" switch, and the button
+// that opens quick fill underneath.
+.course-schedule-bulk__toolbar {
+    margin-top: brand.$spacing-4;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$card-bg;
+}
+
+.course-schedule-bulk__toolbar-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: brand.$spacing-3 brand.$spacing-6;
+    padding: brand.$spacing-3 brand.$spacing-4;
+}
+
+.course-schedule-bulk__timezone {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-2;
+
+    .course-schedule-modal__label {
+        margin: 0;
+        white-space: nowrap;
+    }
+
+    select.form-control {
+        width: 14rem;
+    }
+}
+
+.course-schedule-bulk__shift {
+    margin: 0;
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-caption;
+}
+
+.btn.course-schedule-bulk__fill-toggle {
+    min-height: 0;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+// Quick fill panel, opened from the toolbar.
+.course-schedule-bulk__fill {
+    padding: brand.$spacing-3 brand.$spacing-4 brand.$spacing-4;
+    border-top: 1px solid brand.$border-color;
+}
+
+.course-schedule-bulk__fill-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: brand.$spacing-2;
+
+    .course-schedule-picker {
+        width: auto;
+        flex: 0 0 auto;
+    }
+
+    // Date: room for "Mon, 12 Oct 2026" and its icon.
+    .course-schedule-picker:nth-of-type(1) {
+        width: 13.5rem;
+    }
+
+    // Times: room for "12:45 PM" and the clear button.
+    .course-schedule-picker:not(:nth-of-type(1)) {
+        width: 7.5rem;
+    }
+
+    .btn {
+        min-height: 0;
+        margin-left: brand.$spacing-2;
+        white-space: nowrap;
+    }
+}
+
+.course-schedule-bulk__fill-text {
+    color: brand.$text-color-light;
+    font-size: brand.$font-size-caption;
+}
+
+.course-schedule-bulk__fill-help {
+    margin: brand.$spacing-2 0 0;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-label;
+}
+
+.course-schedule-bulk-modal__hint {
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-caption;
+
+    &.has-changes {
+        color: brand.$accent-active;
+        font-weight: brand.$font-weight-medium;
+    }
+}
+
+// No scroll box of its own: the modal body is the only thing that scrolls
+// (a nested scroller clipped the last rows under the modal's footer shadow),
+// and the header row stays pinned to the top of the body as it scrolls.
+// Narrow screens scroll the table sideways instead, without the pinned header.
+.course-schedule-table__wrapper {
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-sm;
+
+    @media (max-width: 991.98px) {
+        overflow-x: auto;
+    }
+}
+
+// Small corners, so the heading looks the same whether stuck or not.
+.course-schedule-table thead th:first-child {
+    border-top-left-radius: brand.$border-radius-sm;
+}
+
+.course-schedule-table thead th:last-child {
+    border-top-right-radius: brand.$border-radius-sm;
+}
+
+.course-schedule-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: brand.$font-size-caption;
+
+    th,
+    td {
+        padding: brand.$spacing-2 brand.$spacing-3;
+        border-bottom: 1px solid brand.$border-color;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    tbody tr:last-child > * {
+        border-bottom: 0;
+    }
+
+    // Header row stays visible while the rows scroll.
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: brand.$color-linen;
+        color: brand.$text-color-muted;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-label;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    tbody tr:hover {
+        background: brand.$color-linen;
+    }
+
+    // Edited since opening: a saffron bar on the left until saved.
+    tbody tr.is-edited > :first-child {
+        box-shadow: inset 3px 0 0 brand.$accent;
+    }
+
+    tbody tr.is-invalid {
+        background: brand.$error-bg;
+    }
+
+    .form-control {
+        font-size: brand.$font-size-caption;
+    }
+}
+
+.course-schedule-table__num {
+    width: 2.5rem;
+    color: brand.$text-color-empty;
+    font-variant-numeric: tabular-nums;
+    text-align: right !important;
+}
+
+.course-schedule-table__section {
+    width: 32%;
+    max-width: 0; // lets the name ellipsis instead of widening the column
+    font-weight: brand.$font-weight-medium;
+}
+
+// One line per section; the full name shows on hover (title attribute).
+.course-schedule-table__name {
+    display: inline-block;
+    max-width: calc(100% - 1.5rem);
+    overflow: hidden;
+    color: brand.$text-color-primary;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.course-schedule-table tr.is-unscheduled .course-schedule-table__name {
+    color: brand.$text-color-light;
+}
+
+// Room for "Wed, 14 Oct" and its icon.
+.course-schedule-table__date {
+    width: 10.5rem;
+}
+
+// Room for a 3-digit number beside the browser's up/down arrows.
+.course-schedule-table__days {
+    width: 6.5rem;
+
+    .form-control {
+        min-width: 4.5rem;
+    }
+}
+
+// Two times ("12:45 PM" each, plus a clear button) and a dash.
+.course-schedule-table__time {
+    width: 15.5rem;
+}
+
+.course-schedule-table__time-range {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-1;
+
+    .course-schedule-picker {
+        flex: 1;
+    }
+}
+
+.course-schedule-table__instructor {
+    min-width: 10rem;
+}
+
+.course-schedule-table__empty {
+    color: brand.$text-color-empty;
+}
+
+// Row action: quiet until the row is hovered or focused.
+.course-schedule-table__actions {
+    width: 3rem;
+
+    .btn-icon {
+        width: 2rem;
+        min-height: 2rem;
+        color: brand.$text-color-muted;
+        opacity: 0.5;
+    }
+}
+
+.course-schedule-table tr:hover .course-schedule-table__actions .btn-icon,
+.course-schedule-table__actions .btn-icon:focus-visible {
+    opacity: 1;
+}
+
+.course-schedule-table__error {
+    margin-top: brand.$spacing-1;
+    color: brand.$error-text;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-body;
+}
