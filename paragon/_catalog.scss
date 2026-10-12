@@ -3,6 +3,90 @@
 @use "./variables" as brand;
 @import "./overrides";
 
+// Full-width notice above the homepage hero. The slot renders this as a
+// sibling of .home-hero, so it does not inherit the hero's grid or padding.
+.catalog-announcement {
+  position: relative;
+  // Info is also the fallback when the tone class is missing.
+  background: brand.$info-bg;
+  color: brand.$info-text;
+  font-family: brand.$font-family-brand-ui;
+  font-size: brand.$font-size-body;
+  font-weight: brand.$font-weight-body;
+  line-height: brand.$line-height-body;
+  padding: brand.$spacing-4 brand.$spacing-8;
+
+  @media (max-width: 900px) {
+    padding: brand.$spacing-3 brand.$spacing-6;
+  }
+
+  @media (max-width: 600px) {
+    padding: brand.$spacing-3 brand.$spacing-4;
+    font-size: brand.$font-size-caption;
+    line-height: brand.$line-height-caption;
+  }
+
+  &--info {
+    background: brand.$info-bg;
+    color: brand.$info-text;
+  }
+
+  &--success {
+    background: brand.$success-bg;
+    color: brand.$success-text;
+  }
+
+  &--warning {
+    background: brand.$warning-bg;
+    color: brand.$warning-text;
+  }
+
+  &--alert {
+    background: brand.$error-bg;
+    color: brand.$error-text;
+  }
+
+  &__message {
+    // Same cap as .partner-carousel__row. No spacing token lands on 75rem.
+    // Side padding keeps the text clear of the dismiss control.
+    max-width: 75rem;
+    margin: 0 auto;
+    padding-inline: brand.$minimum-touch-target;
+    text-align: center;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  &__dismiss {
+    position: absolute;
+    inset-block-start: brand.$spacing-2;
+    inset-inline-end: brand.$spacing-2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: brand.$minimum-touch-target;
+    height: brand.$minimum-touch-target;
+    padding: 0;
+    border: 0;
+    border-radius: brand.$border-radius-full;
+    background: transparent;
+    color: inherit;
+    font-family: brand.$font-family-brand-ui;
+    font-size: brand.$font-size-h3;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      background: brand.$ghost-hover-bg;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: brand.$focus-ring-offset;
+    }
+  }
+}
+
 // --pc-per-view lives here, not set inline like the other vars, so the media
 // queries below can override it — an inline style always beats a media query.
 .partner-carousel {
