@@ -3,6 +3,8 @@
 //   1. Global overrides (shared brand button/typography rules)
 //   2. Course outline status bar
 //   3. Course section schedule (frontend-app-authoring src/course-schedule/)
+//   4. Advanced settings values
+//   5. Studio header
 @use "./variables" as brand;
 
 
@@ -1300,3 +1302,43 @@
     font-size: brand.$font-size-label;
     font-weight: brand.$font-weight-body;
 }
+
+
+// ============================================================================
+// 4. Advanced settings values
+// ============================================================================
+
+// Course display name and other authored values. Jomolhari covers Tibetan
+// (unicode-range) and falls through to the UI face for Latin. line-height: 2
+// matches catalog titles so stacked glyphs don't collide when the value wraps.
+.advanced-settings .setting-items-list textarea.form-control {
+    font-family: brand.$font-family-jomolhari, brand.$font-family-brand-ui;
+    line-height: 1.5;
+}
+
+
+// ============================================================================
+// 5. Studio header
+// ============================================================================
+
+// Upstream StudioHeader.scss hardcodes 3.75rem (60px). Match .site-nav.
+.studio-header {
+    height: brand.$spacing-16;
+}
+
+// The title span is overflow:hidden at 1.375rem, which clips Tibetan stacks.
+// The org line is a short Latin label and does not need that same 22px box.
+// 4 + 16 + 40 + 4 = 64, so the bar does not grow.
+.studio-header .course-title-lockup {
+    padding-top: brand.$spacing-1;
+    padding-bottom: brand.$spacing-1;
+}
+
+.studio-header .course-title-lockup [data-testid="course-org-number"] {
+    line-height: brand.$spacing-4;
+}
+
+.studio-header .course-title-lockup [data-testid="course-title"] {
+    line-height: brand.$spacing-8 + brand.$spacing-2;
+}
+
