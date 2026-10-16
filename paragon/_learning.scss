@@ -72,6 +72,12 @@ h1, h2, h3, h4, h5, h6,
     font-size: brand.$learning-sequence-title-font-size;
 }
 
+// Course home title (OutlineTab). Tibetan runs are a 1.2em Jomolhari span;
+// a unitless line-height recomputes against that size so stacks clear the next line.
+[data-learner-type] [role="heading"].h2 {
+    line-height: 1.5;
+}
+
 
 // ============================================================================
 // 2. Dates tab: scheduled sections

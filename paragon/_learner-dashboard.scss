@@ -385,7 +385,8 @@
             font-family: brand.$font-family-brand-display;
             font-size: 26px;
             font-weight: 500;
-            line-height: 1.2;
+            // Clears stacked Tibetan glyphs; 1.2 clips a wrapped title.
+            line-height: 1.5;
             letter-spacing: 0;
             text-wrap: pretty;
             transition: color brand.$interaction-transition;
