@@ -1717,6 +1717,42 @@ $filter-panel-sticky-top: 88px;
   color: brand.$text-color-primary;
 }
 
+.catalog-page .catalog-empty-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  padding: 88px brand.$spacing-8;
+  border: 1px solid brand.$border-color;
+  border-radius: 14px;
+  background: brand.$card-bg;
+  text-align: center;
+
+  > * {
+    margin: brand.$spacing-2 0;
+  }
+
+  h2 {
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display;
+    font-size: brand.$font-size-h2;
+    font-weight: brand.$font-weight-h2;
+    line-height: brand.$line-height-h2;
+  }
+
+  p {
+    max-width: 36rem;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-body;
+  }
+}
+
+.catalog-empty-results__illustration {
+  width: min(240px, 70%);
+  max-height: 180px;
+}
+
 // Pagination footer. The divider and spacing live on the pager itself, not
 // on this wrapper (and Paragon's own border-top on it is cleared) — the pager
 // renders nothing when there's only one page of results, and a wrapper-level
