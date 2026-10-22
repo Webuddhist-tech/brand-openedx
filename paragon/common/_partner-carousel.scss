@@ -1,0 +1,141 @@
+@use "../variables" as brand;
+
+.partner-carousel {
+  padding: brand.$spacing-12 0;
+  background: brand.$body-bg;
+  font-family: brand.$font-family-brand-ui;
+
+  --pc-per-view: 4;
+
+  @media (width <= 960px) {
+    --pc-per-view: 3;
+  }
+
+  @media (width <= 760px) {
+    --pc-per-view: 2;
+
+    padding: brand.$spacing-4 0;
+  }
+
+  @media (width <= 460px) {
+    --pc-per-view: 1;
+  }
+
+  &__title {
+    margin-bottom: brand.$spacing-8;
+    color: brand.$text-color-muted;
+    font-size: brand.$font-size-h4;
+    font-weight: brand.$font-weight-label;
+    letter-spacing: .19em;
+    text-align: center;
+    text-transform: uppercase;
+    scroll-margin-top: calc(50vh - 15rem);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: brand.$spacing-3;
+    max-width: 75rem;
+    margin: 0 auto;
+    padding: 0 brand.$spacing-8;
+
+    @media (width <= 900px) {
+      padding: 0 brand.$spacing-6;
+    }
+
+    @media (width <= 600px) {
+      gap: brand.$spacing-2;
+      padding: 0 brand.$spacing-4;
+    }
+
+    @media (width >= 1600px) {
+      max-width: 97rem;
+    }
+
+    @media (width >= 2000px) {
+      max-width: 104.5rem;
+    }
+  }
+
+  &__arrow {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: brand.$minimum-touch-target;
+    height: brand.$minimum-touch-target;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-full;
+    background: brand.$color-white;
+    color: brand.$text-color-light;
+    cursor: pointer;
+    transition:
+      background brand.$interaction-transition,
+      border-color brand.$interaction-transition,
+      color brand.$interaction-transition;
+
+    &:hover {
+      border-color: brand.$primary;
+      background: brand.$primary;
+      color: brand.$primary-contrast;
+    }
+
+    &:focus-visible {
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: 2px;
+    }
+  }
+
+  &__viewport {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  &__track {
+    display: flex;
+    align-items: center;
+    width: calc(100% * var(--pc-window) / var(--pc-per-view));
+    transition: transform var(--pc-duration) cubic-bezier(.4, 0, .2, 1);
+  }
+
+  &__item {
+    display: flex;
+    flex: 0 0 calc(100% / var(--pc-window));
+    align-items: center;
+    justify-content: center;
+    padding: brand.$spacing-3 brand.$spacing-6;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$color-white;
+    line-height: 0;
+    transition: border-color brand.$interaction-transition;
+
+    &:focus-visible {
+      border-color: brand.$color-bark;
+      outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+      outline-offset: -2px;
+    }
+  }
+
+  &__logo {
+    width: 100%;
+    height: 6.5rem;
+    object-fit: contain;
+    transition: transform 280ms cubic-bezier(.34, 1.35, .64, 1);
+
+    .partner-carousel__item:hover &,
+    .partner-carousel__item:focus-visible & {
+      transform: scale(1.1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .partner-carousel__track,
+    .partner-carousel__logo {
+      transition-duration: 0s;
+    }
+  }
+}
