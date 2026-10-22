@@ -1,1 +1,35 @@
 // ORA Grading MFE-specific overrides.
+@use "./variables" as brand;
+@import "./overrides";
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+
+  [data-testid="redux-provider"] {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0; // let flex children size; avoid extra viewport slab
+  }
+
+  // App.jsx: <div> around header | main | footer
+  [data-testid="redux-provider"] > div {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+  }
+
+  main[data-testid="main"] {
+    flex: 1 1 auto;
+  }
+
+  .site-footer {
+    flex-shrink: 0;
+    // drop margin-top: auto if main already flex: 1 (pick one strategy)
+  }
+}
