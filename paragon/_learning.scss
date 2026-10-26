@@ -3,8 +3,178 @@
 //   1. Course-authored content fonts
 //   2. Dates tab: scheduled sections (frontend-app-learning
 //      src/course-home/dates-tab/section-schedule/)
+//   3. Page shell: content column, staff bar, course tabs
+//   4. Course home: title, start card, latest update, outline
+//   5. Course home sidebar: tools, dates, handouts
+//   6. Unit page: outline tray, unit card, navigation, side panel
+//   7. Dates tab: timeline
+//   8. Progress tab: completion, grades, certificate, related links
+//   9. Narrow screens
+//
+// Sections 3-9 follow the WBA learning designs (Course Learning, Updates &
+// Handouts, Course Unit, Course Dates, Course Progress). Their selectors start at #root: the MFE imports
+// this file at the top of its index.scss, so its own rules and the component
+// stylesheets imported from JS load later and would win a tie. The id lifts
+// these rules above them; !important is kept for Paragon utility classes
+// (.mb-3, .text-dark, .bg-light-200 ...) and the central button styles in
+// _overrides, which are !important themselves.
 @use "./variables" as brand;
 @import "./overrides";
+
+// Shapes from the learning designs.
+$learning-card-radius: brand.$border-radius-xl;   // start card, sidebar cards, unit card
+$learning-panel-radius: 14px;                     // outline sections, update card
+$learning-control-radius: 10px;                   // buttons and hovered rows
+$learning-card-shadow: 0 2px 8px rgba(brand.$color-espresso, 0.06);
+$learning-card-shadow-hover: 0 4px 14px rgba(brand.$color-espresso, 0.08);
+
+$learning-sidebar-width: 300px;
+$learning-sidebar-width-wide: 320px;
+$learning-outline-tray-width: 340px;
+$learning-outline-tray-width-narrow: 280px;
+$learning-side-panel-width: 380px;
+$learning-control-size: 40px;
+
+// Course home and the unit page drop to one column at or below this width.
+$learning-single-column: 980px;
+$learning-narrow: 640px;
+
+// Progress tab: the unfilled part of the donut and grade bar, and the
+// "passing" green, both straight from the Course Progress design.
+$learning-track: #F2E7D5;
+$learning-pass: #1B7A4B;
+$learning-pass-bg: #EAF4EE;
+$learning-pass-border: #CFE5D8;
+
+// Course-authored text: Tibetan in Jomolhari (its unicode-range limits it to
+// U+0F00-0FFF), everything else in the brand UI face. brand.$font-family-course-content
+// has no DM Sans, so Latin runs in these elements used to fall back to Segoe UI.
+$learning-author-font: brand.$font-family-jomolhari, brand.$font-family-brand-ui;
+
+// The content column follows the site header's shell ($nav-* come from
+// _header.scss, pulled in through ./overrides), so tabs and cards line up
+// under the logo at every width.
+@mixin learning-shell {
+    max-width: none;
+    padding-right: brand.$spacing-4;
+    padding-left: brand.$spacing-4;
+
+    @media (min-width: #{$nav-collapse + 1px}) {
+        padding-right: brand.$spacing-6;
+        padding-left: brand.$spacing-6;
+    }
+
+    @media (min-width: 1000px) {
+        padding-right: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-md}) / 2))"};
+        padding-left: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-md}) / 2))"};
+    }
+
+    @media (min-width: 1600px) {
+        padding-right: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-lg}) / 2))"};
+        padding-left: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-lg}) / 2))"};
+    }
+
+    @media (min-width: 2000px) {
+        padding-right: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-xl}) / 2))"};
+        padding-left: #{"max(#{$nav-gutter}, calc((100% - #{$nav-shell-xl}) / 2))"};
+    }
+}
+
+@mixin learning-card($radius: $learning-card-radius) {
+    border: 1px solid brand.$border-color;
+    border-radius: $radius;
+    background: brand.$color-white;
+    box-shadow: $learning-card-shadow;
+}
+
+// Small uppercase label heading each sidebar card ("COURSE TOOLS"). Platform
+// text, so the UI face; the !important beats the heading rule in section 1.
+@mixin learning-eyebrow {
+    color: brand.$text-color-muted;
+    font-family: brand.$font-family-brand-ui !important;
+    font-size: brand.$font-size-label;
+    font-weight: brand.$font-weight-bold;
+    letter-spacing: 2.2px;
+    line-height: brand.$line-height-label;
+    text-transform: uppercase;
+}
+
+@mixin learning-button-base {
+    min-height: brand.$minimum-touch-target;
+    padding: brand.$spacing-3 22px;
+    border-radius: $learning-control-radius;
+    font-size: 14.5px;
+    font-weight: brand.$font-weight-semibold;
+    transition: background brand.$interaction-transition,
+        border-color brand.$interaction-transition,
+        color brand.$interaction-transition;
+}
+
+// Buttons answer hover with color only: no lift, shadow or size change.
+
+// Saffron call to action ("Start course", "Next").
+@mixin learning-button-primary {
+    @include learning-button-base;
+    border: 0 !important;
+    background: brand.$accent !important;
+    color: brand.$accent-contrast !important;
+
+    &:hover:not(:disabled):not(.disabled) {
+        background: brand.$accent-hover !important;
+    }
+}
+
+// White button with a hairline border ("Start discussion", "Previous").
+@mixin learning-button-ghost {
+    @include learning-button-base;
+    border: 1.5px solid brand.$border-color !important;
+    background: brand.$color-white !important;
+    color: brand.$text-color-primary !important;
+
+    &:hover:not(:disabled):not(.disabled),
+    &:active:not(:disabled):not(.disabled) {
+        border-color: brand.$color-bark !important;
+        background: brand.$section-bg !important;
+        color: brand.$text-color !important;
+    }
+}
+
+// An outline icon drawn as a mask over the element's background color (used
+// in ::before, where an <svg> can't go). Chromium before 120 only knows the
+// -webkit- form; without it the element shows as a solid square.
+@mixin learning-mask-icon($url) {
+    -webkit-mask: $url center / contain no-repeat;
+    mask: $url center / contain no-repeat;
+}
+
+// Square bordered icon button: sidebar triggers, top previous/next, the
+// collapsed outline toggle.
+@mixin learning-icon-button {
+    width: $learning-control-size;
+    height: $learning-control-size;
+    min-width: $learning-control-size;
+    min-height: $learning-control-size;
+    padding: 0 !important;
+    border: 1px solid brand.$border-color !important;
+    border-radius: $learning-control-radius !important;
+    background: brand.$color-white !important;
+    box-shadow: none !important;
+    color: brand.$text-color-primary !important;
+    transition: background brand.$interaction-transition,
+        border-color brand.$interaction-transition,
+        color brand.$interaction-transition;
+
+    &:hover:not(:disabled):not(.disabled) {
+        border-color: brand.$color-bark !important;
+        background: brand.$section-bg !important;
+        color: brand.$text-color !important;
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+    }
+}
 
 
 // ============================================================================
@@ -17,7 +187,7 @@
 
 // User-uploaded / course-authored content uses Jomolhari for Tibetan characters.
 // Jomolhari has unicode-range: U+0F00-0FFF, so it only activates for Tibetan characters.
-// English/Latin characters in these elements fall through to the sans-serif fallbacks unchanged.
+// English/Latin characters in these elements fall through to the brand UI face.
 
 .user-content,
 .xblock-content,
@@ -60,7 +230,7 @@ h1, h2, h3, h4, h5, h6,
 .page-header,
 .page-header h1,
 .sequence-header {
-    font-family: brand.$font-family-course-content !important;
+    font-family: $learning-author-font !important;
 }
 
 // Increase font sizes for section and subsection titles (since Jomolhari can look small)
@@ -72,56 +242,2543 @@ h1, h2, h3, h4, h5, h6,
     font-size: brand.$learning-sequence-title-font-size;
 }
 
-// Course home title (OutlineTab). Tibetan runs are a 1.2em Jomolhari span;
-// a unitless line-height recomputes against that size so stacks clear the next line.
-[data-learner-type] [role="heading"].h2 {
-    line-height: 1.5;
-}
-
 
 // ============================================================================
 // 2. Dates tab: scheduled sections
 // ============================================================================
 
+// Each scheduled session is a compact white card under its date: the
+// section name, a teal time pill, instructor and tools on one muted line,
+// then any notes below a hairline.
 .dates-section-schedule {
-    margin-bottom: brand.$spacing-2;
-    padding: brand.$spacing-2 brand.$spacing-3;
-    border-left: 3px solid brand.$accent;
-    border-radius: 0 brand.$border-radius-sm brand.$border-radius-sm 0;
-    background: brand.$card-bg;
+    max-width: 640px;
+    margin-top: 10px;
+    border: 1px solid brand.$border-color;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$color-white;
     color: brand.$text-color;
+    line-height: 1.6;
+    // Padding and font size are set with the Dates timeline (section 7),
+    // where they have to beat the card's .pb-1 and .small utilities.
 }
 
 // The section name is course-authored and often Tibetan.
 .dates-section-schedule__title {
-    font-family: brand.$font-family-course-content;
-    font-weight: brand.$font-weight-bold;
-    color: brand.$text-color-primary;
+    color: brand.$text-color;
+    font-family: $learning-author-font;
+    font-size: 16px;
+    font-weight: brand.$font-weight-semibold;
+    line-height: 1.5;
 }
 
 .dates-section-schedule__when {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: brand.$spacing-2 0 6px;
+    padding: 3px 10px;
+    border-radius: brand.$border-radius-full;
+    background: brand.$info-bg;
     color: brand.$secondary;
-    font-weight: brand.$font-weight-medium;
+    font-size: 13px;
+    font-weight: brand.$font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+
+    // Clock, drawn in the pill's own color.
+    &::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 13px;
+        height: 13px;
+        background: currentColor;
+        @include learning-mask-icon(url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E"));
+    }
 }
 
+// Instructor and tools sit on one line, split by a dot.
 .dates-section-schedule__detail {
-    color: brand.$text-color-light;
+    display: inline;
+    color: brand.$text-color-muted;
+    font-size: 13.5px;
+}
+
+// The time pill is inline, so the first detail after it needs a line break.
+// (After the block-level title it already starts a new line.)
+.dates-section-schedule__when + .dates-section-schedule__detail::before {
+    content: "\A";
+    white-space: pre;
+}
+
+.dates-section-schedule__detail + .dates-section-schedule__detail::before {
+    content: "·";
+    margin: 0 brand.$spacing-2;
+    color: brand.$color-bark;
 }
 
 // Creators write notes on several lines; keep their line breaks.
 .dates-section-schedule__notes {
-    margin-top: brand.$spacing-1;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid brand.$section-bg;
     white-space: pre-line;
     color: brand.$text-color-light;
+    font-size: 13.5px;
 }
 
 .dates-section-schedule__notice {
-    display: inline-block;
-    margin-top: brand.$spacing-1;
-    padding: 0 brand.$spacing-2;
+    display: block;
+    width: fit-content;
+    margin-top: 10px;
+    padding: 2px brand.$spacing-2;
     border-radius: brand.$border-radius-full;
     background: brand.$warning-bg;
     color: brand.$warning-text;
     font-size: brand.$font-size-label;
     font-weight: brand.$font-weight-semibold;
+}
+
+
+// ============================================================================
+// 3. Page shell: content column, staff bar, course tabs
+// ============================================================================
+
+#root {
+    #courseTabsNavigation > .container-xl,
+    #main-content.container-xl,
+    [data-testid="instructor-toolbar"] .container-xl {
+        @include learning-shell;
+    }
+}
+
+// Staff bar (InstructorToolbar): "View this course as" and "View course in".
+#root [data-testid="instructor-toolbar"] {
+    > .bg-primary {
+        background: brand.$color-espresso !important;
+        color: rgba(brand.$color-parchment, 0.7) !important;
+    }
+
+    > .bg-primary > .container-xl {
+        padding-top: brand.$spacing-3 !important;
+        padding-bottom: brand.$spacing-3 !important;
+        font-size: 13.5px;
+    }
+
+    .col-form-label {
+        color: rgba(brand.$color-parchment, 0.7);
+        font-size: 13.5px;
+    }
+
+    hr.border-light {
+        border-color: rgba(brand.$color-parchment, 0.1) !important;
+    }
+
+    .btn-inverse-outline-primary {
+        min-height: 0;
+        padding: 7px 14px;
+        border: 1px solid rgba(brand.$color-parchment, 0.33) !important;
+        border-radius: brand.$border-radius-md;
+        background: transparent !important;
+        color: brand.$color-parchment !important;
+        font-size: 13.5px;
+        font-weight: brand.$font-weight-semibold;
+
+        &:hover,
+        &:focus,
+        &[aria-expanded="true"] {
+            border-color: brand.$accent !important;
+            background: rgba(brand.$color-white, 0.08) !important;
+            color: brand.$color-parchment !important;
+        }
+
+        &:focus-visible {
+            outline: brand.$focus-ring-width solid brand.$accent;
+            outline-offset: 2px;
+        }
+    }
+}
+
+// "View this course as" menu (Staff / Specific Student / a track) and the
+// course tabs' "More..." menu, drawn like the header's menus in _header.scss:
+// white panel, sand hover, and the selected row in sand, instead of
+// Paragon's navy.
+#root [data-testid="instructor-toolbar"] .dropdown-menu,
+#root .course-tabs-navigation .dropdown-menu {
+    min-width: 240px;
+    margin-top: brand.$spacing-2;
+    padding: brand.$border-radius-lg;
+    border: 1px solid brand.$color-dusk;
+    border-radius: brand.$border-radius-lg;
+    background: brand.$color-white;
+    box-shadow: 0 12px 32px rgba(brand.$color-espresso, 0.13);
+
+    .dropdown-item {
+        position: relative;
+        padding: brand.$spacing-2 brand.$spacing-3 brand.$spacing-2 brand.$spacing-4;
+        border-radius: brand.$border-radius-md;
+        background: none;
+        color: brand.$color-deep-brown;
+        font-family: brand.$font-family-brand-ui;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-medium;
+        line-height: brand.$line-height-caption;
+        transition: background brand.$interaction-transition, color brand.$interaction-transition;
+
+        & + .dropdown-item {
+            margin-top: 2px;
+        }
+
+        &:hover,
+        &:focus {
+            background: brand.$color-sand;
+            color: brand.$color-espresso;
+        }
+
+        &:active {
+            background: brand.$color-dusk;
+        }
+
+        &.active {
+            background: brand.$color-sand;
+            color: brand.$color-espresso;
+            font-weight: brand.$font-weight-semibold;
+        }
+
+        &:focus-visible {
+            outline: brand.$focus-ring-width solid brand.$focus-ring-color;
+            outline-offset: -2px;
+        }
+    }
+}
+
+// Course tabs: brown labels, a saffron underline that grows in from the left.
+#root .course-tabs-navigation {
+    border-bottom: 1px solid brand.$border-color;
+    background: brand.$color-white;
+
+    .nav-underline-tabs {
+        gap: brand.$spacing-1;
+    }
+
+    .nav-underline-tabs .nav-link {
+        position: relative;
+        min-height: 0;
+        padding: brand.$spacing-4 14px 15px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: brand.$text-color-primary !important;
+        font-family: brand.$font-family-brand-ui;
+        font-size: 14.5px;
+        font-weight: brand.$font-weight-medium;
+        transition: color brand.$interaction-transition;
+
+        &::after {
+            content: "";
+            position: absolute;
+            right: 14px;
+            bottom: 0;
+            left: 14px;
+            height: 2.5px;
+            border-radius: 2px;
+            background: brand.$accent;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.18s ease-out;
+        }
+
+        &:hover,
+        &:focus-visible,
+        &.active {
+            background: transparent;
+            color: brand.$text-color !important;
+
+            &::after {
+                transform: scaleX(1);
+            }
+        }
+
+        &.active {
+            font-weight: brand.$font-weight-semibold;
+        }
+    }
+
+    // "More..." (tabs that don't fit on narrow screens): a tab like the rest,
+    // not Paragon's underlined link button. Its ::after is Paragon's dropdown
+    // caret, which the tab underline above turns into a stray mark, so it is
+    // dropped; the open state shows in the label colour.
+    .nav-underline-tabs .dropdown-toggle.nav-link {
+        box-shadow: none !important;
+        text-decoration: none !important;
+
+        &::after {
+            display: none;
+        }
+
+        &[aria-expanded="true"] {
+            color: brand.$text-color !important;
+        }
+    }
+
+    .dropdown-menu {
+        min-width: 200px;
+    }
+
+    .search-toggle {
+        align-self: center;
+        margin-bottom: 0;
+    }
+}
+
+
+// ============================================================================
+// 4. Course home: title, start card, latest update, outline
+// ============================================================================
+
+// Course title: the Tibetan name large, an English subtitle under it.
+// OutlineTab wraps Tibetan runs in .course-title-tibetan and the trailing English in .course-title-subtitle.
+#root [data-learner-type] .course-home-title {
+    margin: 0;
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display !important;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: brand.$font-weight-body;
+    line-height: 1.5;
+}
+
+#root .course-title-tibetan {
+    font-family: brand.$font-family-jomolhari, brand.$font-family-noto-serif-tibetan, serif;
+}
+
+#root .course-title-subtitle {
+    display: block;
+    margin-top: brand.$spacing-1;
+    color: brand.$text-color-primary;
+    font-size: clamp(22px, 2.4vw, 28px);
+    line-height: 1.3;
+}
+
+// Main column and a fixed-width sidebar.
+#root .course-outline-tab {
+    @media (min-width: #{$learning-single-column + 1px}) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) $learning-sidebar-width;
+        column-gap: 40px;
+        align-items: start;
+        margin-right: 0;
+        margin-left: 0;
+
+        // Alerts above the two columns span both.
+        > * {
+            grid-column: 1 / -1;
+            max-width: none;
+            padding-right: 0;
+            padding-left: 0;
+        }
+
+        > .col-md-8,
+        > .col-md-4 {
+            grid-column: auto;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        grid-template-columns: minmax(0, 1fr) $learning-sidebar-width-wide;
+        column-gap: brand.$spacing-12;
+    }
+
+    @media (max-width: $learning-single-column) {
+        > .col-md-8,
+        > .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+}
+
+// "Begin your course today" with Start discussion and Start/Resume course.
+#root .course-outline-tab [data-testid="start-resume-card"] {
+    @include learning-card;
+    border: 1px solid brand.$border-color !important;
+    box-shadow: $learning-card-shadow !important;
+
+    .pgn__card-header {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: brand.$spacing-6;
+        padding: 26px 28px;
+    }
+
+    // Paragon gives the heading block width: 100%, which (with wrapping on)
+    // pushes the buttons onto a second line; let it share the row instead.
+    .pgn__card-header-content {
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        margin-top: 0;
+    }
+
+    .pgn__card-header-title-md {
+        margin: 0;
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-display;
+        font-size: 26px;
+        font-weight: brand.$font-weight-medium;
+        line-height: 1.3;
+    }
+
+    .pgn__card-header-actions {
+        margin-top: 0;
+        margin-left: auto;
+
+        > .d-flex {
+            gap: brand.$spacing-3;
+        }
+
+        // On phones the MFE stacks the header (display: block), so the gap
+        // above no longer separates the heading from the buttons.
+        @media (max-width: 575.98px) {
+            margin-top: 18px;
+        }
+    }
+
+    // Kept in the markup only for spacing; the header carries the padding now.
+    .pgn__card-footer {
+        display: none;
+    }
+
+    .btn-brand {
+        @include learning-button-primary;
+        margin-bottom: 0 !important;
+    }
+
+    .btn-outline-brand {
+        @include learning-button-ghost;
+        gap: 9px;
+        margin-right: 0 !important;
+
+        .course-tool-icon {
+            flex: 0 0 auto;
+        }
+    }
+}
+
+// Latest course update (WelcomeMessage). The text itself is inside an iframe,
+// styled by the MFE's public/static/LmsHtmlFragment.css.
+#root [data-testid="alert-container-welcome"] {
+    margin-bottom: 0;
+    padding: brand.$spacing-6 28px 18px;
+    border: 1px solid brand.$border-color !important;
+    border-radius: $learning-panel-radius;
+    background: brand.$color-white !important;
+    box-shadow: none !important;
+    color: brand.$text-color;
+
+    // "UPDATES" label above the message, like the sidebar card labels.
+    .welcome-message-label {
+        @include learning-eyebrow;
+        margin: 0 0 10px;
+        letter-spacing: 1.4px;
+    }
+
+    // Space between the message and the Show more / Dismiss row.
+    .alert-message-content .mb-3 {
+        margin-bottom: brand.$spacing-1 !important;
+    }
+
+    // "Show more" and "Dismiss" read as text links.
+    .pgn__alert-actions .btn {
+        min-height: 0;
+        padding: brand.$spacing-2 brand.$spacing-1;
+        border: 0 !important;
+        background: transparent !important;
+        color: brand.$color-deep-saffron !important;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-semibold;
+
+        &:hover:not(:disabled) {
+            background: transparent !important;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+    }
+}
+
+// Certificate status alert on the course home ("Congratulations! Your
+// certificate is ready."). Not in the designs; built from the Progress
+// design's passing strip (green tint, green tick) on a course-home card,
+// with the icon beside the heading and the saffron button on the right.
+#root .certificate-status-alert {
+    margin-bottom: brand.$spacing-4;
+    padding: 22px 28px;
+    border: 1px solid brand.$border-color !important;
+    border-radius: $learning-panel-radius;
+    background: brand.$card-bg !important;
+    box-shadow: none !important;
+    color: brand.$text-color;
+
+    &.alert-success {
+        border-color: $learning-pass-border !important;
+        background: $learning-pass-bg !important;
+
+        .alert-icon {
+            color: $learning-pass !important;
+        }
+    }
+
+    &.alert-warning .alert-icon {
+        color: brand.$color-deep-saffron !important;
+    }
+
+    // Text on the left, button on the right.
+    .alert-message-content > .d-flex {
+        gap: brand.$spacing-6;
+    }
+
+    // Icon in its own column beside the heading and body.
+    .col-lg-8,
+    .col-auto {
+        display: grid;
+        grid-template-columns: 22px minmax(0, 1fr);
+        column-gap: 14px;
+        align-items: center;
+        flex: 1 1 auto;
+        max-width: none;
+        padding: 0;
+    }
+
+    .alert-icon {
+        grid-row: 1 / span 2;
+        width: 22px;
+        height: 22px;
+        margin: 0;
+    }
+
+    // Platform text; the !important beats the heading rule in section 1.
+    .alert-heading {
+        margin: 0;
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-ui !important;
+        font-size: 16px;
+        font-weight: brand.$font-weight-semibold;
+        line-height: 1.5;
+    }
+
+    .alert-heading ~ * {
+        grid-column: 2;
+        margin: brand.$spacing-1 0 0;
+        color: brand.$text-color-muted;
+        font-size: 14.5px;
+        line-height: 1.6;
+    }
+
+    .btn-primary {
+        @include learning-button-primary;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 991.98px) {
+        .alert-message-content > .d-flex {
+            align-items: flex-start !important;
+        }
+
+        .pt-3 {
+            padding-top: 0 !important;
+            padding-left: 36px;
+        }
+    }
+}
+
+// "Expand all" / "Collapse all".
+#root #expand-button-row {
+    margin: 28px 0 14px !important;
+
+    .btn {
+        @include learning-button-ghost;
+        min-height: $learning-control-size;
+        padding: 9px brand.$spacing-4;
+        font-size: 13.5px;
+    }
+}
+
+// Sections as accordion cards; each subsection is a row inside.
+#root #courseHome-outline {
+    > li > .pgn_collapsible {
+        @include learning-card($learning-panel-radius);
+        margin-bottom: brand.$spacing-3 !important;
+        overflow: hidden;
+        transition: border-color brand.$interaction-transition,
+            box-shadow brand.$interaction-transition;
+
+        &:hover,
+        &.is-open {
+            border-color: brand.$color-bark;
+        }
+
+        &:hover {
+            box-shadow: $learning-card-shadow-hover;
+        }
+    }
+
+    .collapsible-trigger {
+        gap: brand.$spacing-4;
+        padding: 20px 22px;
+        border-bottom: 1px solid transparent;
+
+        &:hover {
+            background: transparent;
+        }
+
+        &[aria-expanded="true"] {
+            border-bottom-color: brand.$section-bg;
+        }
+
+        // The title column carries .font-weight-bold; Jomolhari has no bold cut.
+        .font-weight-bold {
+            font-weight: brand.$font-weight-body !important;
+        }
+
+        .pgn__icon {
+            width: 22px;
+            height: 22px;
+        }
+    }
+
+    .section-title {
+        color: brand.$text-color;
+        font-size: 19px;
+        line-height: 1.75;
+    }
+
+    // The +/- toggle as a round outlined button.
+    .collapsible-icon .btn-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        border: 1px solid brand.$border-color !important;
+        border-radius: 50% !important;
+        background: transparent;
+        color: brand.$text-color-primary;
+    }
+
+    .collapsible-trigger:hover .collapsible-icon .btn-icon,
+    .is-open .collapsible-icon .btn-icon {
+        border-color: brand.$color-bark !important;
+        background: brand.$section-bg;
+    }
+
+    .collapsible-body {
+        padding: 0 brand.$spacing-6 brand.$spacing-2;
+    }
+
+    // Rows are split by a straight hairline on the list item. The row inside
+    // carries the rounded hover fill, inset a little from the lines so the
+    // fill floats between them. (A border on the rounded row itself bent
+    // up at both ends.)
+    .collapsible-body > ol > li + li {
+        border-top: 1px solid brand.$section-bg;
+    }
+
+    .collapsible-body > ol > li > div {
+        margin: brand.$spacing-1 (-(brand.$spacing-3)) !important;
+        padding: brand.$spacing-3 !important;
+        border-top: 0 !important;
+        border-radius: $learning-control-radius;
+        transition: background brand.$interaction-transition;
+
+        &:hover {
+            background: brand.$card-bg;
+        }
+    }
+
+    .sequence-title {
+        color: brand.$secondary;
+        font-size: 15px;
+        line-height: 1.55;
+    }
+
+    a.sequence-title {
+        text-decoration: underline transparent;
+        text-underline-offset: 3px;
+        transition: color brand.$interaction-transition,
+            text-decoration-color brand.$interaction-transition;
+
+        &:hover {
+            color: brand.$secondary-active;
+            text-decoration-color: currentColor;
+        }
+    }
+
+    .collapsible-body .small {
+        color: brand.$text-color-muted;
+    }
+
+    // Completion ticks: a tan ring until done, teal once complete.
+    .text-gray-400 {
+        color: brand.$color-bark !important;
+    }
+
+    .text-success {
+        color: brand.$secondary !important;
+    }
+}
+
+
+// ============================================================================
+// 5. Course home sidebar: tools, dates, handouts
+// ============================================================================
+
+#root .course-sidebar-card {
+    @include learning-card;
+    margin-bottom: 20px !important;
+    padding: brand.$spacing-4 brand.$spacing-3;
+
+    h2.h4 {
+        @include learning-eyebrow;
+        margin: 0;
+        padding: 6px brand.$spacing-3 10px;
+        border-left: 0;
+    }
+
+    ul.list-unstyled li {
+        font-size: brand.$font-size-caption;
+    }
+
+    // Tool rows: Bookmarks, Updates, Launch tour ...
+    ul.list-unstyled li a,
+    #courseHome-launchTourLink .btn-link {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 11px;
+        width: 100%;
+        min-height: 0;
+        padding: 11px brand.$spacing-3 !important;
+        border: 0;
+        border-radius: 9px;
+        background: transparent !important;
+        color: brand.$text-color-primary !important;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-medium;
+        text-align: left;
+        text-decoration: none !important;
+        transition: background brand.$interaction-transition,
+            color brand.$interaction-transition;
+
+        // .course-tool-icon: the design's outline icons (Bookmarks, Updates,
+        // Launch tour); other tools still use Font Awesome.
+        .course-tool-icon,
+        .svg-inline--fa,
+        .pgn__icon {
+            flex: 0 0 auto;
+            width: 17px !important;
+            height: 17px !important;
+            margin-right: 0 !important;
+            color: brand.$text-color-muted;
+            transition: color brand.$interaction-transition;
+        }
+
+        &:hover,
+        &:focus-visible {
+            background: brand.$section-bg !important;
+            color: brand.$text-color !important;
+
+            .course-tool-icon,
+            .svg-inline--fa,
+            .pgn__icon {
+                color: brand.$accent;
+            }
+        }
+    }
+}
+
+// Important dates.
+#root #courseHome-dates {
+    ol.list-unstyled {
+        padding: brand.$spacing-1 brand.$spacing-3 0;
+    }
+
+    li {
+        margin-bottom: brand.$spacing-3 !important;
+        color: brand.$text-color !important;
+        font-size: brand.$font-size-caption;
+    }
+
+    li > .row:first-child {
+        align-items: center;
+        font-weight: brand.$font-weight-bold;
+    }
+
+    .svg-inline--fa {
+        color: brand.$text-color-muted;
+    }
+
+    .date-summary-text {
+        color: brand.$text-color-primary;
+        font-size: 13.5px;
+        line-height: 1.6;
+
+        .font-weight-bold {
+            font-weight: brand.$font-weight-semibold !important;
+        }
+    }
+
+    #dates-tab-link {
+        display: inline-block;
+        margin: 0 0 6px brand.$spacing-3 !important;
+        padding: 0 !important;
+        color: brand.$color-deep-saffron;
+        font-size: 13.5px;
+        font-weight: brand.$font-weight-semibold !important;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+}
+
+
+// Course home tour ("Launch tour"): Paragon's ProductTour checkpoints, styled
+// as the tour popover in the Course Learning design: a white card, serif
+// title and pill step dots. The design's thick brown edge is left out:
+// Paragon's arrow is a solid triangle fused to the card, and a dark edge
+// plus a dark triangle reads as a heavy lip, so the arrow is white instead.
+// The checkpoint sits outside the MFE's own markup, so these selectors hang
+// off body rather than #root.
+body .pgn__checkpoint {
+    // Both arrow colors: "border" paints the arrow when the card sits below
+    // its target, "arrow-border-top" when it sits above or beside it.
+    --pgn-color-product-tour-checkpoint-bg: #{brand.$color-white};
+    --pgn-color-product-tour-checkpoint-border: #{brand.$color-white};
+    --pgn-color-product-tour-checkpoint-arrow-border-top: #{brand.$color-white};
+    --pgn-color-product-tour-checkpoint-body: #{brand.$text-color-primary};
+    --pgn-color-product-tour-checkpoint-breadcrumb: #{brand.$accent};
+    --pgn-size-product-tour-checkpoint-width-border: 5px;
+    --pgn-size-product-tour-checkpoint-width-arrow: 10px;
+    --pgn-size-product-tour-checkpoint-width-max: 400px;
+
+    border: 1px solid brand.$border-color;
+    border-radius: $learning-card-radius;
+    padding: 22px brand.$spacing-6 20px;
+    box-shadow: 0 18px 44px rgba(brand.$color-espresso, 0.22);
+    font-family: brand.$font-family-brand-ui;
+
+    .pgn__checkpoint-header {
+        align-items: flex-start;
+        gap: brand.$spacing-4;
+        margin-bottom: brand.$spacing-2;
+    }
+
+    // Platform text; the !important beats the heading rule in section 1.
+    #pgn__checkpoint-title {
+        margin: 0;
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-display !important;
+        font-size: 27px;
+        font-weight: brand.$font-weight-semibold;
+        line-height: 1.15;
+    }
+
+    // Step dots: small tan pills, the current one wider and saffron.
+    .pgn__checkpoint-breadcrumb-container {
+        flex: 0 0 auto;
+        gap: 5px;
+        margin-top: brand.$spacing-3;
+    }
+
+    .pgn__checkpoint-breadcrumb {
+        width: 7px;
+        height: 7px;
+        margin: 0 !important;
+        border: 0 !important;
+        border-radius: brand.$border-radius-full;
+        transition: width 0.2s;
+
+        &.pgn__checkpoint-breadcrumb_active {
+            width: 18px;
+            background: brand.$accent;
+        }
+
+        &.pgn__checkpoint-breadcrumb_inactive {
+            background: brand.$border-color;
+        }
+    }
+
+    .pgn__checkpoint-body {
+        margin-bottom: 20px;
+        font-size: 15px;
+        line-height: 1.65;
+    }
+
+    .pgn__checkpoint-action-row {
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pgn__checkpoint-action-row .btn {
+        min-height: 0;
+        padding: 10px brand.$spacing-4;
+        border-radius: $learning-control-radius;
+        font-size: 14.5px;
+        font-weight: brand.$font-weight-semibold;
+    }
+
+    // "Dismiss": a quiet text button.
+    .pgn__checkpoint-button_dismiss {
+        margin: 0 !important;
+        border: 1.5px solid transparent !important;
+        background: transparent !important;
+        color: brand.$color-deep-saffron !important;
+
+        &:hover:not(:disabled) {
+            background: brand.$section-bg !important;
+            color: brand.$color-deep-saffron !important;
+        }
+    }
+
+    // "Next" / "Okay".
+    .pgn__checkpoint-button_advance {
+        @include learning-button-primary;
+        min-height: 0;
+        padding: 10px 22px;
+    }
+}
+
+
+// ============================================================================
+// 6. Unit page: outline tray, unit card, navigation, side panel
+// ============================================================================
+
+#root {
+    // The unit card. Below 576px the MFE drops the frame, so does this.
+    @media (min-width: 576px) {
+        .sequence {
+            border: 1px solid brand.$border-color;
+            border-radius: $learning-card-radius;
+            background: brand.$color-white;
+            box-shadow: $learning-card-shadow;
+        }
+
+        .unit-container {
+            padding-right: brand.$spacing-8;
+            padding-left: brand.$spacing-8;
+        }
+    }
+
+    // Below 1200px the outline button leads the card's top row. The MFE pulls
+    // that row up 2rem (mt-n4.5), leaving the button 8px from the card's top
+    // but 32px from its side; -8px gives 24px padding + 16px row padding - 8px
+    // = 32px, the same inset on both sides.
+    @media (min-width: 576px) and (max-width: 1199.98px) {
+        .top-unit-navigation.mt-n4\.5 {
+            margin-top: -(brand.$spacing-2) !important;
+        }
+    }
+
+    // Keeps the iframe 8px in from the card edge, as before the padding change.
+    @media (min-width: 830px) {
+        .unit-iframe-wrapper {
+            margin-right: -(brand.$spacing-6);
+            margin-left: -(brand.$spacing-6);
+        }
+    }
+
+    // Unit title (course-authored) and the bookmark link under it.
+    .unit-title-container h3 {
+        margin-bottom: 0;
+        color: brand.$text-color;
+        font-size: 30px;
+        font-weight: brand.$font-weight-body;
+        line-height: 1.5;
+    }
+
+    .unit .pgn__stateful-btn.btn-link {
+        min-height: 0;
+        margin: brand.$spacing-2 0 0 !important;
+        padding: 6px 0 !important;
+        color: brand.$secondary !important;
+        font-size: brand.$font-size-caption;
+        font-weight: brand.$font-weight-medium;
+
+        .pgn__icon,
+        .text-primary {
+            color: brand.$secondary !important;
+        }
+
+        &:hover:not(:disabled) {
+            color: brand.$secondary-active !important;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+    }
+
+    // Top row: discussion and notification triggers, then previous/next.
+    .top-unit-navigation {
+        .notification-btn {
+            @include learning-icon-button;
+            justify-content: center;
+        }
+
+        .sidebar-active .notification-btn {
+            border-color: brand.$color-bark !important;
+            background: brand.$section-bg !important;
+            color: brand.$text-color !important;
+        }
+
+        .icon-container {
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .previous-button.btn-icon,
+        .next-button.btn-icon {
+            @include learning-icon-button;
+            margin: 0 !important;
+        }
+    }
+
+    [data-testid="notification-dot"] {
+        top: -4px !important;
+        right: -4px !important;
+        width: 13px;
+        height: 13px;
+        padding: 0 !important;
+        border: 2px solid brand.$color-white;
+        background: brand.$color-danger !important;
+    }
+
+    // Bottom row: Previous as a ghost button, Next in saffron.
+    .unit-navigation:not(.top-unit-navigation) {
+        max-width: none;
+        margin: 30px 0 0;
+        padding-top: brand.$spacing-6;
+        border-top: 1px solid brand.$section-bg;
+    }
+
+    .sequence-bottom-nav-buttons {
+        .previous-button.btn {
+            @include learning-button-ghost;
+            flex: 0 0 auto;
+            padding: 13px brand.$spacing-6;
+        }
+
+        .next-button.btn {
+            @include learning-button-primary;
+            flex: 0 0 auto;
+            padding: 13px brand.$spacing-6;
+        }
+    }
+
+    // Course outline tray (left). It narrows while the side panel is open.
+    .outline-sidebar-wrapper:not(.fixed-top) {
+        width: $learning-outline-tray-width;
+
+        .outline-sidebar {
+            @include learning-card;
+        }
+
+        // Card corners only when the tray is a card, not full-screen on phones.
+        .outline-sidebar-heading-wrapper:not(.collapsed) {
+            border-radius: ($learning-card-radius - 1px) ($learning-card-radius - 1px) 0 0;
+        }
+    }
+
+    .sequence-container:has(#course-sidebar:not(.d-none):not(.fixed-top)) .outline-sidebar-wrapper:not(.fixed-top) {
+        width: $learning-outline-tray-width-narrow;
+    }
+
+    .outline-sidebar-heading-wrapper:not(.collapsed) {
+        gap: brand.$spacing-3;
+        padding: brand.$spacing-4 18px !important;
+        border: 0 !important;
+        border-bottom: 1px solid brand.$border-color !important;
+        background: brand.$card-bg !important;
+
+        .outline-sidebar-toggle-btn {
+            width: brand.$spacing-8;
+            height: brand.$spacing-8;
+            min-width: brand.$spacing-8;
+            min-height: brand.$spacing-8;
+            border-radius: brand.$border-radius-md;
+            background: transparent !important;
+            color: brand.$text-color-primary !important;
+
+            &:hover {
+                border-color: transparent !important;
+                background: brand.$section-bg !important;
+                box-shadow: none !important;
+                color: brand.$text-color !important;
+                transform: none;
+            }
+        }
+    }
+
+    // "Course outline", or the current section's name as a back button.
+    .outline-sidebar-heading {
+        min-height: 0;
+        color: brand.$text-color !important;
+        font-family: brand.$font-family-brand-ui !important;
+        font-size: 15px;
+        font-weight: brand.$font-weight-semibold;
+        line-height: 1.5;
+    }
+
+    button.outline-sidebar-heading {
+        font-size: brand.$font-size-body - 2px;
+        font-weight: brand.$font-weight-body;
+    }
+
+    // Collapsed tray: one square button that reopens it. Its design icon
+    // already points right, so the MFE's mirror flip (and hover lift) is
+    // undone in every state.
+    .outline-sidebar-heading-wrapper.collapsed .outline-sidebar-toggle-btn {
+        @include learning-icon-button;
+
+        &,
+        &:hover:not(:disabled),
+        &:active:not(:disabled) {
+            transform: none;
+        }
+    }
+
+    #outline-sidebar-outline {
+        margin: 0;
+        border: 0 !important;
+        border-radius: 0 0 ($learning-card-radius - 1px) ($learning-card-radius - 1px);
+        background: brand.$color-white;
+
+        li {
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        // Section rows (outline level) and subsection accordions (section level).
+        .course-sidebar-section,
+        > li > .pgn_collapsible {
+            margin: 0 !important;
+            border: 0 !important;
+            border-bottom: 1px solid brand.$section-bg !important;
+            border-radius: 0 !important;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        > li:last-child > .pgn_collapsible,
+        > .course-sidebar-section:last-child {
+            border-bottom: 0 !important;
+        }
+
+        .course-sidebar-section .btn {
+            min-height: 0;
+            padding: 15px 18px !important;
+            border: 0 !important;
+            color: brand.$text-color !important;
+            font-weight: brand.$font-weight-body;
+
+            &:hover:not(:disabled) {
+                background: brand.$card-bg !important;
+            }
+
+            > .pgn__icon:last-child {
+                color: brand.$text-color-muted;
+            }
+        }
+
+        .collapsible-trigger {
+            padding: 15px 18px;
+            border: 0;
+
+            &:hover {
+                background: brand.$card-bg;
+            }
+        }
+
+        .text-dark-500 {
+            color: brand.$text-color !important;
+        }
+
+        // Subsections read as headers: bolder and larger than their units.
+        .collapsible-trigger .text-dark-500 {
+            font-size: 15px;
+            font-weight: brand.$font-weight-semibold;
+            line-height: 1.5;
+        }
+
+        // Units: smaller rows indented under their subsection's title, with
+        // no rules between them, so they read as children rather than peers.
+        .collapsible-body > ol > li,
+        .collapsible-body li.border-top {
+            border-top: 0 !important;
+        }
+
+        .collapsible-body > ol {
+            padding-bottom: 6px;
+        }
+
+        // The hover and open-unit fills float as rounded pills inset from the
+        // tray's edges (the link's m-0 / w-100 utilities need !important).
+        .collapsible-body ol li > a {
+            width: calc(100% - 20px) !important;
+            margin: 1px 10px !important;
+            padding: 9px 8px 9px 42px;
+            border-radius: 10px;
+            color: brand.$text-color-primary !important;
+            font-size: 14px;
+            transition: background brand.$interaction-transition;
+
+            &:hover {
+                background: brand.$card-bg;
+                color: brand.$text-color !important;
+            }
+        }
+
+        // Completion: a tan ring until done, a solid green tick once complete.
+        .text-gray-300 {
+            color: brand.$color-bark !important;
+        }
+
+        .text-success {
+            color: $learning-pass !important;
+        }
+
+        // The MFE marks the current section and unit with a light blue fill;
+        // the design uses sand for the open unit and section, nothing else.
+        .bg-info-100 {
+            background-color: transparent !important;
+        }
+
+        .course-sidebar-section .btn.bg-info-100 {
+            background-color: brand.$section-bg !important;
+        }
+
+        .collapsible-body li.bg-info-100 {
+            > a,
+            > a:hover {
+                background-color: brand.$section-bg;
+                color: brand.$text-color !important;
+                font-weight: brand.$font-weight-semibold;
+            }
+
+            .text-gray-300,
+            .col-auto svg.text-success {
+                color: brand.$accent !important;
+            }
+        }
+    }
+
+    // Discussions / notifications panel (right). The discussion itself is the
+    // discussions MFE in an iframe; only the frame is styled here.
+    #course-sidebar:not(.fixed-top) {
+        width: $learning-side-panel-width !important;
+        border: 1px solid brand.$border-color !important;
+        border-radius: $learning-card-radius;
+        box-shadow: $learning-card-shadow;
+    }
+
+    .discussions-sidebar-frame {
+        border-radius: ($learning-card-radius - 1px);
+    }
+
+    // Below 1200px the MFE opens the outline, notifications and discussions
+    // full-screen (fixed-top, w-100, vh-100). They float instead: an inset
+    // card over a dimmed page, below the course header, the outline from the
+    // left and the others from the right. The utilities are !important (the
+    // side panel also carries zindex-0), so these are too.
+    $learning-panel-top: calc(#{brand.$spacing-16} + 16px);
+
+    .outline-sidebar-wrapper.fixed-top,
+    #course-sidebar.fixed-top {
+        z-index: 1040 !important;
+        top: $learning-panel-top;
+        bottom: auto;
+        width: min(420px, calc(100vw - 32px)) !important;
+        height: auto !important;
+        max-height: calc(100dvh - #{brand.$spacing-16} - 32px);
+        border: 1px solid brand.$border-color !important;
+        border-radius: $learning-card-radius;
+        background: brand.$color-white !important;
+        box-shadow: 0 12px 40px rgba(brand.$color-espresso, 0.18), 0 0 0 100vmax rgba(brand.$color-espresso, 0.32);
+        overflow: hidden auto;
+    }
+
+    .outline-sidebar-wrapper.fixed-top {
+        right: auto;
+        left: 16px;
+
+        .outline-sidebar {
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        // A compact header and rows for the narrower floating card.
+        .outline-sidebar-heading-wrapper:not(.collapsed) {
+            padding: 12px 14px 12px 16px !important;
+        }
+
+        .outline-sidebar-heading,
+        button.outline-sidebar-heading {
+            font-size: 14.5px;
+            line-height: 1.45;
+        }
+
+        #outline-sidebar-outline {
+            .collapsible-trigger,
+            .course-sidebar-section .btn {
+                padding: 13px 16px !important;
+            }
+
+            .collapsible-trigger .text-dark-500 {
+                font-size: 14.5px;
+                line-height: 1.45;
+            }
+
+            .collapsible-body ol li > a {
+                width: calc(100% - 16px) !important;
+                margin: 1px 8px !important;
+                padding: 8px 8px 8px 38px;
+                font-size: 13.5px;
+            }
+        }
+    }
+
+    #course-sidebar.fixed-top {
+        right: 16px;
+        left: auto;
+        display: flex;
+        flex-direction: column;
+        animation: learning-panel-in-right 0.25s ease-out;
+
+        &.d-none {
+            display: none !important;
+        }
+
+        > :first-child {
+            flex: 0 0 auto;
+        }
+
+        // The discussion frame fills the card under its title bar.
+        .discussions-sidebar-frame {
+            position: static;
+            flex: 1 1 auto;
+            height: auto !important;
+            min-height: 0;
+            border-radius: 0;
+        }
+    }
+
+    // A discussion needs the full height; the other panels fit their content.
+    #course-sidebar.fixed-top:has(.discussions-sidebar-frame) {
+        height: calc(100dvh - #{brand.$spacing-16} - 32px) !important;
+    }
+
+    @media (max-width: 575.98px) {
+        .outline-sidebar-wrapper.fixed-top,
+        #course-sidebar.fixed-top {
+            width: calc(100vw - 24px) !important;
+        }
+
+        .outline-sidebar-wrapper.fixed-top {
+            left: 12px;
+        }
+
+        #course-sidebar.fixed-top {
+            right: 12px;
+        }
+    }
+
+    // The MFE pulls the unit's outline button left with a negative margin,
+    // out past the unit card's edge; keep it inside the card.
+    .top-unit-navigation .outline-trigger-mobile {
+        margin-left: 0 !important;
+    }
+
+    // Side panel title bar (Notifications), drawn like the Discussions head
+    // in the Course Unit design: serif title, hairline under it, a round
+    // muted close button.
+    #course-sidebar > .d-flex:has(> .course-sidebar-title) {
+        gap: brand.$spacing-3;
+        margin: 0 !important;
+        padding: 14px brand.$spacing-3 14px 22px;
+        border-bottom: 1px solid brand.$border-color;
+
+        .course-sidebar-title {
+            padding: 0 !important;
+            color: brand.$text-color;
+            font-family: brand.$font-family-brand-display;
+            font-size: 24px;
+            font-weight: brand.$font-weight-semibold;
+            line-height: 1.2;
+        }
+
+        > .d-inline-flex {
+            margin: 0 0 0 auto !important;
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            border-radius: 50%;
+            background: transparent !important;
+            color: brand.$text-color-muted !important;
+
+            .pgn__icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            &:hover:not(:disabled) {
+                background: brand.$section-bg !important;
+                color: brand.$text-color !important;
+            }
+        }
+    }
+
+    // "You have no new notifications at this time.": a centered empty state
+    // under a quiet bell (the design's bell, as a mask in the brand's tan).
+    #course-sidebar[data-testid="sidebar-NOTIFICATIONS"] > div > p.small {
+        margin: 0;
+        padding: 36px 22px 40px !important;
+        color: brand.$text-color-muted;
+        font-size: brand.$font-size-caption;
+        line-height: 1.6;
+        text-align: center;
+
+        &::before {
+            content: "";
+            display: block;
+            width: 28px;
+            height: 28px;
+            margin: 0 auto brand.$spacing-3;
+            background: brand.$color-bark;
+            @include learning-mask-icon(url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3.2a5.4 5.4 0 0 0-5.4 5.4c0 4.2-1.4 5.6-2.1 6.3a.6.6 0 0 0 .4 1h14.2a.6.6 0 0 0 .4-1c-.7-.7-2.1-2.1-2.1-6.3A5.4 5.4 0 0 0 12 3.2z'/%3E%3Cpath d='M10.2 19.2a2 2 0 0 0 3.6 0'/%3E%3C/svg%3E"));
+        }
+    }
+}
+
+
+// Unit page icons, sized as in the Course Unit design (the MFE draws them
+// from src/generic/WbaIcons at Paragon's 24px default).
+#root {
+    // Top row: discussion, notifications, previous, next.
+    .top-unit-navigation {
+        .notification-btn .pgn__icon,
+        .previous-button .btn-icon__icon,
+        .next-button .btn-icon__icon {
+            width: 17px;
+            height: 17px;
+        }
+
+        // The discussion and bell icons carry an inline navy/white color
+        // from the MFE; they take the button's brand color instead.
+        .notification-btn .pgn__icon {
+            color: inherit !important;
+        }
+    }
+
+    // Bottom Previous / Next.
+    .sequence-bottom-nav-buttons .btn .pgn__icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    // "Bookmark this page".
+    .unit .pgn__stateful-btn .pgn__icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    // Outline tray: close / reopen toggles and the back chevron.
+    .outline-sidebar-toggle-btn .btn-icon__icon {
+        width: 19px;
+        height: 19px;
+    }
+
+    .outline-sidebar-heading .pgn__icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    #outline-sidebar-outline {
+        // Completion ring / tick beside sections and subsections.
+        .course-sidebar-section .col-auto svg,
+        .collapsible-trigger .col-auto svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        // Chevrons: section rows and subsection accordions.
+        .course-sidebar-section .btn > .pgn__icon:last-child,
+        .collapsible-icon .pgn__icon {
+            width: 16px;
+            height: 16px;
+            color: brand.$text-color-muted;
+        }
+
+        // Unit type icons (video, reading, practice): muted brown whether done
+        // or not, saffron for the open unit (set further up). A completed unit
+        // shows a green tick at the end of its row instead.
+        .collapsible-body li > a .col-auto svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .collapsible-body li:not(.bg-info-100) > a .col-auto svg.text-gray-300,
+        .collapsible-body li:not(.bg-info-100) > a .col-auto svg.text-success {
+            color: brand.$text-color-muted !important;
+        }
+
+        .collapsible-body li > a .col-auto svg.sidebar-unit-done {
+            width: 19px;
+            height: 19px;
+            color: $learning-pass !important;
+        }
+    }
+}
+
+// Page titles on the Dates and Progress tabs ("Important dates", "Your progress").
+@mixin learning-page-title {
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display !important;
+    font-size: clamp(34px, 4.4vw, 46px);
+    font-weight: brand.$font-weight-medium;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+// Card titles on the Progress tab ("Course completion", "Grades" ...).
+// Platform text; the !important beats the heading rule in section 1.
+@mixin learning-card-title {
+    margin: 0;
+    color: brand.$text-color;
+    font-family: brand.$font-family-brand-display !important;
+    font-size: 30px;
+    font-weight: brand.$font-weight-medium;
+    line-height: 1.25;
+}
+
+// Explanatory paragraph under a Progress card title.
+@mixin learning-card-body {
+    margin: brand.$spacing-3 0 0;
+    max-width: 46ch;
+    color: brand.$text-color-muted;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+// ============================================================================
+// 7. Dates tab: timeline
+// ============================================================================
+
+#root .dates-tab-title {
+    @include learning-page-title;
+    margin: brand.$spacing-6 0 34px !important;
+}
+
+// One card holding a vertical line of dates. Past dates are an open ring,
+// today a saffron dot with a halo, future dates a filled brown dot.
+#root .dates-timeline {
+    @include learning-card;
+    margin-top: 0 !important;
+    padding: 36px 40px 40px !important;
+
+    // The design's 44px gap suits a short list; real courses list a date per
+    // session, so the gap is tighter.
+    .dates-day {
+        padding: 0 0 32px 46px !important;
+
+        &:last-child {
+            padding-bottom: 0 !important;
+        }
+
+        // The content column (Day renders it last, after the dot and lines).
+        > div:last-child {
+            display: block !important;
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+        }
+    }
+
+    // "Show 12 earlier dates" / "Hide earlier dates": dates before today
+    // start folded away so long schedules open on today. The control is a
+    // row of the timeline itself: an open ring in the dot column with a
+    // dashed line down to the next date (history tucked away), and a pill
+    // button where a date would be. The line turns solid once opened.
+    .dates-timeline-earlier {
+        position: relative;
+        padding: 0 0 28px 46px;
+
+        // Ring, centered on the 36px-tall button.
+        &::before {
+            content: "";
+            position: absolute;
+            top: 11px;
+            left: 7px;
+            width: 14px;
+            height: 14px;
+            border: 2px dashed brand.$color-bark;
+            border-radius: 50%;
+            background: brand.$color-white;
+            z-index: 1;
+        }
+
+        // Line from the ring down to the next date's dot.
+        &::after {
+            content: "";
+            position: absolute;
+            top: 25px;
+            bottom: -4px;
+            left: 13px;
+            border-left: 2px dashed brand.$color-bark;
+        }
+
+        &.is-open::before {
+            border-style: solid;
+            border-color: brand.$border-color;
+        }
+
+        &.is-open::after {
+            border-left: 2px solid brand.$border-color;
+        }
+
+        .btn-link {
+            gap: 6px;
+            min-height: 36px;
+            padding: 0 brand.$spacing-3 0 brand.$spacing-4 !important;
+            border: 1.5px solid brand.$border-color !important;
+            border-radius: brand.$border-radius-full;
+            background: brand.$color-white !important;
+            color: brand.$text-color-primary !important;
+            font-size: 13.5px;
+            font-weight: brand.$font-weight-semibold;
+            text-decoration: none !important;
+
+            .btn-icon-after,
+            .pgn__icon {
+                width: 18px;
+                height: 18px;
+                margin: 0;
+                color: brand.$text-color-muted;
+            }
+
+            &:hover:not(:disabled) {
+                border-color: brand.$color-bark !important;
+                background: brand.$section-bg !important;
+                color: brand.$text-color !important;
+            }
+        }
+    }
+
+    .dates-line-top {
+        display: none;
+    }
+
+    .dates-line-bottom {
+        top: 18px;
+        bottom: -4px;
+        left: 13px;
+        width: 2px;
+        border: 0 !important;
+        background: brand.$border-color !important;
+    }
+
+    .dates-dot {
+        top: 8px;
+        left: 7px;
+        width: 14px;
+        height: 14px;
+        border: 2px solid brand.$text-color-muted !important;
+        background: brand.$color-white;
+
+        // Today.
+        &.bg-warning-300 {
+            top: 6px;
+            left: 5px;
+            width: 18px;
+            height: 18px;
+            border: 0 !important;
+            background: brand.$accent !important;
+            box-shadow: 0 0 0 5px rgba(brand.$accent, 0.2);
+        }
+
+        // Future dates.
+        &.bg-gray-900 {
+            border-color: brand.$color-deep-saffron !important;
+            background: brand.$color-deep-saffron !important;
+        }
+
+        &.bg-light-500 {
+            border-color: brand.$secondary !important;
+            background: brand.$secondary !important;
+        }
+
+        &.bg-dark-200 {
+            border-color: brand.$color-danger !important;
+            background: brand.$color-danger !important;
+        }
+
+        &.bg-gray-500,
+        &.bg-dark-700 {
+            border-color: brand.$text-color-muted !important;
+            background: brand.$text-color-muted !important;
+        }
+    }
+
+    // The date itself.
+    [data-testid="dates-header"] {
+        flex-wrap: wrap;
+        gap: brand.$spacing-3;
+        margin-bottom: 0 !important;
+        color: brand.$text-color !important;
+        font-family: brand.$font-family-brand-display;
+        font-size: 28px;
+        font-weight: brand.$font-weight-medium;
+        line-height: 1.2;
+
+        .badge {
+            margin-left: 0 !important;
+        }
+    }
+
+    // Day and item badges: Today, Completed, Past due, Due next ...
+    .badge {
+        padding: brand.$spacing-1 10px;
+        border: 1.5px solid brand.$accent;
+        border-radius: brand.$border-radius-full;
+        background: brand.$card-bg !important;
+        color: brand.$color-deep-saffron !important;
+        font-family: brand.$font-family-brand-ui;
+        font-size: 12.5px;
+        font-weight: brand.$font-weight-bold;
+        letter-spacing: 1px;
+        line-height: 1.2;
+        text-transform: uppercase;
+        vertical-align: middle;
+
+        &.bg-light-500 {
+            border-color: brand.$success-text;
+            background: brand.$success-bg !important;
+            color: brand.$success-text !important;
+        }
+
+        &.bg-dark-200 {
+            border-color: brand.$color-danger;
+            background: brand.$error-bg !important;
+            color: brand.$color-danger !important;
+        }
+
+        &.bg-gray-500 {
+            border-color: brand.$accent;
+            background: brand.$accent !important;
+            color: brand.$accent-contrast !important;
+        }
+
+        &.border-gray-500 {
+            border-color: brand.$border-color !important;
+            background: brand.$color-white !important;
+            color: brand.$text-color-muted !important;
+        }
+
+        &.bg-dark-700 {
+            border-color: brand.$color-espresso;
+            background: brand.$color-espresso !important;
+            color: brand.$color-parchment !important;
+        }
+    }
+
+    // What happens on that date: a brown bold title, a muted description.
+    [data-testid="dates-item"] {
+        margin-top: 6px;
+        padding-bottom: 0 !important;
+        font-size: 15px;
+
+        &.text-primary-700 {
+            color: brand.$color-deep-saffron !important;
+        }
+
+        &.text-gray-500 {
+            color: brand.$text-color-muted !important;
+        }
+
+        .small {
+            font-size: inherit;
+        }
+
+        // The title is course-authored (often an assignment name).
+        .font-weight-bold {
+            font-family: $learning-author-font;
+        }
+
+        > div + div {
+            max-width: 60ch;
+            margin: brand.$spacing-1 0 0 !important;
+            color: brand.$text-color-muted;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        .badge {
+            margin-left: brand.$spacing-2 !important;
+            font-size: 11px;
+        }
+    }
+
+    // Session card padding and size, here to beat its .pb-1 / .small utilities.
+    .dates-section-schedule {
+        padding: 14px 18px 16px !important;
+        font-size: brand.$font-size-caption !important;
+    }
+}
+
+
+// ============================================================================
+// 8. Progress tab: completion, grades, certificate, related links
+// ============================================================================
+
+#root .progress-tab-header {
+    align-items: center;
+    gap: brand.$spacing-4;
+    margin: brand.$spacing-6 0 34px !important;
+
+    h1 {
+        @include learning-page-title;
+        margin: 0;
+    }
+
+    // "View grading in Studio".
+    .btn {
+        @include learning-button-ghost;
+        color: brand.$text-color !important;
+    }
+}
+
+// Main column and a fixed-width sidebar, as on the course home.
+#root .progress-tab {
+    @media (min-width: #{$learning-single-column + 1px}) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) $learning-sidebar-width;
+        column-gap: 40px;
+        align-items: start;
+
+        > .col-md-8,
+        > .col-md-4 {
+            max-width: none;
+            padding: 0 !important;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        grid-template-columns: minmax(0, 1fr) $learning-sidebar-width-wide;
+        column-gap: brand.$spacing-12;
+    }
+
+    @media (max-width: $learning-single-column) {
+        > .col-md-8,
+        > .col-md-4 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            padding: 0 !important;
+        }
+    }
+
+    // Cards in the main column, 26px apart. The grade breakdown wrapper
+    // (.grades) holds two of them, so it drops its own frame.
+    // The radius is !important to beat the .rounded utility these cards carry.
+    .raised-card {
+        @include learning-card;
+        border: 1px solid brand.$border-color !important;
+        border-radius: $learning-card-radius !important;
+        box-shadow: $learning-card-shadow !important;
+    }
+
+    > .col-md-8 > section,
+    .grades > section {
+        margin: 0 0 26px !important;
+    }
+
+    .grades {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent;
+        box-shadow: none !important;
+
+        > section {
+            @include learning-card;
+            border-radius: $learning-card-radius !important;
+            padding: 34px 36px;
+        }
+    }
+}
+
+// Course completion: title and text on the left, the donut on the right.
+#root .progress-tab > .col-md-8 > section.raised-card:has(.donut) {
+    padding: 34px 36px !important;
+
+    > .row {
+        align-items: center;
+    }
+
+    .mt-sm-n3 {
+        margin-top: 0 !important;
+    }
+}
+
+#root .progress-tab {
+    h2 {
+        @include learning-card-title;
+    }
+
+    h2 + p.small {
+        @include learning-card-body;
+    }
+
+    // Completion donut: saffron for done, a pale track for the rest, tan
+    // for content that isn't released yet.
+    .donut {
+        .donut-ring,
+        .donut-segment {
+            stroke-width: 4.4px;
+        }
+
+        .complete-stroke {
+            stroke: brand.$accent;
+        }
+
+        .incomplete-stroke {
+            stroke: $learning-track;
+        }
+
+        .locked-stroke {
+            stroke: brand.$color-bark;
+        }
+
+        .donut-segment-group:focus circle {
+            stroke-width: 5.2px;
+        }
+
+        .donut-chart-text {
+            fill: brand.$text-color;
+        }
+
+        .donut-chart-number {
+            font-family: brand.$font-family-brand-ui;
+            letter-spacing: -0.04em;
+        }
+
+        .donut-chart-label {
+            fill: brand.$text-color-muted;
+            font-family: brand.$font-family-brand-ui;
+        }
+    }
+}
+
+// Grades: title and text beside the grade bar, then a notice strip.
+#root .progress-tab > .col-md-8 > section.raised-card:has(.grade-bar) {
+    overflow: hidden;
+
+    .row.p-4 {
+        align-items: center;
+        padding: 34px 36px !important;
+    }
+
+    // Passing / not passing / due date notices along the bottom.
+    .bg-warning-100,
+    .bg-success-100 {
+        align-items: center;
+        padding: 18px 36px !important;
+        border-top: 1px solid brand.$border-color;
+        border-radius: 0 !important;
+        flex-wrap: nowrap;
+        gap: 14px;
+        color: brand.$text-color;
+        font-size: 15px;
+        font-weight: brand.$font-weight-semibold;
+
+        // The message carries .h4 (wide screens) or .h5; it is platform
+        // text at body size, not a heading.
+        .small,
+        .h4,
+        .h5 {
+            margin: 0;
+            font-family: brand.$font-family-brand-ui !important;
+            font-size: 15px;
+            font-weight: brand.$font-weight-semibold;
+            line-height: 1.5;
+        }
+
+        > .col-auto {
+            display: flex;
+        }
+
+        > .col-11 {
+            flex: 1 1 auto;
+            max-width: none;
+            padding: 0 !important;
+        }
+
+        .pgn__icon {
+            width: 19px;
+            height: 19px;
+        }
+    }
+
+    .bg-warning-100 {
+        background: brand.$card-bg !important;
+    }
+
+    .bg-success-100 {
+        border-top-color: $learning-pass-border;
+        background: $learning-pass-bg !important;
+
+        .pgn__icon {
+            color: $learning-pass;
+        }
+    }
+
+    // "Preview of your grades" bar shown when grades are locked.
+    #grade-course-header {
+        background: brand.$color-espresso !important;
+        color: brand.$color-parchment !important;
+    }
+}
+
+// Grades: "Your current grade" and "Passing grade" as two figures, over one
+// bar that fills to the current grade (saffron, green once passing) with a
+// dark tick at the passing grade. The small tick beside "Passing grade"
+// matches the one on the bar, so the two read together.
+#root .grade-bar {
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-4;
+
+    .grade-bar__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: brand.$spacing-3 brand.$spacing-8;
+    }
+
+    .grade-bar__stat {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .grade-bar__stat-label {
+        display: inline-flex;
+        align-items: center;
+        gap: brand.$spacing-2;
+        color: brand.$text-color-muted;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-bold;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+    }
+
+    .grade-bar__stat--passing .grade-bar__stat-label::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 3px;
+        height: 12px;
+        border-radius: 2px;
+        background: $learning-pass;
+    }
+
+    // The passing grade, its tick and its label on the bar share the pass green.
+    .grade-bar__stat--passing .grade-bar__stat-value {
+        color: $learning-pass !important;
+    }
+
+    .grade-bar__stat-value {
+        color: brand.$text-color;
+        font-size: 30px;
+        font-weight: brand.$font-weight-bold;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.5px;
+        line-height: 1.15;
+    }
+
+    &.is-not-passing .grade-bar__stat--current .grade-bar__stat-value {
+        color: brand.$color-deep-saffron;
+    }
+
+    &.is-passing .grade-bar__stat--current .grade-bar__stat-value {
+        color: $learning-pass;
+    }
+
+    .grade-bar__stat-note {
+        color: brand.$text-color-muted;
+        font-size: 12.5px;
+    }
+
+    .grade-bar__track {
+        position: relative;
+        height: 10px;
+        margin-top: brand.$spacing-2;
+        border-radius: brand.$border-radius-full;
+        background: $learning-track;
+    }
+
+    .grade-bar__fill {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        border-radius: inherit;
+        background: brand.$accent;
+        transition: width 0.4s ease;
+    }
+
+    &.is-passing .grade-bar__fill {
+        background: $learning-pass;
+    }
+
+    .grade-bar__pass-marker {
+        position: absolute;
+        z-index: 2;
+        top: -5px;
+        width: 3px;
+        height: 20px;
+        border-radius: 2px;
+        background: $learning-pass;
+        transform: translateX(-50%);
+    }
+
+    // 0%, the passing grade under its tick, and 100%.
+    .grade-bar__scale {
+        position: relative;
+        height: 20px;
+        color: brand.$text-color-muted;
+        font-size: 12.5px;
+        font-variant-numeric: tabular-nums;
+        line-height: 20px;
+    }
+
+    .grade-bar__scale-end,
+    .grade-bar__pass-label {
+        position: absolute;
+        top: 0;
+        white-space: nowrap;
+    }
+
+    .grade-bar__scale-end.is-at-start {
+        inset-inline-start: 0;
+    }
+
+    .grade-bar__scale-end.is-at-end {
+        inset-inline-end: 0;
+    }
+
+    .grade-bar__pass-label {
+        color: $learning-pass;
+        font-weight: brand.$font-weight-bold;
+        transform: translateX(-50%);
+
+        &.is-at-start {
+            transform: none;
+        }
+
+        &.is-at-end {
+            transform: translateX(-100%);
+        }
+    }
+
+    // Right-to-left: positions already come from inset-inline-start, so only
+    // the centring shifts flip.
+    [dir="rtl"] & {
+        .grade-bar__pass-marker,
+        .grade-bar__pass-label {
+            transform: translateX(50%);
+        }
+
+        .grade-bar__pass-label.is-at-start {
+            transform: none;
+        }
+
+        .grade-bar__pass-label.is-at-end {
+            transform: translateX(100%);
+        }
+    }
+}
+
+// The grade figures sit beside the card text from 576px up (the MFE's
+// columns); give the pair breathing room from the text, and on phones,
+// where they stack under it, space from the paragraph above.
+#root .progress-tab > .col-md-8 > section.raised-card:has(.grade-bar) .row.p-4 {
+    row-gap: brand.$spacing-6;
+
+    > .col-sm-6:first-child {
+        padding-inline-end: brand.$spacing-8 !important;
+    }
+
+    @media (max-width: 575.98px) {
+        > .col-sm-6:first-child {
+            padding-inline-end: 0 !important;
+        }
+    }
+}
+
+// Grade summary and detailed grades.
+#root .progress-tab .grades {
+    h3.h4 {
+        @include learning-card-title;
+    }
+
+    // Outline info and lock icons (src/generic/WbaIcons), muted like the
+    // notes around them.
+    .pgn__icon,
+    svg[data-testid="lock-icon"] {
+        color: brand.$text-color-muted;
+    }
+
+    // Info beside "Grade summary" and "Your current weighted grade".
+    .pgn__icon.pgn__icon__sm {
+        width: 18px;
+        height: 18px;
+    }
+
+    // A locked grade in the summary table.
+    svg[data-testid="lock-icon"] {
+        width: 16px;
+        height: 16px;
+        vertical-align: -3px;
+    }
+
+    // The lock in the "Hidden Scores" legend.
+    ul.micro b svg {
+        width: 15px;
+        height: 15px;
+        vertical-align: -2px;
+        color: brand.$text-color;
+    }
+
+    // Expand / collapse chevron on each detailed-grades row.
+    .collapsible-trigger .pgn__icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    // "Hidden scores — ..." and "Practice scores — ..." notes.
+    ul.micro {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin: 14px 0 0 !important;
+        padding: 0 !important;
+        list-style: none;
+        color: brand.$text-color-muted !important;
+        font-size: 13.5px;
+        line-height: 1.6;
+
+        b {
+            color: brand.$text-color;
+        }
+    }
+
+    // The frame goes on the wrapper, which holds both the table and the
+    // "Your current weighted grade" footer, so the footer shares its corners.
+    .pgn__data-table-wrapper {
+        margin-top: 22px;
+        border: 1px solid brand.$border-color;
+        border-radius: brand.$border-radius-lg;
+        background: brand.$color-white;
+        box-shadow: none;
+        overflow: hidden;
+    }
+
+    .pgn__data-table-container {
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    table.pgn__data-table {
+        width: 100%;
+        margin: 0;
+        border: 0;
+        border-collapse: collapse;
+    }
+
+    .pgn__data-table th {
+        padding: 14px 20px;
+        border: 0;
+        background: brand.$card-bg;
+        color: brand.$text-color-muted;
+
+        // Column labels: small uppercase.
+        .h5 {
+            margin: 0;
+            color: inherit;
+            font-family: brand.$font-family-brand-ui !important;
+            font-size: brand.$font-size-label;
+            font-weight: brand.$font-weight-bold;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+    }
+
+    .pgn__data-table td {
+        padding: brand.$spacing-4 20px;
+        border: 0;
+        border-top: 1px solid brand.$border-color;
+        background: transparent;
+        color: brand.$text-color;
+        font-size: 14.5px;
+        font-variant-numeric: tabular-nums;
+        vertical-align: middle;
+
+        .small {
+            font-size: inherit;
+        }
+    }
+
+    .pgn__data-table tbody tr {
+        background: transparent;
+        transition: background brand.$interaction-transition;
+
+        &:hover {
+            background: brand.$card-bg;
+        }
+    }
+
+    // "Your current weighted grade".
+    .pgn__data-table-footer {
+        margin: 0;
+        padding: brand.$spacing-4 20px;
+        border-radius: 0;
+        box-shadow: none;
+        border-top: 1px solid brand.$border-color !important;
+        background: brand.$card-bg !important;
+        color: brand.$text-color;
+
+        .small {
+            font-size: 14.5px;
+            font-weight: brand.$font-weight-semibold;
+        }
+
+        [data-testid="gradeSummaryFooterTotalWeightedGrade"] {
+            font-size: 17px;
+            font-weight: brand.$font-weight-bold;
+        }
+    }
+
+    // "The lowest 2 ... scores are dropped."
+    li.x-small {
+        color: brand.$text-color-muted;
+        font-size: 13px;
+    }
+
+    // Detailed grades: one table per section, headed by the section name.
+    > section:last-child {
+        .my-3 {
+            margin: 22px 0 0 !important;
+
+            .pgn__data-table-wrapper {
+                margin-top: 0;
+            }
+        }
+
+        // The section name is course-authored, so it keeps its case and font.
+        .pgn__data-table th:first-child .h5 {
+            color: brand.$text-color;
+            font-family: $learning-author-font !important;
+            font-size: 15.5px;
+            font-weight: brand.$font-weight-body;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        .pgn__data-table td {
+            padding: brand.$spacing-3 20px;
+        }
+
+        .pgn__data-table td:last-child {
+            font-weight: brand.$font-weight-semibold;
+        }
+
+        .collapsible-trigger {
+            color: brand.$text-color-muted;
+        }
+
+        a.muted-link {
+            color: brand.$text-color;
+            font-family: $learning-author-font;
+            font-size: 15px;
+            text-decoration: none;
+
+            &:hover {
+                color: brand.$color-deep-saffron;
+                text-decoration: underline;
+                text-underline-offset: 3px;
+            }
+        }
+
+        // Per-problem scores under an opened row.
+        .x-small {
+            color: brand.$text-color-muted;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+    }
+}
+
+// Sidebar: certificate status card and related links.
+#root .progress-tab [data-testid="certificate-status-component"] {
+    .pgn__card {
+        border: 1px solid brand.$border-color !important;
+        border-radius: $learning-card-radius;
+        background: brand.$card-bg !important;
+        box-shadow: $learning-card-shadow !important;
+    }
+
+    .pgn__card-header {
+        padding: 24px brand.$spacing-6 0;
+    }
+
+    // Paragon adds a top margin to the header content on top of the padding.
+    .pgn__card-header-content {
+        margin-top: 0;
+    }
+
+    .pgn__card-header-title-md {
+        margin: 0;
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-display;
+        font-size: 23px;
+        font-weight: brand.$font-weight-semibold;
+        line-height: 1.2;
+    }
+
+    .pgn__card-section {
+        padding: 10px brand.$spacing-6 24px;
+        color: brand.$text-color-muted !important;
+        font-size: brand.$font-size-caption;
+        line-height: 1.7;
+
+        a {
+            color: brand.$color-deep-saffron;
+            font-weight: brand.$font-weight-semibold;
+            text-decoration: underline;
+            text-decoration-color: rgba(brand.$color-deep-saffron, 0.25);
+            text-underline-offset: 3px;
+        }
+    }
+
+    // The text already ends with bottom padding; the footer only adds the
+    // button, and disappears when there is none.
+    .pgn__card-footer {
+        padding: 0 brand.$spacing-6 24px;
+
+        &:not(:has(.btn)) {
+            display: none;
+        }
+    }
+
+    // "View my certificate" and similar: a solid brown button.
+    .btn {
+        @include learning-button-base;
+        width: 100%;
+        border: 1.5px solid brand.$color-deep-saffron !important;
+        background: brand.$color-deep-saffron !important;
+        color: brand.$color-parchment !important;
+
+        &:hover:not(:disabled):not(.disabled) {
+            border-color: brand.$primary-hover !important;
+            background: brand.$primary-hover !important;
+        }
+    }
+}
+
+#root .progress-tab section.x-small {
+    padding: 0 brand.$spacing-1;
+
+    h3.h4 {
+        margin: 0;
+        color: brand.$text-color;
+        font-family: brand.$font-family-brand-display !important;
+        font-size: 23px;
+        font-weight: brand.$font-weight-semibold;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin: brand.$spacing-4 0 0;
+        padding: 0 !important;
+        list-style: none;
+    }
+
+    a {
+        color: brand.$color-deep-saffron;
+        font-size: 15px;
+        font-weight: brand.$font-weight-semibold;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(brand.$color-deep-saffron, 0.25);
+    }
+
+    p {
+        margin: 5px 0 0;
+        color: brand.$text-color-muted;
+        font-size: 13.5px;
+        line-height: 1.6;
+    }
+}
+
+
+// ============================================================================
+// 9. Narrow screens
+// ============================================================================
+
+@media (max-width: $learning-narrow) {
+    #root {
+        .course-sidebar-card,
+        .course-outline-tab [data-testid="start-resume-card"] {
+            border-radius: $learning-panel-radius;
+        }
+
+        .course-outline-tab [data-testid="start-resume-card"] .pgn__card-header {
+            padding: 22px 18px;
+        }
+
+        .unit-title-container h3 {
+            font-size: 25px;
+        }
+
+        .dates-timeline {
+            padding: 26px 20px 30px !important;
+        }
+
+        .progress-tab > .col-md-8 > section.raised-card:has(.donut),
+        .progress-tab > .col-md-8 > section.raised-card .row.p-4,
+        .progress-tab .grades > section {
+            padding: 24px 20px !important;
+        }
+
+        .progress-tab > .col-md-8 > section.raised-card .bg-warning-100,
+        .progress-tab > .col-md-8 > section.raised-card .bg-success-100 {
+            padding: brand.$spacing-4 20px !important;
+        }
+    }
+}
+
+// Floating side panels (notifications, discussions) slide in from the right.
+@keyframes learning-panel-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(1.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// The outline button's "Course outline" tooltip (Paragon renders it on the
+// body) keeps showing while the floating outline it opened is on screen.
+body:has(.outline-sidebar-wrapper.fixed-top) #course-outline-tooltip {
+    display: none !important;
 }
