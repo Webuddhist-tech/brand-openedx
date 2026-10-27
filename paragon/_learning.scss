@@ -397,10 +397,12 @@ h1, h2, h3, h4, h5, h6,
     }
 }
 
-// "View this course as" menu (Staff / Specific Student / a track), drawn
-// like the header's menus in _header.scss: white panel, sand hover, and the
-// selected row in sand, instead of Paragon's navy.
-#root [data-testid="instructor-toolbar"] .dropdown-menu {
+// "View this course as" menu (Staff / Specific Student / a track) and the
+// course tabs' "More..." menu, drawn like the header's menus in _header.scss:
+// white panel, sand hover, and the selected row in sand, instead of
+// Paragon's navy.
+#root [data-testid="instructor-toolbar"] .dropdown-menu,
+#root .course-tabs-navigation .dropdown-menu {
     min-width: 240px;
     margin-top: brand.$spacing-2;
     padding: brand.$border-radius-lg;
@@ -498,6 +500,27 @@ h1, h2, h3, h4, h5, h6,
         &.active {
             font-weight: brand.$font-weight-semibold;
         }
+    }
+
+    // "More..." (tabs that don't fit on narrow screens): a tab like the rest,
+    // not Paragon's underlined link button. Its ::after is Paragon's dropdown
+    // caret, which the tab underline above turns into a stray mark, so it is
+    // dropped; the open state shows in the label colour.
+    .nav-underline-tabs .dropdown-toggle.nav-link {
+        box-shadow: none !important;
+        text-decoration: none !important;
+
+        &::after {
+            display: none;
+        }
+
+        &[aria-expanded="true"] {
+            color: brand.$text-color !important;
+        }
+    }
+
+    .dropdown-menu {
+        min-width: 200px;
     }
 
     .search-toggle {
@@ -609,6 +632,12 @@ h1, h2, h3, h4, h5, h6,
 
         > .d-flex {
             gap: brand.$spacing-3;
+        }
+
+        // On phones the MFE stacks the header (display: block), so the gap
+        // above no longer separates the heading from the buttons.
+        @media (max-width: 575.98px) {
+            margin-top: 18px;
         }
     }
 
@@ -1134,6 +1163,16 @@ body .pgn__checkpoint {
         }
     }
 
+    // Below 1200px the outline button leads the card's top row. The MFE pulls
+    // that row up 2rem (mt-n4.5), leaving the button 8px from the card's top
+    // but 32px from its side; -8px gives 24px padding + 16px row padding - 8px
+    // = 32px, the same inset on both sides.
+    @media (min-width: 576px) and (max-width: 1199.98px) {
+        .top-unit-navigation.mt-n4\.5 {
+            margin-top: -(brand.$spacing-2) !important;
+        }
+    }
+
     // Keeps the iframe 8px in from the card edge, as before the padding change.
     @media (min-width: 830px) {
         .unit-iframe-wrapper {
@@ -1357,17 +1396,33 @@ body .pgn__checkpoint {
             color: brand.$text-color !important;
         }
 
-        .collapsible-body > ol > li {
-            border-top: 1px solid brand.$section-bg;
+        // Subsections read as headers: bolder and larger than their units.
+        .collapsible-trigger .text-dark-500 {
+            font-size: 15px;
+            font-weight: brand.$font-weight-semibold;
+            line-height: 1.5;
         }
 
+        // Units: smaller rows indented under their subsection's title, with
+        // no rules between them, so they read as children rather than peers.
+        .collapsible-body > ol > li,
         .collapsible-body li.border-top {
-            border-top-color: brand.$section-bg !important;
+            border-top: 0 !important;
         }
 
+        .collapsible-body > ol {
+            padding-bottom: 6px;
+        }
+
+        // The hover and open-unit fills float as rounded pills inset from the
+        // tray's edges (the link's m-0 / w-100 utilities need !important).
         .collapsible-body ol li > a {
-            padding: 13px 18px 13px 44px;
+            width: calc(100% - 20px) !important;
+            margin: 1px 10px !important;
+            padding: 9px 8px 9px 42px;
+            border-radius: 10px;
             color: brand.$text-color-primary !important;
+            font-size: 14px;
             transition: background brand.$interaction-transition;
 
             &:hover {
@@ -1376,13 +1431,13 @@ body .pgn__checkpoint {
             }
         }
 
-        // Completion: a tan ring until done, teal once complete.
+        // Completion: a tan ring until done, a solid green tick once complete.
         .text-gray-300 {
             color: brand.$color-bark !important;
         }
 
         .text-success {
-            color: brand.$secondary !important;
+            color: $learning-pass !important;
         }
 
         // The MFE marks the current section and unit with a light blue fill;
@@ -1396,14 +1451,15 @@ body .pgn__checkpoint {
         }
 
         .collapsible-body li.bg-info-100 {
-            background-color: brand.$section-bg !important;
-
-            > a {
+            > a,
+            > a:hover {
+                background-color: brand.$section-bg;
                 color: brand.$text-color !important;
                 font-weight: brand.$font-weight-semibold;
             }
 
-            .text-gray-300 {
+            .text-gray-300,
+            .col-auto svg.text-success {
                 color: brand.$accent !important;
             }
         }
@@ -1420,6 +1476,119 @@ body .pgn__checkpoint {
 
     .discussions-sidebar-frame {
         border-radius: ($learning-card-radius - 1px);
+    }
+
+    // Below 1200px the MFE opens the outline, notifications and discussions
+    // full-screen (fixed-top, w-100, vh-100). They float instead: an inset
+    // card over a dimmed page, below the course header, the outline from the
+    // left and the others from the right. The utilities are !important (the
+    // side panel also carries zindex-0), so these are too.
+    $learning-panel-top: calc(#{brand.$spacing-16} + 16px);
+
+    .outline-sidebar-wrapper.fixed-top,
+    #course-sidebar.fixed-top {
+        z-index: 1040 !important;
+        top: $learning-panel-top;
+        bottom: auto;
+        width: min(420px, calc(100vw - 32px)) !important;
+        height: auto !important;
+        max-height: calc(100dvh - #{brand.$spacing-16} - 32px);
+        border: 1px solid brand.$border-color !important;
+        border-radius: $learning-card-radius;
+        background: brand.$color-white !important;
+        box-shadow: 0 12px 40px rgba(brand.$color-espresso, 0.18), 0 0 0 100vmax rgba(brand.$color-espresso, 0.32);
+        overflow: hidden auto;
+    }
+
+    .outline-sidebar-wrapper.fixed-top {
+        right: auto;
+        left: 16px;
+
+        .outline-sidebar {
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        // A compact header and rows for the narrower floating card.
+        .outline-sidebar-heading-wrapper:not(.collapsed) {
+            padding: 12px 14px 12px 16px !important;
+        }
+
+        .outline-sidebar-heading,
+        button.outline-sidebar-heading {
+            font-size: 14.5px;
+            line-height: 1.45;
+        }
+
+        #outline-sidebar-outline {
+            .collapsible-trigger,
+            .course-sidebar-section .btn {
+                padding: 13px 16px !important;
+            }
+
+            .collapsible-trigger .text-dark-500 {
+                font-size: 14.5px;
+                line-height: 1.45;
+            }
+
+            .collapsible-body ol li > a {
+                width: calc(100% - 16px) !important;
+                margin: 1px 8px !important;
+                padding: 8px 8px 8px 38px;
+                font-size: 13.5px;
+            }
+        }
+    }
+
+    #course-sidebar.fixed-top {
+        right: 16px;
+        left: auto;
+        display: flex;
+        flex-direction: column;
+        animation: learning-panel-in-right 0.25s ease-out;
+
+        &.d-none {
+            display: none !important;
+        }
+
+        > :first-child {
+            flex: 0 0 auto;
+        }
+
+        // The discussion frame fills the card under its title bar.
+        .discussions-sidebar-frame {
+            position: static;
+            flex: 1 1 auto;
+            height: auto !important;
+            min-height: 0;
+            border-radius: 0;
+        }
+    }
+
+    // A discussion needs the full height; the other panels fit their content.
+    #course-sidebar.fixed-top:has(.discussions-sidebar-frame) {
+        height: calc(100dvh - #{brand.$spacing-16} - 32px) !important;
+    }
+
+    @media (max-width: 575.98px) {
+        .outline-sidebar-wrapper.fixed-top,
+        #course-sidebar.fixed-top {
+            width: calc(100vw - 24px) !important;
+        }
+
+        .outline-sidebar-wrapper.fixed-top {
+            left: 12px;
+        }
+
+        #course-sidebar.fixed-top {
+            right: 12px;
+        }
+    }
+
+    // The MFE pulls the unit's outline button left with a negative margin,
+    // out past the unit card's edge; keep it inside the card.
+    .top-unit-navigation .outline-trigger-mobile {
+        margin-left: 0 !important;
     }
 
     // Side panel title bar (Notifications), drawn like the Discussions head
@@ -1534,8 +1703,8 @@ body .pgn__checkpoint {
         // Completion ring / tick beside sections and subsections.
         .course-sidebar-section .col-auto svg,
         .collapsible-trigger .col-auto svg {
-            width: 17px;
-            height: 17px;
+            width: 19px;
+            height: 19px;
         }
 
         // Chevrons: section rows and subsection accordions.
@@ -1546,15 +1715,23 @@ body .pgn__checkpoint {
             color: brand.$text-color-muted;
         }
 
-        // Unit type icons (video, reading, practice): muted brown until done,
-        // teal once complete, saffron for the open unit (set further up).
+        // Unit type icons (video, reading, practice): muted brown whether done
+        // or not, saffron for the open unit (set further up). A completed unit
+        // shows a green tick at the end of its row instead.
         .collapsible-body li > a .col-auto svg {
             width: 16px;
             height: 16px;
         }
 
-        .collapsible-body li:not(.bg-info-100) > a .col-auto svg.text-gray-300 {
+        .collapsible-body li:not(.bg-info-100) > a .col-auto svg.text-gray-300,
+        .collapsible-body li:not(.bg-info-100) > a .col-auto svg.text-success {
             color: brand.$text-color-muted !important;
+        }
+
+        .collapsible-body li > a .col-auto svg.sidebar-unit-done {
+            width: 19px;
+            height: 19px;
+            color: $learning-pass !important;
         }
     }
 }
@@ -2067,116 +2244,178 @@ body .pgn__checkpoint {
     }
 }
 
-// Rounded ends come from rx attributes in the MFE's SVG markup; CSS rx needs
-// Safari 17.4+.
+// Grades: "Your current grade" and "Passing grade" as two figures, over one
+// bar that fills to the current grade (saffron, green once passing) with a
+// dark tick at the passing grade. The small tick beside "Passing grade"
+// matches the one on the bar, so the two read together.
 #root .grade-bar {
-    rect {
-        height: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: brand.$spacing-4;
+
+    .grade-bar__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: brand.$spacing-3 brand.$spacing-8;
     }
 
-    text {
-        fill: brand.$text-color;
-        font-family: brand.$font-family-brand-ui;
-        font-size: brand.$font-size-caption;
+    .grade-bar__stat {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
     }
 
-    .grade-bar__base {
-        fill: $learning-track;
+    .grade-bar__stat-label {
+        display: inline-flex;
+        align-items: center;
+        gap: brand.$spacing-2;
+        color: brand.$text-color-muted;
+        font-size: brand.$font-size-label;
+        font-weight: brand.$font-weight-bold;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
     }
 
-    // The bar draws a passing-grade fill under the current grade; the design
-    // shows only a marker at the passing grade.
-    rect.grade-bar--passing {
-        fill: transparent;
-    }
-
-    // The passing grade is an upright dark tick across the bar (the marker
-    // rect PassingGradeTooltip adds), not the dot the MFE draws.
-    circle.grade-bar--passing {
-        fill: transparent;
-    }
-
-    rect.grade-bar__passing-marker {
+    .grade-bar__stat--passing .grade-bar__stat-label::before {
+        content: "";
+        flex: 0 0 auto;
         width: 3px;
-        height: 19px;
-        fill: brand.$color-espresso;
-        transform: translateX(-1.5px);
+        height: 12px;
+        border-radius: 2px;
+        background: $learning-pass;
     }
 
-    // Start, end and current-grade dividers: the design has none.
-    .grade-bar__divider {
-        display: none;
+    // The passing grade, its tick and its label on the bar share the pass green.
+    .grade-bar__stat--passing .grade-bar__stat-value {
+        color: $learning-pass !important;
     }
 
-    .grade-bar--current-passing {
-        fill: $learning-pass;
+    .grade-bar__stat-value {
+        color: brand.$text-color;
+        font-size: 30px;
+        font-weight: brand.$font-weight-bold;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.5px;
+        line-height: 1.15;
     }
 
-    .grade-bar--current-non-passing {
-        fill: brand.$accent;
+    &.is-not-passing .grade-bar__stat--current .grade-bar__stat-value {
+        color: brand.$color-deep-saffron;
+    }
+
+    &.is-passing .grade-bar__stat--current .grade-bar__stat-value {
+        color: $learning-pass;
+    }
+
+    .grade-bar__stat-note {
+        color: brand.$text-color-muted;
+        font-size: 12.5px;
+    }
+
+    .grade-bar__track {
+        position: relative;
+        height: 10px;
+        margin-top: brand.$spacing-2;
+        border-radius: brand.$border-radius-full;
+        background: $learning-track;
+    }
+
+    .grade-bar__fill {
+        position: relative;
+        z-index: 1;
+        height: 100%;
+        border-radius: inherit;
+        background: brand.$accent;
+        transition: width 0.4s ease;
+    }
+
+    &.is-passing .grade-bar__fill {
+        background: $learning-pass;
+    }
+
+    .grade-bar__pass-marker {
+        position: absolute;
+        z-index: 2;
+        top: -5px;
+        width: 3px;
+        height: 20px;
+        border-radius: 2px;
+        background: $learning-pass;
+        transform: translateX(-50%);
+    }
+
+    // 0%, the passing grade under its tick, and 100%.
+    .grade-bar__scale {
+        position: relative;
+        height: 20px;
+        color: brand.$text-color-muted;
+        font-size: 12.5px;
+        font-variant-numeric: tabular-nums;
+        line-height: 20px;
+    }
+
+    .grade-bar__scale-end,
+    .grade-bar__pass-label {
+        position: absolute;
+        top: 0;
+        white-space: nowrap;
+    }
+
+    .grade-bar__scale-end.is-at-start {
+        inset-inline-start: 0;
+    }
+
+    .grade-bar__scale-end.is-at-end {
+        inset-inline-end: 0;
+    }
+
+    .grade-bar__pass-label {
+        color: $learning-pass;
+        font-weight: brand.$font-weight-bold;
+        transform: translateX(-50%);
+
+        &.is-at-start {
+            transform: none;
+        }
+
+        &.is-at-end {
+            transform: translateX(-100%);
+        }
+    }
+
+    // Right-to-left: positions already come from inset-inline-start, so only
+    // the centring shifts flip.
+    [dir="rtl"] & {
+        .grade-bar__pass-marker,
+        .grade-bar__pass-label {
+            transform: translateX(50%);
+        }
+
+        .grade-bar__pass-label.is-at-start {
+            transform: none;
+        }
+
+        .grade-bar__pass-label.is-at-end {
+            transform: translateX(100%);
+        }
     }
 }
 
-// Grade bar labels. Popovers render outside #root, so these hang off their ids.
-body #minimum-grade-tooltip,
-body #passing-grade-tooltip,
-body #non-passing-grade-tooltip {
-    border: 0;
-    border-radius: brand.$border-radius-md;
-    font-family: brand.$font-family-brand-ui;
-    font-size: brand.$font-size-caption;
-    font-weight: brand.$font-weight-bold;
+// The grade figures sit beside the card text from 576px up (the MFE's
+// columns); give the pair breathing room from the text, and on phones,
+// where they stack under it, space from the paragraph above.
+#root .progress-tab > .col-md-8 > section.raised-card:has(.grade-bar) .row.p-4 {
+    row-gap: brand.$spacing-6;
 
-    .popover-body {
-        padding: 7px brand.$spacing-3;
+    > .col-sm-6:first-child {
+        padding-inline-end: brand.$spacing-8 !important;
     }
 
-    // The design shows plain badges with no pointer. Hidden, not removed:
-    // the popover's positioning measures the arrow, and the space it keeps
-    // is the gap between each badge and the bar.
-    .arrow {
-        visibility: hidden;
-    }
-}
-
-body #minimum-grade-tooltip {
-    background: brand.$color-espresso !important;
-
-    .popover-body {
-        color: brand.$color-parchment !important;
-    }
-
-    .arrow::after {
-        border-bottom-color: brand.$color-espresso;
-    }
-}
-
-body #passing-grade-tooltip {
-    background: $learning-pass;
-
-    .popover-body {
-        color: brand.$color-white !important;
-    }
-
-    .arrow::after {
-        border-top-color: $learning-pass;
-    }
-}
-
-body #non-passing-grade-tooltip {
-    border: 1.5px solid brand.$accent;
-    background: brand.$card-bg;
-
-    .popover-body {
-        color: brand.$text-color !important;
-    }
-
-    .arrow::before {
-        border-top-color: brand.$accent;
-    }
-
-    .arrow::after {
-        border-top-color: brand.$card-bg;
+    @media (max-width: 575.98px) {
+        > .col-sm-6:first-child {
+            padding-inline-end: 0 !important;
+        }
     }
 }
 
@@ -2184,6 +2423,40 @@ body #non-passing-grade-tooltip {
 #root .progress-tab .grades {
     h3.h4 {
         @include learning-card-title;
+    }
+
+    // Outline info and lock icons (src/generic/WbaIcons), muted like the
+    // notes around them.
+    .pgn__icon,
+    svg[data-testid="lock-icon"] {
+        color: brand.$text-color-muted;
+    }
+
+    // Info beside "Grade summary" and "Your current weighted grade".
+    .pgn__icon.pgn__icon__sm {
+        width: 18px;
+        height: 18px;
+    }
+
+    // A locked grade in the summary table.
+    svg[data-testid="lock-icon"] {
+        width: 16px;
+        height: 16px;
+        vertical-align: -3px;
+    }
+
+    // The lock in the "Hidden Scores" legend.
+    ul.micro b svg {
+        width: 15px;
+        height: 15px;
+        vertical-align: -2px;
+        color: brand.$text-color;
+    }
+
+    // Expand / collapse chevron on each detailed-grades row.
+    .collapsible-trigger .pgn__icon {
+        width: 16px;
+        height: 16px;
     }
 
     // "Hidden scores — ..." and "Practice scores — ..." notes.
@@ -2489,4 +2762,23 @@ body #non-passing-grade-tooltip {
             padding: brand.$spacing-4 20px !important;
         }
     }
+}
+
+// Floating side panels (notifications, discussions) slide in from the right.
+@keyframes learning-panel-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(1.5rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+// The outline button's "Course outline" tooltip (Paragon renders it on the
+// body) keeps showing while the floating outline it opened is on screen.
+body:has(.outline-sidebar-wrapper.fixed-top) #course-outline-tooltip {
+    display: none !important;
 }
