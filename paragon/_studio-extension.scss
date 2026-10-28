@@ -1,0 +1,4 @@
+// Studio Extension MFE-specific overrides.
+@use "./variables" as brand;
+@import "./overrides";
+@import "./common/studio-header";
